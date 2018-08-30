@@ -1,0 +1,192 @@
+body {
+  padding: 0;
+  margin: 0;
+  background-color: white;
+}
+
+/**
+ * These styles are for backoffice !!
+ */
+
+@keyframes target-active {
+  from {
+    background: red;
+  }
+  to {
+    background: rgb(158, 226, 0);
+  }
+}
+
+@keyframes target-can-drop {
+  to {
+    min-height: 8px;
+    background: red;
+    border-radius: 6px;
+    padding: 21px 0px;
+  }
+}
+
+.target {
+  /* min-height: 8px; */
+  border: 0px dashed;
+  background: none; /* none */
+  transition: padding 200ms ease-in-out, background-color 200ms ease-in-out, border-radius 200ms ease-in-out, margin 200ms ease-in-out, border 200ms ease-in-out,
+    border-color 200ms ease-in-out, font-size 200ms ease-in-out, color 200ms ease-in-out;
+  font-family: "Chinese Quote", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica,
+    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  position: relative;
+}
+
+.target.can-drop {
+  background: #e8eef2;
+  border: 3px dashed #c2d2dc;
+  border-radius: 12px;
+  padding: 14px 0px;
+  margin: 8px 0px;
+  font-size: 26px !important;
+  color: #3c657f;
+
+  /* transition: padding border-radius 1000ms; */
+  /* animation-name: target-can-drop;
+  animation-duration: 450ms;
+  animation-fill-mode: both; */
+}
+
+.target.active {
+  padding: 32px 0px;
+  background: #c2d2dc;
+  border: 3px dashed #8ea8b9;
+
+  /* animation-name: target-active;
+  animation-duration: 250ms;
+  animation-fill-mode: both; */
+}
+
+.wrapper-header {
+  height: auto;
+  width: 100%;
+  background: black;
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: none;
+  z-index: 201;
+  padding: 0 16px;
+}
+
+[draggable~="true"]:hover .wrapper-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+[draggable~="true"]:hover::after {
+  background-color: rgba(0, 0, 0, 0.25);
+  border: 2px solid black;
+}
+
+[draggable~="true"]::after {
+  z-index: 200;
+  content: "";
+  background-color: rgba(0, 0, 0, 0);
+  transition: background-color 85ms ease-in-out;
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.ui-button {
+  border-radius: 4px;
+  padding: 4px 12px;
+  margin: 6px 4px;
+  color: white;
+  -webkit-transition-duration: 0.4s; /* Safari */
+  transition-duration: 0.4s;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.2);
+  font-weight: bold;
+  background: none;
+  font-size: 2.2em;
+  font-weight: 200;
+}
+
+.ui-button:disabled {
+  cursor: not-allowed;
+  background-color: #8e8e8e;
+}
+
+.ui-button.red {
+  color: white;
+}
+
+.ui-button:hover {
+  background-color: #5a5a5a;
+  color: white;
+}
+
+.editMove {
+  width: 26px;
+  height: 26px;
+  background: url("assets/images/more.svg") no-repeat;
+  background-size: 26px;
+  margin-top: 4px;
+  cursor: grab;
+  margin: 0 15px;
+}
+
+.avatar {
+  border-radius: 50%;
+  background-color: #ccc;
+  width: 35px;
+  height: 35px;
+  background-image: url("assets/images/avatar.svg");
+  background-repeat: no-repeat;
+  background-size: 25px;
+  background-position: center;
+  margin-top: 4px;
+}
+
+.composer-error-render {
+  border: 2px dashed #aa3939;
+  background: #d46a6a;
+  margin: 16px 12px;
+  padding: 8px 20px;
+  border-radius: 12px;
+  color: #ffcccc;
+}
+.composer-error-render h2 {
+  color: white;
+  font-size: 32px;
+}
+
+.composer-error-render details {
+  margin-bottom: 16px;
+  overflow-y: auto;
+  max-height: 420px;
+  background: white;
+  padding: 12px 20px;
+  color: black;
+  border-radius: 12px;
+  box-shadow: 0px 0px 12px 0px rgba(255, 255, 255, 0.95);
+  font-size: 18px;
+  white-space: pre-wrap;
+}
+
+canvas {
+  border: 1px solid red;
+}
+
+.layout {
+  padding: 0px;
+}
+
+.layout.active {
+  /* background: #E2FB82; */
+  background: #E0F4BD;
+  border: 2px solid #DAF95F;
+  padding: 8px 0px;
+}

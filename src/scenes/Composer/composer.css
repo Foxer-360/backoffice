@@ -1,0 +1,9 @@
+.button-right {
+  margin-left: 12px;
+}
+
+.composer-content-holder {
+  padding: 0px;
+  overflow: hidden;
+  height: 100%;
+}

@@ -1,0 +1,27 @@
+.alert-enter {
+  opacity: 0;
+  margin-top: 0px;
+  height: 0px;
+  overflow: hidden;
+}
+
+.alert-enter.alert-enter-active {
+  opacity: 1;
+  margin-top: 16px;
+  height: auto;
+  transition: opacity 300ms ease-in, margin 100ms ease-in;
+}
+
+.alert-leave {
+  opacity: 1;
+  margin-top: 16px;
+  height: auto;
+}
+
+.alert-leave.alert-leave-active {
+  opacity: 0;
+  margin-top: 0px;
+  height: 0px;
+  overflow: hidden;
+  transition: opacity 300ms ease-in, margin 100ms ease-out;
+}

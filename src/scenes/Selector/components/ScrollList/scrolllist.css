@@ -1,0 +1,9 @@
+div.scroll-list-wrapper {
+  background: white;
+  padding: 10px;
+  margin: 15px;
+  height: 240px;
+  overflow: auto;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+}
