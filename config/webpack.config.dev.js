@@ -12,7 +12,7 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const deps = require('./deps');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // In development, we always serve from the root. This makes config easier.
@@ -29,6 +29,9 @@ const env = getClientEnvironment(publicUrl);
 function srcPath(subdir) {
   return path.join(__dirname, "src", subdir);
 }
+
+// Files which will be excluded from check of importing outside src folder
+const allowedOutsideFiles = deps.getFilesToAllow([ 'components.json', 'plugins.json' ]);
 
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
@@ -80,7 +83,7 @@ module.exports = {
     // We placed these paths second because we want `node_modules` to "win"
     // if there are any conflicts. This matches Node resolution mechanism.
     // https://github.com/facebookincubator/create-react-app/issues/253
-    modules: ['node_modules', paths.appNodeModules].concat(
+    modules: ['node_modules', paths.appNodeModules, deps.componentsPath, deps.pluginsPath].concat(
       // It is guaranteed to exist because we tweak it in `env.js`
       process.env.NODE_PATH.split(path.delimiter).filter(Boolean)
     ),
@@ -115,9 +118,8 @@ module.exports = {
       // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
       // please link the files into your node_modules/ and let module-resolution kick in.
       // Make sure your source files are compiled, as they will not be processed in any way.
-      new ModuleScopePlugin(paths.appSrc, [paths.appPackageJson]),
+      new ModuleScopePlugin(paths.appSrc, [paths.appPackageJson, ...allowedOutsideFiles]),
       new TsconfigPathsPlugin({ configFile: paths.appTsConfig }),
-      new BundleAnalyzerPlugin(),
     ],
   },
   module: {
