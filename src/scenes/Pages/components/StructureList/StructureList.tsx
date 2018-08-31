@@ -3,7 +3,7 @@ import { Button, Popconfirm, Table } from 'antd';
 import CreatePageModal from './components/CreatePageModal';
 import Actions from './components/Actions';
 import { Query } from 'react-apollo';
-import { queries } from 'services/graphql';
+import { queries } from '@source/services/graphql';
 import { adopt } from 'react-adopt';
 
 const { Component } = React;

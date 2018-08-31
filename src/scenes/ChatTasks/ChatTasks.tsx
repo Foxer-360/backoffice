@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Card, Col, Icon, Row, Spin, Drawer, Button, Tabs } from 'antd';
 import { Query, Mutation, Subscription } from 'react-apollo';
-import { queries, mutations, subscriptions } from 'services/graphql';
+import { queries, mutations, subscriptions } from '@source/services/graphql';
 import { adopt } from 'react-adopt';
 import Chat from './components/Chat';
 import { ChatItem } from './components/Chat/Chat';

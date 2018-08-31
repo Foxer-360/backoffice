@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Button, Input, Row, Col, Tooltip, Select, Alert } from 'antd';
 import { indexOf } from 'lodash';
 import { CreateWebsiteDto } from '../../../../services/api/resources/environment';
-import { queries } from 'services/graphql';
+import { queries } from '@source/services/graphql';
 import { Query } from 'react-apollo';
 
 const { Component } = React;

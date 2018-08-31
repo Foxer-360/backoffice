@@ -5,7 +5,7 @@ import Actions from './components/Actions';
 import ModalWindow from './components/ModalWindow';
 import { adopt } from 'react-adopt';
 import { Query, Mutation } from 'react-apollo';
-import { queries, mutations } from 'services/graphql';
+import { queries, mutations } from '@source/services/graphql';
 
 const { Component } = React;
 
