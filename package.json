@@ -73,7 +73,7 @@
     "test": "node scripts/test.js --env=jsdom",
     "buildCss": "node scripts/buildCss.js",
     "deps": "node scripts/deps.js",
-    "removeDeps": "rm -rf ./components ./plugins ./public/styles",
+    "removeDeps": "node scripts/removeDeps.js",
     "updateDeps": "yarn removeDeps && yarn deps"
   },
   "devDependencies": {
