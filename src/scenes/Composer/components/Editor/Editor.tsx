@@ -4,7 +4,7 @@ import Sidebar from './components/Sidebar';
 import View from './components/View';
 import { AddComponentObject, ComponentsServiceLikeClass, EditorInfo, LockInfo } from '../../Composer';
 import DelayComponent from './components/DelayComponent';
-import { getObjectFromContent, IContent, IComponent } from 'delta';
+import { getObjectFromContent, IContent, IComponent } from '@foxer360/delta';
 
 const { Component } = React;
 

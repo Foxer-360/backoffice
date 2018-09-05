@@ -12,6 +12,7 @@ const iFrameInitContent = `<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=0.5">
     <link rel="stylesheet" type="text/css" href="/frame.css">
     <link rel="stylesheet" type="text/css" href="${styleFile}">
+    <link rel="stylesheet" type="text/css" href="/styles/fromGit.css">
   </head>
   <body>
     <div id="mountHere"></div>
@@ -29,7 +30,6 @@ const simpleStyle = {
 
 class Frame extends Component<{}, {}> {
   render() {
-
     return (
       <ReactFrame initialContent={iFrameInitContent} mountTarget="#mountHere" style={simpleStyle}>
         <div>{this.props.children ? this.props.children : null}</div>

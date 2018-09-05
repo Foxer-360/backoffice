@@ -22,11 +22,18 @@ function convertJson2Array(filePath) {
 
     const baseLibPath = path.resolve(appPath, type);
 
+    // Resolve css files
+    let stylePath = undefined;
+    if (json[keys[i]].style) {
+      stylePath = path.resolve(baseLibPath, keys[i], json[keys[i]].style);
+    }
+
     res.push(Object.assign(json[keys[i]], {
       name: keys[i],
       type,
       target: path.resolve(appPath, json[keys[i]].path),
       libPath: path.resolve(baseLibPath, keys[i]),
+      stylePath,
     }));
   }
 
@@ -61,7 +68,7 @@ function parseMainFile(lib) {
  *
  * @param {string[]} configs array of config json files relative to app folder
  */
-function getFilesToAllow(configs) {
+function getFilesToAllow2(configs) {
   const res = [];
 
   for (let i = 0; i < configs.length; i++) {
@@ -103,10 +110,43 @@ function getLibDefinitions(configs) {
   return res;
 }
 
+/**
+ * Get array of main files of libs to allow import them out of sources.
+ *
+ * @param {string} config relative path to config file
+ * @return {string[]} files which will be allowed to import from src folder
+ */
+function getFilesToAllow(config) {
+  const fp = path.resolve(__dirname, config);
+  if (!fs.existsSync(fp)) {
+    console.log(`Config file ${config} doen't exists. Please try to run yarn deps`);
+    return null;
+  }
+
+  const deps = require(fp);
+  if (!deps || !deps.components || !deps.plugins) {
+    console.log(`Config file ${config} is invalid`);
+    return null;
+  }
+
+  const mapFce = (lib) => {
+    return lib.paths.main.replace('.js', '');
+  };
+
+  const components = deps.components.map(mapFce);
+  const plugins = deps.plugins.map(mapFce);
+
+  return [
+    ...components,
+    ...plugins
+  ];
+}
+
 module.exports = {
   convertJson2Array,
   parseMainFile,
   getFilesToAllow,
+  getFilesToAllow2,
   getLibDefinitions,
   componentsPath,
   pluginsPath

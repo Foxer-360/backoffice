@@ -10,7 +10,7 @@ import { client, queries } from '@source/services/graphql';
 import ChatTasks from '@source/scenes/ChatTasks';
 import { adopt } from 'react-adopt';
 import { Query } from 'react-apollo';
-import { IContent } from 'delta';
+import { IContent } from '@foxer360/delta';
 
 const { Component } = React;
 const socket = connect();

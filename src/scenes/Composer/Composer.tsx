@@ -4,8 +4,8 @@ import Editor from './components/Editor';
 import Spinner from './components/Spinner';
 import Users from './components/Users';
 import { deepCopy } from '@source/utils';
-import { builder, Delta, getObjectFromContent } from 'delta';
-import { IContent, IComponent, IOperation } from 'delta/';
+import { builder, Delta, getObjectFromContent } from '@foxer360/delta';
+import { IContent, IComponent, IOperation } from '@foxer360/delta/';
 import './composer.css';
 
 const { Component } = React;

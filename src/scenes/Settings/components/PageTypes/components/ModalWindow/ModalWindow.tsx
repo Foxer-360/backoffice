@@ -4,7 +4,7 @@ import Composer from '@source/scenes/Composer';
 import componentService from '@source/services/components';
 import pluginsService from '@source/services/plugins';
 import { ComponentObject } from '@source/scenes/Composer/Composer';
-import { IContent } from 'delta';
+import { IContent } from '@foxer360/delta';
 
 const { Component } = React;
 

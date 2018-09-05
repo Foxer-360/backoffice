@@ -29,6 +29,13 @@ components.json
 plugins/*
 plugins.json
 
+config/deps.json
+src/services/deps.json
+
+public/styles
+public/assets/*
+!public/assets/images
+
 
 # ignore public of components
 public/components

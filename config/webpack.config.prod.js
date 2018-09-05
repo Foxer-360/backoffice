@@ -38,7 +38,10 @@ if (env.stringified['process.env'].NODE_ENV !== '"production"') {
 }
 
 // Files which will be excluded from check of importing outside src folder
-const allowedOutsideFiles = deps.getFilesToAllow([ 'components.json', 'plugins.json' ]);
+const allowedOutsideFiles = deps.getFilesToAllow('deps.json');
+if (allowedOutsideFiles === null) {
+  process.exit(1);
+}
 
 // Note: defined here because it will be used more than once.
 const cssFilename = 'static/css/[name].[contenthash:8].css';

@@ -31,7 +31,10 @@ function srcPath(subdir) {
 }
 
 // Files which will be excluded from check of importing outside src folder
-const allowedOutsideFiles = deps.getFilesToAllow([ 'components.json', 'plugins.json' ]);
+const allowedOutsideFiles = deps.getFilesToAllow('deps.json');
+if (allowedOutsideFiles === null) {
+  process.exit(1);
+}
 
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
