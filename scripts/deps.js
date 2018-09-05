@@ -91,11 +91,13 @@ async function cloneRepository(git, path) {
   }
 
   // Install deps in cloned repo
+  console.log(`Called yarn install for ${git}`);
   execSync(`yarn install --production=true`, {
     cwd: path,
   });
 
   // Pull data also using git LFS to get images
+  console.log(`Called git lfs pull for ${git}`);
   execSync(`git lfs pull`, {
     cwd: path,
   });
@@ -332,6 +334,11 @@ function copyLibStyle(lib) {
     return;
   }
 
+  if (!fs.existsSync(lib.paths.styleTarget)) {
+    console.log(`Styles for ${lib.type}/${lib.name} doesn't exists!`);
+    return;
+  }
+
   console.log(`Copy style for ${lib.type}/${lib.name} lib...`);
   fs.copyFileSync(lib.paths.styleTarget, lib.paths.style);
 }
@@ -343,6 +350,11 @@ function copyLibStyle(lib) {
  */
 function copyLibAssets(lib) {
   if (!lib.paths.assets) {
+    return;
+  }
+
+  if (!fs.existsSync(lib.paths.assetsTarget)) {
+    console.log(`Assets for ${lib.type}/${lib.name} doesn't exists!`);
     return;
   }
 
