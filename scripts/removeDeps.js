@@ -9,7 +9,8 @@ const paths = {
   assets: path.resolve(appPath, 'public/assets'),
   config: {
     target: path.resolve(appPath, 'config/deps.json'),
-    source: path.resolve(appPath, 'src/services/deps.json')
+    source: path.resolve(appPath, 'src/services/deps.json'),
+    ts: path.resolve(appPath, 'src/services/modules/config.ts')
   }
 };
 
@@ -109,6 +110,11 @@ function main() {
   if (fs.existsSync(paths.config.target)) {
     fs.unlinkSync(paths.config.target);
     console.log(`Removed generated config...`);
+  }
+
+  if (fs.existsSync(paths.config.ts)) {
+    fs.unlinkSync(paths.config.ts);
+    console.log(`Removed generated ts config...`);
   }
 
   console.log(`Done...`);

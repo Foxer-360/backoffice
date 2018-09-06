@@ -5,6 +5,7 @@ const { execSync } = require('child_process');
 
 
 const appPath = path.resolve(__dirname, '../');
+const templatePath = path.resolve(appPath, 'scripts/deps.template.ts');
 const paths = {
   components: path.resolve(appPath, 'components'),
   plugins: path.resolve(appPath, 'plugins'),
@@ -12,7 +13,8 @@ const paths = {
   assets: path.resolve(appPath, 'public/assets'),
   config: {
     target: path.resolve(appPath, 'config/deps.json'),
-    source: path.resolve(appPath, 'src/services/deps.json')
+    source: path.resolve(appPath, 'src/services/modules/deps.json'),
+    ts: path.resolve(appPath, 'src/services/modules/config.ts')
   }
 };
 
@@ -240,13 +242,17 @@ function resolveFolder(folder) {
  * @param {JSON} json generated data
  * @return {void}
  */
-function saveGeneratedJson(target, source, json) {
+function saveGeneratedJson(target, source, ts, json) {
   const str = JSON.stringify(json, null, 2);
   fs.writeFileSync(target, str);
+  fs.writeFileSync(source, str);
 
-  if (!fs.existsSync(source)) {
-    fs.symlinkSync(target, source, 'file');
-  }
+  const tsStr = generateTsConfig(json);
+  fs.writeFileSync(ts, tsStr);
+
+  // if (!fs.existsSync(source)) {
+  //   fs.symlinkSync(target, source, 'file');
+  // }
 }
 
 /**
@@ -387,6 +393,72 @@ function resolveCssImports(lib) {
 }
 
 /**
+ * Generate config file for using in ts
+ *
+ * @param {json} config file
+ */
+function generateTsConfig(config) {
+  if (!fs.existsSync(templatePath)) {
+    console.log(`Template file ${templatePath} doesn't exists. Unable to generate ts config file.`);
+    return;
+  }
+
+  let template = fs.readFileSync(templatePath).toString();
+  if (!template) {
+    console.log(`Failed to load ${templatePath} template...`);
+    return;
+  }
+
+  const componentsImport = [];
+  const componentsJson = [];
+  const pluginsImport = [];
+  const pluginsJson = [];
+
+  config.components.forEach((lib) => {
+    const importedName = `components${capitalizeFirstLetter(lib.name)}`;
+    const imp = `import { ComponentsService as ${importedName} } from '${lib.paths.relative.import}';`;
+    const json = `  ${lib.name}: ${importedName},`;
+
+    componentsImport.push(imp);
+    componentsJson.push(json);
+  });
+
+  config.plugins.forEach((lib) => {
+    const importedName = `plugins${capitalizeFirstLetter(lib.name)}`;
+    const imp = `import { PluginsService as ${importedName} } from '${lib.paths.relative.import}';`;
+    const json = `  ${lib.name}: ${importedName},`;
+
+    pluginsImport.push(imp);
+    pluginsJson.push(json);
+  });
+
+  if (componentsImport.length < 1) {
+    template = template.replace('<components-import>', '');
+  } else {
+    template = template.replace('<components-import>', componentsImport.join('\n') + '\n');
+  }
+  if (pluginsImport.length < 1) {
+    template = template.replace('<plugins-import>', '');
+  } else {
+    template = template.replace('<plugins-import>', pluginsImport.join('\n') + '\n');
+  }
+  template = template.replace('<components-json>', componentsJson.join('\n'));
+  template = template.replace('<plugins-json>', pluginsJson.join('\n'));
+
+  return template;
+}
+
+/**
+ * Capitalize first letter in string
+ *
+ * @param {string} val
+ * @return {string}
+ */
+function capitalizeFirstLetter(val) {
+  return val.charAt(0).toUpperCase() + val.slice(1);
+}
+
+/**
  * Main function which resolve all dependencies
  *
  * @return {void}
@@ -401,7 +473,7 @@ async function main() {
   linkAllLibs(config.components);
   linkAllLibs(config.plugins);
 
-  saveGeneratedJson(paths.config.target, paths.config.source, config);
+  saveGeneratedJson(paths.config.target, paths.config.source, paths.config.ts, config);
 }
 
 // Just call main function
