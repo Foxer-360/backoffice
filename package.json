@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "@foxer360/delta": "git+ssh:git@github.com:Foxer-360/delta#sandbox",
-    "@nevim42/components": "../../composer/components",
     "antd": "^3.5.1",
     "apollo-boost": "^0.1.12",
     "apollo-link-ws": "^1.0.8",

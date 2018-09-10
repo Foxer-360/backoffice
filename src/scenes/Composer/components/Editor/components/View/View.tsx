@@ -41,7 +41,9 @@ class View extends Component<Properties, {}> {
 
     return (
       <div className="composer-content-holder">
-        <Frame>
+        <Frame
+          componentsService={this.props.componentsService}
+        >
           <Container
             {...this.props}
             container={this.props.content.id}

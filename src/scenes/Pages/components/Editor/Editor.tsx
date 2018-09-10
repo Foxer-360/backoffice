@@ -11,6 +11,7 @@ import ChatTasks from '@source/scenes/ChatTasks';
 import { adopt } from 'react-adopt';
 import { Query } from 'react-apollo';
 import { IContent } from '@foxer360/delta';
+import { ComponentsModule } from '@source/services/modules';
 
 const { Component } = React;
 const socket = connect();
@@ -346,7 +347,7 @@ class Editor extends Component<Properties, State> {
           ref={node => (this.composer = node)}
           onComponentStartEditing={this.props.startEditing}
           onComponentStopEditing={this.props.stopEditing}
-          componentService={ComponentsService}
+          componentService={ComponentsModule}
           pluginService={PluginService}
           onComponentAdded={data => this.handleEvent('onComponentAdded', data)}
           onComponentTryAdd={data => this.handleEvent('onComponentTryAdd', data)}

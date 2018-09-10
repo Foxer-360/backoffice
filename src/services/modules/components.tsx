@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { components, config, LibDefinition } from './config';
 
 interface NamedInstances {
@@ -7,6 +8,18 @@ interface NamedInstances {
 
 interface Name2InstanceMap {
   [name: string]: string;
+}
+
+class NotFound extends React.Component<{}, {}> {
+
+  public render() {
+    return (
+      <div>
+        <span>Component not found!</span>
+      </div>
+    );
+  }
+
 }
 
 /**
@@ -50,6 +63,45 @@ class ComponentsModule {
    */
   public getAllowedTypes() {
     return this.names;
+  }
+
+  public getComponent(type: string) {
+    const name = this.name2instance[type];
+    const i = this.instances[name];
+
+    if (!name || !i) {
+      return this.getNotFoundComponent();
+    }
+
+    return i.getComponent(type);
+  }
+
+  public getComponentResource(type: string) {
+    const name = this.name2instance[type];
+    const i = this.instances[name];
+
+    return i.getComponentResource(type);
+  }
+
+  public getForm(type: string) {
+    const name = this.name2instance[type];
+    const i = this.instances[name];
+
+    return i.getForm(type);
+  }
+
+  public getStyles() {
+    const res = config.components.map((lib) => {
+      return lib.paths.relative.style;
+    }).filter((style) => {
+      return style ? true : false;
+    });
+
+    return res;
+  }
+
+  private getNotFoundComponent() {
+    return NotFound;
   }
 
 }
