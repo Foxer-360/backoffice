@@ -3,7 +3,6 @@ import { Composer } from '@foxer360/composer';
 import { IComponentObject, IAddComponentObject, IEditorInfo, ILockInfo } from '@foxer360/composer';
 import { RouterAction } from 'react-router-redux';
 import { Button } from 'antd';
-import ComponentsService from '@source/services/components';
 import PluginService from '@source/services/plugins';
 import { connect, StandardResponse } from '@source/services/socket';
 import { client, queries } from '@source/services/graphql';

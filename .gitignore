@@ -31,6 +31,7 @@ plugins.json
 
 config/deps.json
 src/services/deps.json
+src/services/config.ts
 
 public/styles
 public/assets/*
