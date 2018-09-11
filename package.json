@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@nevim42/components": "../../composer/components",
+    "@foxer360/composer": "git+ssh:git@github.com:Foxer-360/composer.git#sandbox",
+    "@foxer360/delta": "git+ssh:git@github.com:Foxer-360/delta#sandbox",
     "antd": "^3.5.1",
     "apollo-boost": "^0.1.12",
     "apollo-link-ws": "^1.0.8",
@@ -16,7 +17,6 @@
     "case-sensitive-paths-webpack-plugin": "2.1.1",
     "chalk": "1.1.3",
     "css-loader": "0.28.7",
-    "delta": "git+ssh:git@github.com:Foxer-360/delta#sandbox",
     "dotenv": "4.0.0",
     "extract-text-webpack-plugin": "3.0.2",
     "file-loader": "0.11.2",
@@ -71,7 +71,10 @@
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom",
-    "buildCss": "node scripts/buildCss.js"
+    "buildCss": "node scripts/buildCss.js",
+    "deps": "node scripts/deps.js",
+    "removeDeps": "node scripts/removeDeps.js",
+    "updateDeps": "yarn removeDeps && yarn deps"
   },
   "devDependencies": {
     "@types/auth0-js": "^8.11.2",
@@ -82,7 +85,7 @@
     "@types/node": "^9.6.2",
     "@types/prop-types": "^15.5.4",
     "@types/react": "*",
-    "@types/react-dom": "^16.0.5",
+    "@types/react-dom": "*",
     "@types/react-infinite-scroller": "^1.0.6",
     "@types/react-redux": "^5.0.15",
     "@types/react-router-dom": "^4.2.6",
@@ -90,6 +93,7 @@
     "@types/redux": "^3.6.0",
     "@types/socket.io-client": "^1.4.32",
     "@types/ws": "^5.1.2",
+    "git-clone": "^0.1.0",
     "typescript": "^2.8.1",
     "webpack-bundle-analyzer": "^2.13.1"
   },

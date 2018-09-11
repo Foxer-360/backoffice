@@ -1,16 +1,16 @@
 import * as React from 'react';
-import Composer from '@source/scenes/Composer';
+import { Composer } from '@foxer360/composer';
+import { IComponentObject, IAddComponentObject, IEditorInfo, ILockInfo } from '@foxer360/composer';
 import { RouterAction } from 'react-router-redux';
 import { Button } from 'antd';
-import ComponentsService from '@source/services/components';
 import PluginService from '@source/services/plugins';
-import { ComponentObject, AddComponentObject, EditorInfo, LockInfo } from '@source/scenes/Composer/Composer';
 import { connect, StandardResponse } from '@source/services/socket';
 import { client, queries } from '@source/services/graphql';
 import ChatTasks from '@source/scenes/ChatTasks';
 import { adopt } from 'react-adopt';
 import { Query } from 'react-apollo';
-import { IContent } from 'delta';
+import { IContent } from '@foxer360/delta';
+import { ComponentsModule } from '@source/services/modules';
 
 const { Component } = React;
 const socket = connect();
@@ -34,7 +34,7 @@ interface Properties {
 
 interface State {
   editors: string[];
-  locks: LockInfo[];
+  locks: ILockInfo[];
   pageId: string;
   taskAndChatHidden: boolean;
 }
@@ -128,7 +128,7 @@ class Editor extends Component<Properties, State> {
     // Init state
     this.state = {
       editors: [] as string[],
-      locks: [] as LockInfo[],
+      locks: [] as ILockInfo[],
       pageId: null,
       taskAndChatHidden: true
     };
@@ -291,7 +291,7 @@ class Editor extends Component<Properties, State> {
       }
 
       if (this.props.content !== nextProps.content) {
-        // await this.composer.setContent(nextProps.content as ComponentObject[]);
+        // await this.composer.setContent(nextProps.content as IComponentObject[]);
         // await this.composer.setContent(nextProps.content as IContent);
       }
       if (this.props.name !== nextProps.name) {
@@ -325,7 +325,7 @@ class Editor extends Component<Properties, State> {
   }
 
   public render() {
-    let editors = [] as EditorInfo[];
+    let editors = [] as IEditorInfo[];
     this.state.editors.forEach((id: string) => {
       let name = undefined as string;
       if (id === socket.id) {
@@ -346,7 +346,7 @@ class Editor extends Component<Properties, State> {
           ref={node => (this.composer = node)}
           onComponentStartEditing={this.props.startEditing}
           onComponentStopEditing={this.props.stopEditing}
-          componentService={ComponentsService}
+          componentService={ComponentsModule}
           pluginService={PluginService}
           onComponentAdded={data => this.handleEvent('onComponentAdded', data)}
           onComponentTryAdd={data => this.handleEvent('onComponentTryAdd', data)}
@@ -436,7 +436,7 @@ class Editor extends Component<Properties, State> {
     if (this.state.pageId !== pageId) {
       return;
     }
-    this.composer.addComponent(component as AddComponentObject, true);
+    this.composer.addComponent(component as IAddComponentObject, true);
   }
 
   /**
@@ -528,7 +528,7 @@ class Editor extends Component<Properties, State> {
     });
   }
   // activatorAddComponent
-  private activatorAddComponent(data: AddComponentObject): Promise<boolean> {
+  private activatorAddComponent(data: IAddComponentObject): Promise<boolean> {
     return new Promise(resolve => {
       socket
         .emit('composer/add-component', {
@@ -567,7 +567,7 @@ class Editor extends Component<Properties, State> {
     });
   }
   // activatorUpdateComponent
-  private activatorUpdateComponent(id: number, data: ComponentObject): Promise<boolean> {
+  private activatorUpdateComponent(id: number, data: IComponentObject): Promise<boolean> {
     return new Promise(resolve => {
       socket
         .emit('composer/update-component', {
@@ -701,7 +701,7 @@ class Editor extends Component<Properties, State> {
     const page = response.payload;
 
     // Prepare locks from page
-    let locks = [] as LockInfo[];
+    let locks = [] as ILockInfo[];
     const keys = Object.keys(page.locks);
     keys.forEach((key: string) => {
       if (page.locks[key]) {

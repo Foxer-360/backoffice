@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { Button, Col, Input, Modal, Row, Select } from 'antd';
-import Composer from '@source/scenes/Composer';
-import componentService from '@source/services/components';
+import { Composer } from '@foxer360/composer';
+import { IComponentObject } from '@foxer360/composer';
+// import componentService from '@source/services/components';
+import { ComponentsModule } from '@source/services/modules';
 import pluginsService from '@source/services/plugins';
-import { ComponentObject } from '@source/scenes/Composer/Composer';
-import { IContent } from 'delta';
+import { IContent } from '@foxer360/delta';
 
 const { Component } = React;
 
@@ -129,7 +130,7 @@ class ModalWindow extends Component<Properties, State> {
           maskClosable={false}
         >
           <Composer
-            componentService={componentService}
+            componentService={ComponentsModule}
             pluginService={pluginsService}
             onSave={this.handleCloseEditor}
             layouts={true}
