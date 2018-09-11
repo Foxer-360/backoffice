@@ -16,7 +16,7 @@
 }
 
 .editor {
-  .ant-row {
+  & > .ant-row {
     display: flex;
     justify-content: stretch;
     min-height: 87.6vh;

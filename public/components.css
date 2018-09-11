@@ -335,7 +335,7 @@ input {
   justify-content: center; }
 
 .sectionHeading, .blogHolder h1, .blogDetail h1, .boxHolder h1, .imageHero h1, .categoryContent h1 {
-  /* Style for "najĂ­t obch" */
+  /* Style for "najít obch" */
   color: #494949;
   font-size: 2.8rem;
   font-weight: 400;
@@ -1918,14 +1918,14 @@ input {
     font-weight: 700;
     letter-spacing: -0.88px;
     text-align: center; }
-  .card__address, .card__openingTime, .card__contacts, .card__phrase, .card__link {
+  .card__address, .card__openingTime, .card__contacts, .card__linkText, .card__link {
     font-size: 1.8rem;
     font-weight: 400;
     letter-spacing: -0.72px;
     text-align: center;
     margin: 23px 0 0 0;
     line-height: 1.1; }
-  .card__contacts, .card__phrase, .card__link {
+  .card__contacts, .card__linkText, .card__link {
     color: #c92731; }
 
 .breadcrumbs ul {
@@ -2282,6 +2282,10 @@ input {
           text-align: left; } }
     .imageText__contentHolder .text-center {
       text-align: center; }
+    .imageText__contentHolder .text-left {
+      text-align: left; }
+    .imageText__contentHolder .text-right {
+      text-align: right; }
     .imageText__contentHolder .btnHolder {
       display: flex;
       align-items: center;
@@ -2322,3 +2326,7 @@ input {
     fill: #cccccc; }
     .searchIcon--gray:hover {
       fill: #c92731; }
+
+.mediaImage {
+  width: 100%;
+  height: auto; }

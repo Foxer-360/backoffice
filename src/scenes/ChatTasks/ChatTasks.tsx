@@ -335,7 +335,7 @@ class ChatTasks extends Component<Properties, State> {
           closable={true}
           onClose={this.props.handleToggleDisplayTaskAndChat}
           visible={!this.props.taskAndChatHidden}
-          width={300}
+          width={500}
           zIndex={1}
         >
           <Tabs defaultActiveKey="1">

@@ -1,5 +1,6 @@
 // Import all components
 import { ComponentsService as componentsBase } from 'components/base';
+import { ComponentsService as componentsFromGit } from 'components/fromGit';
 
 // Import all plugins
 
@@ -45,6 +46,7 @@ interface LibConfig {
  */
 const components = {
   base: componentsBase,
+  fromGit: componentsFromGit,
 };
 
 /**

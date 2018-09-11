@@ -4,6 +4,21 @@ body {
   background-color: white;
 }
 
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1890ff;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #1890ff;
+}
+
 /**
  * These styles are for backoffice !!
  */
@@ -30,10 +45,12 @@ body {
   /* min-height: 8px; */
   border: 0px dashed;
   background: none; /* none */
-  transition: padding 200ms ease-in-out, background-color 200ms ease-in-out, border-radius 200ms ease-in-out, margin 200ms ease-in-out, border 200ms ease-in-out,
+  transition: padding 200ms ease-in-out, background-color 200ms ease-in-out,
+    border-radius 200ms ease-in-out, margin 200ms ease-in-out, border 200ms ease-in-out,
     border-color 200ms ease-in-out, font-size 200ms ease-in-out, color 200ms ease-in-out;
-  font-family: "Chinese Quote", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Chinese Quote', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
   position: relative;
 }
 
@@ -74,20 +91,20 @@ body {
   padding: 0 16px;
 }
 
-[draggable~="true"]:hover .wrapper-header {
+[draggable~='true']:hover .wrapper-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-[draggable~="true"]:hover::after {
+[draggable~='true']:hover::after {
   background-color: rgba(0, 0, 0, 0.25);
   border: 2px solid black;
 }
 
-[draggable~="true"]::after {
+[draggable~='true']::after {
   z-index: 200;
-  content: "";
+  content: '';
   background-color: rgba(0, 0, 0, 0);
   transition: background-color 85ms ease-in-out;
   width: 100%;
@@ -131,7 +148,7 @@ body {
 .editMove {
   width: 26px;
   height: 26px;
-  background: url("assets/images/more.svg") no-repeat;
+  background: url('assets/images/more.svg') no-repeat;
   background-size: 26px;
   margin-top: 4px;
   cursor: grab;
@@ -143,7 +160,7 @@ body {
   background-color: #ccc;
   width: 35px;
   height: 35px;
-  background-image: url("assets/images/avatar.svg");
+  background-image: url('assets/images/avatar.svg');
   background-repeat: no-repeat;
   background-size: 25px;
   background-position: center;
@@ -184,9 +201,101 @@ canvas {
   padding: 0px;
 }
 
+.layout .header {
+  position: relative !important;
+  z-index: 100;
+}
+
 .layout.active {
-  /* background: #E2FB82; */
-  background: #E0F4BD;
-  border: 2px solid #DAF95F;
-  padding: 8px 0px;
+  background: #e6f7ff;
+  min-height: 100px;
+}
+
+.containerEditor {
+  padding: 10px 10px;
+  background: #fafafa;
+  border-top: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e8e8e8;
+}
+.containerEditor .antBtn {
+  line-height: 1.5;
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  background-image: none;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  padding: 0 15px;
+  font-size: 2.2em;
+  border-radius: 4px;
+  height: auto;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  -o-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  position: relative;
+  border-color: #d9d9d9;
+  font-family: 'Chinese Quote', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+}
+
+.black {
+  color: rgba(0, 0, 0, 0.65);
+  margin-right: 10px;
+}
+
+.red {
+  background: #ff4d4f;
+  color: white;
+}
+
+.red:hover {
+  background: #ff4d4f;
+}
+.green {
+  background: #95de64;
+  color: white;
+}
+
+.green:hover {
+  background: #95de64;
+}
+
+.composerArrow {
+  padding: 12px 25px;
+  background: rgba(0, 0, 0, 0.65);
+  color: white;
+  position: fixed;
+  right: 25px;
+  z-index: 3000;
+  transition: 0.45s ease;
+  opacity: 0;
+  font-size: 2.4em;
+  font-weight: 200;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  border-radius: 5%;
+}
+
+.composerArrow__active {
+  opacity: 1;
+}
+
+.composerArrow:hover {
+  background-color: #988796;
+}
+
+.composerArrow__up {
+  top: 25px;
+}
+
+.composerArrow__down {
+  bottom: 165px;
 }

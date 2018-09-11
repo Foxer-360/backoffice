@@ -65,8 +65,6 @@ class Chat extends Component<Properties, State> {
           <List
             renderItem={(item: LooseObject) => (
               <List.Item>
-                {// tslint:disable-next-line:no-console
-                console.log('%c Emilio: ', 'background: #222; color: #bada55', data)}
                 <List.Item.Meta title={Title('Author', item.createdAt)} description={item.text} />
               </List.Item>
             )}
@@ -84,10 +82,10 @@ class Chat extends Component<Properties, State> {
             style={{ marginTop: '26px' }}
           />
           <Row style={{ marginTop: '12px', textAlign: 'right' }}>
-            <Button 
-              type="primary" 
-              icon="check" 
-              disabled={this.state.message.length < 1} 
+            <Button
+              type="primary"
+              icon="check"
+              disabled={this.state.message.length < 1}
               onClick={this.handleSendMessage}
             >
               Send
