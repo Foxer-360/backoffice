@@ -30,8 +30,8 @@ plugins/*
 plugins.json
 
 config/deps.json
-src/services/deps.json
-src/services/config.ts
+src/services/modules/deps.json
+src/services/modules/config.ts
 
 public/styles
 public/assets/*
