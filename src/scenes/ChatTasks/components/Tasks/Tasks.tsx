@@ -41,12 +41,11 @@ const Title = (name: string, date: Date) => (
 );
 
 const ListRenderItem = (
-  edit: (id: string, task: LooseObject) => void, 
-  toggle: (id: string, status: boolean) => void, 
-  remove: (id: string) => void) => (
-  item: TaskItem
-) => (
-      <List.Item style={{ borderBottom: '1px solid e8e8e8', borderTop: ' 1px solid e8e8e8'}}>
+  edit: (id: string, task: LooseObject) => void,
+  toggle: (id: string, status: boolean) => void,
+  remove: (id: string) => void
+) => (item: TaskItem) => (
+  <List.Item style={{ borderBottom: '1px solid e8e8e8', borderTop: ' 1px solid e8e8e8' }}>
     <List.Item.Meta title={Title(item.name, item.updatedAt)} description={item.description} />
     <Button
       type="primary"
@@ -75,20 +74,20 @@ class Tasks extends Component<Properties, State> {
     visibleModal: false,
     editedTaskId: null,
     taskForm: {
-      ...this.RESET_FORM
-    }
+      ...this.RESET_FORM,
+    },
   } as State;
 
   private RESET_FORM = {
     name: '',
-    description: ''
+    description: '',
   };
 
   constructor(props: Properties) {
     super(props);
 
     this.state = {
-      ...this.RESET_STATE
+      ...this.RESET_STATE,
     };
 
     this.handleFinishedFilterSwitch = this.handleFinishedFilterSwitch.bind(this);
@@ -122,24 +121,51 @@ class Tasks extends Component<Properties, State> {
     return (
       <>
         {/* Filters and other header staff */}
-        <div style={{ marginBottom: '6px' }}>
-          <div style={{ margin: '12px 0 12px' }}>
+        <div
+          style={{
+            marginBottom: '6px',
+          }}
+        >
+          <div
+            style={{
+              margin: '12px 0 12px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              paddingRight: '25px',
+            }}
+          >
             <span>Show finished tasks</span>
             <Switch checked={this.state.showFinished} onChange={this.handleFinishedFilterSwitch} />
           </div>
 
-          <div style={{ margin: '12px 0 12px' }}>
+          <div
+            style={{
+              margin: '12px 0 12px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              paddingRight: '25px',
+            }}
+          >
             <span>Unfinished tasks first</span>
-            <Switch checked={this.state.unfinishedFirst} onChange={this.handleUnfinishedFirstSwitch} />
+            <Switch
+              checked={this.state.unfinishedFirst}
+              onChange={this.handleUnfinishedFirstSwitch}
+            />
           </div>
         </div>
 
         {/* List with tasks */}
-        <div style={{ overflowY: 'scroll', overflowX: 'hidden', height: '350px', paddingRight: '8px' }}>
+        <div
+          style={{ overflowY: 'scroll', overflowX: 'hidden', height: '350px', paddingRight: '8px' }}
+        >
           <List
             itemLayout={'vertical'}
             dataSource={data}
-            renderItem={ListRenderItem(this.handleEditTask, this.handleToggleDone, this.handleDeleteTask)}
+            renderItem={ListRenderItem(
+              this.handleEditTask,
+              this.handleToggleDone,
+              this.handleDeleteTask
+            )}
             locale={{ emptyText: 'No tasks to show' }}
           />
         </div>
@@ -165,9 +191,9 @@ class Tasks extends Component<Properties, State> {
               <span>Task name</span>
             </Col>
             <Col span={24 - labelSize}>
-              <Input 
-                value={this.state.taskForm.name} 
-                onChange={e => this.handleFormValueChange('name', e.target.value)} 
+              <Input
+                value={this.state.taskForm.name}
+                onChange={e => this.handleFormValueChange('name', e.target.value)}
               />
             </Col>
           </Row>
@@ -218,13 +244,13 @@ class Tasks extends Component<Properties, State> {
 
   private handleFinishedFilterSwitch(checked: boolean) {
     this.setState({
-      showFinished: checked
+      showFinished: checked,
     });
   }
 
   private handleUnfinishedFirstSwitch(checked: boolean) {
     this.setState({
-      unfinishedFirst: checked
+      unfinishedFirst: checked,
     });
   }
 
@@ -234,8 +260,8 @@ class Tasks extends Component<Properties, State> {
       visibleModal: true,
       taskForm: {
         name,
-        description
-      }
+        description,
+      },
     });
   }
 
@@ -244,8 +270,8 @@ class Tasks extends Component<Properties, State> {
       editedTaskId: null,
       visibleModal: true,
       taskForm: {
-        ...this.RESET_FORM
-      }
+        ...this.RESET_FORM,
+      },
     });
   }
 
@@ -253,14 +279,14 @@ class Tasks extends Component<Properties, State> {
     this.setState({
       taskForm: {
         ...this.state.taskForm,
-        [type]: value
-      }
+        [type]: value,
+      },
     });
   }
 
   private handleModalClose() {
     this.setState({
-      visibleModal: false
+      visibleModal: false,
     });
   }
 
@@ -276,7 +302,7 @@ class Tasks extends Component<Properties, State> {
       if (this.props.onEdit) {
         const task = {
           name: this.state.taskForm.name,
-          description: this.state.taskForm.description
+          description: this.state.taskForm.description,
         };
 
         this.props.onEdit(this.state.editedTaskId, task);
@@ -287,7 +313,7 @@ class Tasks extends Component<Properties, State> {
         const task = {
           name: this.state.taskForm.name,
           description: this.state.taskForm.description,
-          done: false
+          done: false,
         };
 
         this.props.onCreate(task);
@@ -295,7 +321,7 @@ class Tasks extends Component<Properties, State> {
     }
 
     this.setState({
-      visibleModal: false
+      visibleModal: false,
     });
   }
 

@@ -4,7 +4,7 @@ import { urlize } from 'urlize';
 import './style.css';
 import { adopt } from 'react-adopt';
 import { Query, Mutation } from 'react-apollo';
-import { queries, mutations } from 'services/graphql';
+import { queries, mutations } from '@source/services/graphql';
 
 const { Component } = React;
 

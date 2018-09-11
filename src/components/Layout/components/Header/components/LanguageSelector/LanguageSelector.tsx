@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Select } from 'antd';
 import { Query, Mutation } from 'react-apollo';
-import { queries, mutations } from 'services/graphql';
+import { queries, mutations } from '@source/services/graphql';
 import { adopt } from 'react-adopt';
 
 const { Component } = React;

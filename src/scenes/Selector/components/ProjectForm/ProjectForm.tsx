@@ -3,7 +3,7 @@ import { Button, Input, Row, Col, Tooltip, Select } from 'antd';
 import { indexOf } from 'lodash';
 import { CreateProjectDto } from '../../../../services/api/resources/environment';
 import { Query } from 'react-apollo';
-import { queries, mutations } from 'services/graphql';
+import { queries, mutations } from '@source/services/graphql';
 import { ApolloClient } from 'apollo-client';
 
 const { Component } = React;

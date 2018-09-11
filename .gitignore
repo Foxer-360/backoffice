@@ -21,5 +21,22 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# components packages
+components/*
+components.json
+
+# plugins packages
+plugins/*
+plugins.json
+
+config/deps.json
+src/services/modules/deps.json
+src/services/modules/config.ts
+
+public/styles
+public/assets/*
+!public/assets/images
+
+
 # ignore public of components
 public/components

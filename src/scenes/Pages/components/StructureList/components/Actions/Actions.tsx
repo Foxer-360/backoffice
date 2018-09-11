@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Button, Popconfirm } from 'antd';
 import { Mutation, Query } from 'react-apollo';
-import { mutations, queries } from 'services/graphql';
+import { mutations, queries } from '@source/services/graphql';
 import { adopt } from 'react-adopt';
 import history from '@source/services/history';
 

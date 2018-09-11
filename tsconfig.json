@@ -34,9 +34,9 @@
       "node_modules/@types",
       "src/@types"
     ],
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
-      "@source/*": ["*"]
+      "@source/*": ["src/*"]
     }
   },
   "exclude": [
@@ -46,6 +46,8 @@
     "acceptance-tests",
     "webpack",
     "jest",
-    "src/setupTests.ts"
+    "src/setupTests.ts",
+    "components",
+    "plugins"
   ]
 }
