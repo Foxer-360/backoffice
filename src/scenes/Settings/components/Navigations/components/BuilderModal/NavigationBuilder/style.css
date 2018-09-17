@@ -1,0 +1,17 @@
+.navigation-steps-content {
+  padding: 32px 0;
+}
+
+.navigation-steps-content .ant-transfer-list {
+  width: 46%;
+  height: 300px;
+}
+
+.navigation-steps-content .ant-transfer-operation {
+  width: 8%;
+  margin: 0;
+}
+
+.navigation-steps-content .ant-transfer-operation button {
+  margin: auto;
+}
