@@ -211,3 +211,48 @@ export const PAGE_CHAT_LIST = gql`
 //     }
 //   }
 // }
+
+export const NAVIGATION_LIST = gql`
+  query getNavigations($website: ID!) {
+    navigations( where: { website: { id: $website } } ) {
+      id
+      name
+    }
+  }
+`;
+
+export const NAVIGATION_PAGE_LIST = gql`
+  query getPageList($website: ID!) {
+    pages( where: { website: { id: $website } } ) {
+      id
+      parent {
+        id
+      }
+      translations {
+        id
+        language {
+          id
+          code
+        }
+        url
+        name
+      }
+    }
+  }
+`;
+
+export const NAVIGATION_NODES = gql`
+  query getNavigationNodes($navigation: ID!) {
+    navigationNodes(
+      where: { navigation: { id: $navigation } }
+    ) {
+      id
+      page
+      order
+      parent
+      navigation {
+        id
+      }
+    }
+  }
+`;

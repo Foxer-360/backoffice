@@ -280,6 +280,8 @@ class PageTypes extends Component<Properties, State> {
 
             this.handleRemove = remove;
 
+            types.data = types.data.map((type) => ({ ...type, key: type.id }));
+
             return <Table columns={this.COLUMNS} dataSource={types.data} />;
           }}
         </QueryAndMutationForTable>

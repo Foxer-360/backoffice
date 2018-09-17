@@ -8,6 +8,24 @@ import { adopt } from 'react-adopt';
 
 const { Component } = React;
 
+export interface Page {
+  id: string;
+  name: string;
+  parent: string | null;
+  type: string;
+  url: string;
+}
+
+export interface TablePage {
+  id: string;
+  key: string;
+  name: string;
+  parent: string | null;
+  type: string;
+  url: string;
+  children?: Array<TablePage>;
+}
+
 export interface Properties {
   structures: LooseObject[];
 
@@ -92,7 +110,6 @@ class StructureList extends Component<Properties, State> {
   private readonly COLUMNS = [
     { title: 'Name', dataIndex: 'name', key: 'name' },
     { title: 'Url', dataIndex: 'url', key: 'url'},
-    { title: 'Parent', dataIndex: 'parent', key: 'parent' },
     { title: 'Type', dataIndex: 'type', key: 'type' },
     { title: 'Actions', key: 'actions',
       render: Actions(this.handleAddPage.bind(this), this.handleEditPage.bind(this)) }
@@ -131,11 +148,47 @@ class StructureList extends Component<Properties, State> {
     // this.props.editPage(id);
   }
 
+  removeEmptyChildrens(page: TablePage): TablePage {
+    if (page.children.length) {
+      for (let i = 0; i < page.children.length; i++) {
+        page.children[i] = this.removeEmptyChildrens(page.children[i]);
+      }
+    } else {
+      delete page.children;
+    }
+    return page;
+  }
+
+  pagesToTree(list: Array<TablePage>): Array<TablePage> {
+    let map: LooseObject = {},
+      node: TablePage,
+      roots: Array<TablePage> = [];
+    // Prepare
+    for (let i = 0; i < list.length; i++) {
+      map[list[i].id] = i;
+      list[i].children = [];
+    }
+    // Make tree structure
+    for (let i = 0; i < list.length; i++) {
+      node = list[i];
+      if (node.parent) {
+        list[map[node.parent]].children.push(node);
+      } else {
+        roots.push(node);
+      }
+    }
+    // Clear
+    for (let i = 0; i < roots.length; i++) {
+      roots[i] = this.removeEmptyChildrens(roots[i]);
+    }
+    return roots;
+  }
+
   render() {
     return (
       <>
         <PageList>
-          {({ pages }: { pages: LooseObject[] }) => {
+          {({ pages }: { pages: Array<Page> }) => {
             if (!pages || pages.length < 1) {
               return (
                 <>
@@ -150,33 +203,13 @@ class StructureList extends Component<Properties, State> {
               );
             }
 
-            const data = pages.map((page: LooseObject) => {
-              const res = {
-                ...page
+            let data: Array<TablePage> = this.pagesToTree(pages.map((page: Page) => {
+              let res: TablePage = {
+                ...page,
+                key: page.id
               };
-              if (!page.parent) {
-                res.parent = 'No Parent';
-                return res;
-              }
-
-              const parent = pages.find((p: LooseObject) => {
-                if (p.id === page.parent) {
-                  return true;
-                }
-                return false;
-              });
-
-              if (parent) {
-                res.parent = parent.name;
-              } else {
-                res.parent = 'Undefined';
-              }
-
               return res;
-            });
-
-            // tslint:disable-next-line:no-console
-            console.log(data);
+            }));
 
             return <Table columns={this.COLUMNS} dataSource={data} />;
           }}
