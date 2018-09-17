@@ -371,3 +371,33 @@ export const CREATE_NAVIGATION_STRUCTURE = gql`
     }
   }
 `;
+
+export const SAVE_PAGE_PLUGIN = gql`
+    mutation savePagePlugin(
+        $page: ID,
+        $language: ID,
+        $plugin: String!,
+        $content: Json,
+    ) {
+        savePagePlugin(
+            data: {
+                page: {
+                    connect: {
+                        id: $page
+                    }
+                },
+                language: {
+                    connect: {
+                        id: $language
+                    }
+                },
+                plugin: $plugin,
+                content: $content
+            }
+        ) {
+            id
+            plugin
+            content
+        }
+    }
+`;
