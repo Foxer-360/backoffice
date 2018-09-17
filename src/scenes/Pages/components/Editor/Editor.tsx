@@ -5,12 +5,13 @@ import { RouterAction } from 'react-router-redux';
 import { Button } from 'antd';
 import PluginService from '@source/services/plugins';
 import { connect, StandardResponse } from '@source/services/socket';
-import { client, queries } from '@source/services/graphql';
+import { client, mutations, queries } from '@source/services/graphql';
 import ChatTasks from '@source/scenes/ChatTasks';
 import { adopt } from 'react-adopt';
-import { Query } from 'react-apollo';
+import { Query, Mutation } from 'react-apollo';
 import { IContent } from '@foxer360/delta';
 import { ComponentsModule } from '@source/services/modules';
+import Seo from '@source/plugins/Seo/Seo';
 
 const { Component } = React;
 const socket = connect();
@@ -98,6 +99,26 @@ const PageIdsQuery = adopt({
         return render(t.id);
       }}
     </Query>
+  ),
+  savePluginData: ({ page, language, render }) => (
+    <Mutation
+      mutation={mutations.SAVE_PAGE_PLUGIN}
+    >
+      {savePagePlugin => {
+        const fce = (plugin: string, content: string) => {
+          savePagePlugin({
+            variables: {
+              page: page,
+              language: language,
+              plugin: plugin,
+              content: content,
+            }
+          });
+        };
+
+        return render(fce);
+      }}
+    </Mutation>
   )
 });
 
@@ -106,6 +127,7 @@ interface PageIdsQueryVars {
   language: string;
   page: string;
   pageTranslation: string;
+  savePluginData: Function;
 }
 
 class Editor extends Component<Properties, State> {
@@ -121,6 +143,8 @@ class Editor extends Component<Properties, State> {
   };
 
   private DEBUG = true;
+
+  private savePluginData: Function = null;
 
   constructor(props: Properties) {
     super(props);
@@ -195,15 +219,6 @@ class Editor extends Component<Properties, State> {
     this.props.prepareForComposer();
     this.debug('DidMount');
 
-    (async () => {
-      await this.composer.resetContent();
-      if (this.props.name && this.props.name.length > 0) {
-        await this.composer.setName(this.props.name);
-      }
-      await this.composer.enablePlugins('test');
-      await this.composer.setPluginData('test', { name: 'sulin' });
-    })();
-
     // Inform server about new editor of this page
     (async () => {
       const { language } = (await client.cache.readQuery({
@@ -212,8 +227,6 @@ class Editor extends Component<Properties, State> {
       const { website } = (await client.cache.readQuery({
         query: queries.LOCAL_SELECTED_WEBSITE
       })) as LooseObject;
-      // tslint:disable-next-line:no-console
-      console.log(website);
       const { page } = (await client.cache.readQuery({
         query: queries.LOCAL_SELECTED_PAGE
       })) as LooseObject;
@@ -243,9 +256,20 @@ class Editor extends Component<Properties, State> {
         return false;
       });
 
+      (async () => {
+        await this.composer.resetContent();
+        if (this.props.name && this.props.name.length > 0) {
+          await this.composer.setName(this.props.name);
+        }
+        if (language) {
+          await this.composer.enablePlugins('seo');
+        }
+      })();
+
       if (!trans) {
         return;
       }
+
       // Page Translation ID
       const ptid = trans.id;
       this.setState({
@@ -277,7 +301,15 @@ class Editor extends Component<Properties, State> {
 
   handleSave(data: LooseObject) {
     this.props.cancel();
-    // this.props.save(data.content);
+
+    if (this.savePluginData) {
+      if (data && data.plugins) {
+        Object.keys(data.plugins).forEach((name: string) => {
+          // saving plugin data do db
+          this.savePluginData(name, data.plugins[name]);
+        });
+      }
+    }
   }
 
   handleToggleDisplayTaskAndChat() {
@@ -363,14 +395,18 @@ class Editor extends Component<Properties, State> {
           toggleChatAndTask={this.handleToggleDisplayTaskAndChat}
         />
         <PageIdsQuery>
-          {({ page, pageTranslation }: PageIdsQueryVars) => (
-            <ChatTasks
-              page={page}
-              pageTranslation={pageTranslation}
-              taskAndChatHidden={this.state.taskAndChatHidden}
-              handleToggleDisplayTaskAndChat={this.handleToggleDisplayTaskAndChat}
-            />
-          )}
+          {({ page, pageTranslation, savePluginData }: PageIdsQueryVars) => {
+            this.savePluginData = savePluginData;
+
+            return (
+              <ChatTasks
+                page={page}
+                pageTranslation={pageTranslation}
+                taskAndChatHidden={this.state.taskAndChatHidden}
+                handleToggleDisplayTaskAndChat={this.handleToggleDisplayTaskAndChat}
+              />
+            );
+          }}
         </PageIdsQuery>
       </>
     );

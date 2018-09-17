@@ -256,3 +256,23 @@ export const NAVIGATION_NODES = gql`
     }
   }
 `;
+
+export const PAGE_PLUGINS = gql`
+  query getPagePlugins($page: ID!, $language: ID!, $plugin: String!) {
+    pagePlugins( where: {
+      page: { id: $page },
+      language: { id: $language },
+      plugin: $plugin
+    } ) {
+      id
+      page {
+        id
+      }
+      language {
+        id
+      }
+      plugin
+      content
+    }
+  }
+`;
