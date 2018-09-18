@@ -142,7 +142,7 @@
     ],
     "globals": {
       "ts-jest": {
-        "tsConfigFile": "/home/nevim42/Repositories/composer-cms/backoffice/tsconfig.test.json"
+        "tsConfigFile": "tsconfig.test.json"
       }
     }
   },
