@@ -323,3 +323,81 @@ export const REMOVE_PAGE_TYPE = gql`
     ) { id }
   }
 `;
+
+export const CREATE_NAVIGATION = gql`
+  mutation createNavigation($data: NavigationCreateInput!) {
+    createNavigation(
+      data: $data
+    ) {
+      id
+      name
+    }
+  }
+`;
+
+export const UPDATE_NAVIGATION = gql`
+  mutation updateNavigation($id: ID!, $data: NavigationUpdateInput!) {
+    updateNavigation(
+      where: { id: $id },
+      data: $data
+    ) {
+      id
+      name
+    }
+  }
+`;
+
+export const DELETE_NAVIGATION = gql`
+  mutation deleteNavigation($id: ID!) {
+    deleteNavigation( where: { id: $id } ) {
+      id
+    }
+  }
+`;
+
+export const CREATE_NAVIGATION_STRUCTURE = gql`
+  mutation createNavigationStructure($id: ID!, $data: [NavigationNodeCreateInput]!) {
+    createNavigationStructure(
+      navigation: $id,
+      data: $data
+    ) {
+      id
+      page
+      order
+      parent
+      navigation {
+        id
+      }
+    }
+  }
+`;
+
+export const SAVE_PAGE_PLUGIN = gql`
+    mutation savePagePlugin(
+        $page: ID,
+        $language: ID,
+        $plugin: String!,
+        $content: Json,
+    ) {
+        savePagePlugin(
+            data: {
+                page: {
+                    connect: {
+                        id: $page
+                    }
+                },
+                language: {
+                    connect: {
+                        id: $language
+                    }
+                },
+                plugin: $plugin,
+                content: $content
+            }
+        ) {
+            id
+            plugin
+            content
+        }
+    }
+`;
