@@ -33,18 +33,18 @@
   dependencies:
     uuid "^3.3.2"
 
-"@foxer360/composer@git+ssh:git@github.com:Foxer-360/composer.git#sandbox":
+"@foxer360/composer@git+https://github.com/Foxer-360/composer.git#sandbox":
   version "0.1.0"
-  resolved "git+ssh:git@github.com:Foxer-360/composer.git#181c0a6e49f3b256a810e8a699202b0005c541f4"
+  resolved "git+https://github.com/Foxer-360/composer.git#77a19abc125bf34ff4a88527043955f698b552eb"
   dependencies:
     "@foxer-360/delta" "git+ssh://git@github.com:Foxer-360/delta.git#sandbox"
     antd "^3.9.2"
     axios "^0.18.0"
     react-frame-component "^4.0.1"
 
-"@foxer360/delta@git+ssh:git@github.com:Foxer-360/delta#sandbox":
+"@foxer360/delta@git+https://github.com/Foxer-360/delta#sandbox":
   version "0.1.0"
-  resolved "git+ssh:git@github.com:Foxer-360/delta#4152117a328864f7070964ffa9127346de3fe6e7"
+  resolved "git+https://github.com/Foxer-360/delta#4152117a328864f7070964ffa9127346de3fe6e7"
   dependencies:
     uuid "^3.3.2"
 
