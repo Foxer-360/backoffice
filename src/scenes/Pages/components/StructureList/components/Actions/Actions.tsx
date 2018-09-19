@@ -7,6 +7,7 @@ import history from '@source/services/history';
 
 export interface Properties {
   id: string;
+  url: string;
 
   handleAddPage: (id: string) => void;
   handleEditPage: (id: string) => void;
@@ -50,6 +51,30 @@ const RemovePageMutation = adopt({
   )
 });
 
+/**
+ * Assume that in env.REACT_APP_FRONTEND_URL is specified server
+ *
+ * @param  {string} url relative
+ * @return {void}
+ */
+const openInNewTab = (url: string) => {
+  if (!window || window === undefined || window === null) {
+    return;
+  }
+
+  const server = process.env.REACT_APP_FRONTEND_URL;
+  if (!server || server === undefined || server === null || server.length < 2) {
+    return;
+  }
+
+  if (url[0] !== '/') {
+    url = `/${url}`;
+  }
+
+  const win = window.open(`${server}${url}`, '_blank');
+  win.focus();
+};
+
 const Actions = (props: Properties) => (
   <>
     <Button size="small" icon="plus-circle-o" onClick={() => props.handleAddPage(props.id)} />
@@ -61,6 +86,7 @@ const Actions = (props: Properties) => (
         </Popconfirm>
       )}
     </RemovePageMutation>
+    <Button size="small" icon="eye" style={{ marginLeft: 6 }} onClick={() => openInNewTab(props.url)} />
   </>
 );
 

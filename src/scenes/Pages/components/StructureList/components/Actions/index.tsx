@@ -12,6 +12,7 @@ const recordWrapper = (handleAddPage: ActionCallback,
   handleEditPage: ActionCallback) => (text: string, record: LooseObject) => (
   <Actions
     id={record.id}
+    url={`${record.urlPrefix}${record.fullUrl}`}
     handleAddPage={handleAddPage}
     handleEditPage={handleEditPage}
   />
