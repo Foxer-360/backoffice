@@ -23,6 +23,8 @@ export interface TablePage {
   parent: string | null;
   type: string;
   url: string;
+  urlPrefix?: string;
+  fullUrl?: string;
   children?: Array<TablePage>;
 }
 
@@ -52,6 +54,13 @@ const PageList = adopt({
     <Query query={queries.LOCAL_SELECTED_LANGUAGE}>
       {({ data }) => {
         return render(data.language);
+      }}
+    </Query>
+  ),
+  fullWebsite: ({ website, render }) => (
+    <Query query={queries.WEBSITE_DETAIL} variables={{ id: website }}>
+      {({ data }) => {
+        return render(data.website);
       }}
     </Query>
   ),
@@ -97,6 +106,13 @@ const PageList = adopt({
     );
   },
 });
+
+interface PageListObject {
+  website?: string;
+  language?: string;
+  fullWebsite?: LooseObject;
+  pages?: Array<Page>;
+}
 
 class StructureList extends Component<Properties, State> {
 
@@ -180,19 +196,56 @@ class StructureList extends Component<Properties, State> {
     // Clear
     for (let i = 0; i < roots.length; i++) {
       roots[i] = this.removeEmptyChildrens(roots[i]);
+      this.resolveFullUrls(roots[i], null);
     }
     return roots;
+  }
+
+  resolveFullUrls(node: TablePage, parentUrl: string | null) {
+    node.fullUrl = parentUrl ? `${parentUrl}/${node.url}` : `/${node.url}`;
+
+    if (node.children === null || node.children === undefined) {
+      return;
+    }
+    if (node.children.length < 1) {
+      return;
+    }
+
+    node.children.forEach((child: TablePage) => {
+      this.resolveFullUrls(child, node.fullUrl);
+    }, this);
+  }
+
+  getUrlPrefix(website: LooseObject, language: string) {
+    const lang = website.languages.find((l: LooseObject) => {
+      if (l.id === language) {
+        return true;
+      }
+
+      return false;
+    });
+
+    let websiteMask = website.urlMask;
+    if (websiteMask[websiteMask.length - 1] === '/') {
+      websiteMask = websiteMask.slice(0, -1);
+    }
+
+    if (!lang) {
+      return websiteMask;
+    }
+
+    return `${websiteMask}/${lang.code}`;
   }
 
   render() {
     return (
       <>
         <PageList>
-          {({ pages }: { pages: Array<Page> }) => {
+          {({ fullWebsite, language, pages }: PageListObject) => {
             if (!pages || pages.length < 1) {
               return (
                 <>
-                  <Table columns={this.COLUMNS} dataSource={[]} />
+                  <Table columns={this.COLUMNS} dataSource={[]} defaultExpandAllRows={true} />
                   <div>
                   <br />
                   <Button icon="plus-circle-o" onClick={() => this.handleAddPage(null)} type="primary">
@@ -203,15 +256,24 @@ class StructureList extends Component<Properties, State> {
               );
             }
 
-            let data: Array<TablePage> = this.pagesToTree(pages.map((page: Page) => {
-              let res: TablePage = {
+            // const keysToExpand = [] as string[];
+            const urlPrefix = this.getUrlPrefix(fullWebsite, language);
+            const data: Array<TablePage> = this.pagesToTree(pages.map((page: Page) => {
+              const res: TablePage = {
                 ...page,
-                key: page.id
+                key: page.id,
+                urlPrefix,
               };
               return res;
             }));
 
-            return <Table columns={this.COLUMNS} dataSource={data} />;
+            return (
+              <Table
+                columns={this.COLUMNS}
+                dataSource={data}
+                defaultExpandAllRows={true}
+              />
+            );
           }}
         </PageList>
 
