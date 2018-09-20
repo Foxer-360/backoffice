@@ -260,8 +260,8 @@ class Editor extends Component<Properties, State> {
 
       (async () => {
         await this.composer.resetContent();
-        if (this.props.name && this.props.name.length > 0) {
-          await this.composer.setName(this.props.name);
+        if (trans && trans.name) {
+          await this.composer.setName(trans.name);
         }
         if (language) {
           await this.composer.enablePlugins('seo');
