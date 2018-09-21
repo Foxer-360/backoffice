@@ -45,5 +45,78 @@
   border: 0;
   height: 1px;
   margin: 1em auto;
-  border-bottom: 1px solid #d9d9d9;
+  border-bottom: 1px solid #fdfdfd;
+}
+
+.dashBoard {
+  .ant-card {
+    height: 100%;
+  }
+
+  .ant-list-item {
+    transition: 300ms ease;
+
+
+    &:hover {
+      // background: #f8f8f8;
+      background: #F0FBFF;
+    }
+  }
+
+  h3 {
+    color: #c6c6c6;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #c6c6c6;
+    padding-bottom: 16px;
+    display: flex;
+    align-items: c;
+  }
+
+  &__card {
+    &__cont {
+      height: 280px;
+      overflow-y: scroll;
+    }
+
+    &__task {
+      width: 100%;
+      padding: 0 12px;
+
+      &__main {
+        display: flex;
+        justify-content: space-between;
+        padding-bottom: 8px;
+
+        .dueDate {
+          color: #c6c6c6;
+          display: flex;
+          align-items: center;
+        }
+      }
+
+      &__detail {
+        padding-left: 25px;
+        display: flex;
+        justify-content: space-between;
+
+        & > div {
+          display: flex;
+          align-items: center;
+        }
+
+        .anticon {
+          color: #c6c6c6;
+          font-size: 19px;
+          margin-right: 6px;
+        }
+      }
+    }
+
+    &__btn {
+      margin: 20px 0 0;
+      display: flex;
+      justify-content: center;
+    }
+  }
 }
