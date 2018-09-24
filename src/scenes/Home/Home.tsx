@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { Row, Col, Form, Input, Card, Icon, Button, List, Checkbox, Avatar, Tag } from 'antd';
+import TaskList from '@source/components/Ui/TaskList';
+import ChatList from '@source/components/Ui/ChatList';
 
 interface Chat {
   contact: string;
@@ -98,39 +100,7 @@ const Home = () => (
           </h3>
 
           <div className={'dashBoard__card__cont'}>
-            <List
-              size={'large'}
-              dataSource={tasks}
-              renderItem={(task: string) => (
-                <List.Item>
-                  <div className={'dashBoard__card__task'}>
-                    <div className={'dashBoard__card__task__main'}>
-                      <Checkbox>
-                        <span style={{ fontSize: '17px' }}>{task}</span>
-                      </Checkbox>
-                      <span className={'dueDate'}>
-                        <Icon style={{ marginRight: '5px' }} type={'clock-circle'} />
-                        29/09/2018
-                      </span>
-                    </div>
-
-                    <div className={'dashBoard__card__task__detail'}>
-                      {/* <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" /> */}
-                      <span style={{ color: '#c6c6c6' }}>By Emilio Herrera</span>
-
-                      <div>
-                        <Icon type={'tag'} />
-                        <span>
-                          <Tag color="geekblue">BUG</Tag>
-                          <Tag color="blue">JS</Tag>
-                          <Tag color="cyan">CSS</Tag>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </List.Item>
-              )}
-            />
+            <TaskList tasks={tasks} />
           </div>
 
           <div className={'dashBoard__card__btn'}>
@@ -156,29 +126,7 @@ const Home = () => (
           </h3>
 
           <div className={'dashBoard__card__cont'}>
-            <List
-              dataSource={chats}
-              renderItem={(chat: Chat) => (
-                <List.Item style={{ padding: '12px' }}>
-                  <List.Item.Meta
-                    avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                    title={
-                      <a href="https://ant.design">
-                        {chat.contact}
-                        <span>
-                          <Icon type={'arrow-right'} style={{ color: 'green', fontSize: '10px', marginLeft: '12px' }} />
-                        </span>
-                      </a>
-                    }
-                    description={chat.lastMessage}
-                  />
-                  <span className={'dueDate'} style={{ color: '#c6c6c6', fontSize: '12px' }}>
-                    <Icon style={{ marginRight: '5px', marginTop: '2px' }} type={'clock-circle'} />
-                    29/09/2018
-                  </span>
-                </List.Item>
-              )}
-            />
+            {/* <ChatList chats={chats}/> */}
           </div>
 
           <div className={'dashBoard__card__btn'}>

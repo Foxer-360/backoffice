@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Button, Col, Input, List, Modal, Popconfirm, Row, Switch } from 'antd';
+import { Button, Col, Input, List, Modal, Popconfirm, Row, Switch, Checkbox, Tag, Icon } from 'antd';
+import TaskList from '@source/components/Ui/TaskList';
 
 const { Component } = React;
 
@@ -46,24 +47,51 @@ const ListRenderItem = (
   remove: (id: string) => void
 ) => (item: TaskItem) => (
   <List.Item style={{ borderBottom: '1px solid e8e8e8', borderTop: ' 1px solid e8e8e8' }}>
-    <List.Item.Meta title={Title(item.name, item.updatedAt)} description={item.description} />
-    <Button
-      type="primary"
-      size="small"
-      icon="edit"
-      style={{ marginRight: '8px' }}
-      onClick={() => edit(item.id, { name: item.name, description: item.description })}
-    />
-    <Button
-      type={item.done ? 'primary' : 'default'}
-      size="small"
-      icon={item.done ? 'close-circle-o' : 'check-circle-o'}
-      style={{ marginRight: '8px' }}
-      onClick={() => toggle(item.id, !item.done)}
-    />
-    <Popconfirm title="Are you sure to delete this task?" onConfirm={() => remove(item.id)}>
-      <Button type="danger" size="small" icon="delete" />
-    </Popconfirm>
+    {/* <List.Item.Meta title={Title(item.name, item.updatedAt)} description={item.description} />
+  */}
+
+    <List.Item>
+      <div className={'dashBoard__card__task'}>
+        <div className={'dashBoard__card__task__main'}>
+          <Checkbox checked={item.done} onChange={() => toggle(item.id, !item.done)}>
+            <span style={{ fontSize: '17px' }}>{item.name}</span>
+          </Checkbox>
+          <span className={'dueDate'}>
+            <Icon style={{ marginRight: '5px' }} type={'clock-circle'} />
+            {item.updatedAt.toLocaleDateString()}
+          </span>
+        </div>
+
+        <div className={'dashBoard__card__task__detail'}>
+          <span style={{ color: '#c6c6c6' }}>By Emilio Herrera</span>
+
+          <div>
+            <Icon type={'tag'} />
+            <span>
+              <Tag color="geekblue">BUG</Tag>
+              <Tag color="blue">JS</Tag>
+              <Tag color="cyan">CSS</Tag>
+            </span>
+          </div>
+        </div>
+
+        {item.description && <p className={'dashBoard__card__task__desc'}>{item.description}</p>}
+
+        <div className={'dashBoard__card__task__hover'}>
+          <Button
+            type="primary"
+            size="small"
+            icon="edit"
+            style={{ marginRight: '8px' }}
+            onClick={() => edit(item.id, { name: item.name, description: item.description })}
+          />
+          
+          <Popconfirm title="Are you sure to delete this task?" onConfirm={() => remove(item.id)}>
+            <Button type="danger" size="small" icon="delete" />
+          </Popconfirm>
+        </div>
+      </div>
+    </List.Item>
   </List.Item>
 );
 
@@ -147,25 +175,16 @@ class Tasks extends Component<Properties, State> {
             }}
           >
             <span>Unfinished tasks first</span>
-            <Switch
-              checked={this.state.unfinishedFirst}
-              onChange={this.handleUnfinishedFirstSwitch}
-            />
+            <Switch checked={this.state.unfinishedFirst} onChange={this.handleUnfinishedFirstSwitch} />
           </div>
         </div>
 
         {/* List with tasks */}
-        <div
-          style={{ overflowY: 'scroll', overflowX: 'hidden', height: '350px', paddingRight: '8px' }}
-        >
+        <div style={{ overflowY: 'scroll', overflowX: 'hidden', height: '350px', paddingRight: '8px' }}>
           <List
             itemLayout={'vertical'}
             dataSource={data}
-            renderItem={ListRenderItem(
-              this.handleEditTask,
-              this.handleToggleDone,
-              this.handleDeleteTask
-            )}
+            renderItem={ListRenderItem(this.handleEditTask, this.handleToggleDone, this.handleDeleteTask)}
             locale={{ emptyText: 'No tasks to show' }}
           />
         </div>
