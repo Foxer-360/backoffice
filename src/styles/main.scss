@@ -1,3 +1,7 @@
+body {
+  overflow: hidden;
+}
+
 .ant-breadcrumb-separator,
 .ant-breadcrumb-link {
   color: white;
@@ -19,17 +23,22 @@
   & > .ant-row {
     display: flex;
     justify-content: stretch;
-    min-height: 87.6vh;
   }
 
   .ant-col-16,
   .ant-col-8 {
     .ant-card {
       height: 100%;
-
       .ant-card-body {
+        max-height: calc(98vh - 141px);
         height: 100%;
       }
+    }
+  }
+
+  .ant-col-8 {
+    .ant-card-body {
+      overflow-y: scroll;
     }
   }
 }
