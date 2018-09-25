@@ -164,8 +164,19 @@ body {
       .chatBubble {
         order: 2;
         &__content {
+          background: #8c8c8c;
+          border-radius: 5px 5px 5px 5px;
           &:after {
-            left: 2px;
+            content: '';
+            width: 0px;
+            height: 0px;
+            position: absolute;
+            border-left: 5px solid #0000;
+            border-right: 5px solid #8c8c8c;
+            border-top: 5px solid #8c8c8c;
+            border-bottom: 5px solid #0000;
+            left: -10px;
+            top: 6px;
           }
         }
       }
@@ -179,8 +190,20 @@ body {
       .chatBubble {
         order: 1;
         &__content {
+          background: #1890ff;
+          border-radius: 5px 5px 5px 5px;
+
           &:after {
-            right: 2px;
+            content: '';
+            width: 0px;
+            height: 0px;
+            position: absolute;
+            border-left: 5px solid #1890ff;
+            border-right: 5px solid transparent;
+            border-top: 5px solid #1890ff;
+            border-bottom: 5px solid transparent;
+            right: -10px;
+            top: 6px;
           }
         }
       }
@@ -197,24 +220,13 @@ body {
     flex-wrap: wrap;
 
     &__content {
-      background: #1890ff;
+      position: relative;
       color: #fff;
-      border-radius: 5px;
+
       padding: 5px 10px;
       display: flex;
       justify-content: space-between;
       width: 100%;
-
-      &:after {
-        position: absolute;
-        content: '';
-        height: 10px;
-        width: 10px;
-        background: #1890ff;
-
-        bottom: -2px;
-        transform: rotate(45deg);
-      }
     }
 
     &:hover {

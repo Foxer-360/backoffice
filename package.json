@@ -7,7 +7,8 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@foxer360/composer": "git+https://github.com/Foxer-360/composer#sandbox",
+      "@foxer360/composer": "git+https://github.com/Foxer-360/composer#sandbox",
+
     "@foxer360/delta": "git+https://github.com/Foxer-360/delta#sandbox",
     "antd": "^3.5.1",
     "apollo-boost": "^0.1.12",
