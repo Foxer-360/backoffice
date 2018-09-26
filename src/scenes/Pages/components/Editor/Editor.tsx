@@ -38,6 +38,7 @@ interface State {
   locks: ILockInfo[];
   pageId: string;
   taskAndChatHidden: boolean;
+  page: string;
 }
 
 const PageIdsQuery = adopt({
@@ -100,15 +101,15 @@ const PageIdsQuery = adopt({
       }}
     </Query>
   ),
-  savePluginData: ({ page, language, render }) => (
+  savePluginData: ({ language, render }) => (
     <Mutation
       mutation={mutations.SAVE_PAGE_PLUGIN}
     >
       {savePagePlugin => {
-        const fce = (plugin: string, content: string) => {
+        const fce = (plugin: string, content: string, page: string) => {
           savePagePlugin({
             variables: {
-              page: page,
+              page,
               language: language,
               plugin: plugin,
               content: content,
@@ -154,7 +155,8 @@ class Editor extends Component<Properties, State> {
       editors: [] as string[],
       locks: [] as ILockInfo[],
       pageId: null,
-      taskAndChatHidden: true
+      taskAndChatHidden: true,
+      page: null,
     };
 
     // Bind socket to handle updates from server
@@ -258,8 +260,8 @@ class Editor extends Component<Properties, State> {
 
       (async () => {
         await this.composer.resetContent();
-        if (this.props.name && this.props.name.length > 0) {
-          await this.composer.setName(this.props.name);
+        if (trans && trans.name) {
+          await this.composer.setName(trans.name);
         }
         if (language) {
           await this.composer.enablePlugins('seo');
@@ -273,7 +275,8 @@ class Editor extends Component<Properties, State> {
       // Page Translation ID
       const ptid = trans.id;
       this.setState({
-        pageId: ptid
+        pageId: ptid,
+        page,
       });
       this.startEditPage(ptid);
     })();
@@ -306,7 +309,7 @@ class Editor extends Component<Properties, State> {
       if (data && data.plugins) {
         Object.keys(data.plugins).forEach((name: string) => {
           // saving plugin data do db
-          this.savePluginData(name, data.plugins[name]);
+          this.savePluginData(name, data.plugins[name], this.state.page);
         });
       }
     }

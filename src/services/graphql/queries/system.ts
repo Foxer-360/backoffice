@@ -91,10 +91,12 @@ export const WEBSITE_DETAIL = gql`
       title
       languages {
         id
+        code
         name
       }
       defaultLanguage {
         id
+        code
         name
       }
       urlMask
