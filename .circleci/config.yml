@@ -1,0 +1,79 @@
+# Configure Circle CI
+version: 2
+
+# Setup some references
+references:
+  # Define workspace directory (where is repo cloned)
+  workspace_root: &workspace_root
+    /home/circleci/backoffice
+
+  # Define default image and configuration for machine
+  config_machine: &config_machine
+    docker:
+      - image: circleci/node:10.11.0
+    working_directory: *workspace_root
+
+  # Define how to restore cached dependencies (node_modules)
+  restore_dependencies: &restore_dependencies
+    restore_cache:
+      keys:
+        # Use dependencies from cache which correspond to some package.json version
+        - v1-dependencies-{{ checksum "package.json" }}
+        # Fallout to use latest cache, if no exact is found
+        - v1-dependencies
+
+  # Define how to save dependencies (node_modules) into cache
+  save_dependencies: &save_dependencies
+    save_cache:
+      paths:
+        - node_modules
+      key: v1-dependencies-{{ checksum "package.json" }}
+
+  # Define how to persist data into workspace for other jobs
+  persist_workspace: &persist_workspace
+    persist_to_workspace:
+      root: *workspace_root
+      paths:
+        - build
+
+  # Define how to attach persisted data into current workspace
+  attach_workspace: &attach_workspace
+    attach_workspace:
+      at: *workspace_root
+
+# Define jobs for this repository
+jobs:
+  # Build backoffice
+  build:
+    # Configure machine
+    << : *config_machine
+    steps:
+      # Checkout this repository
+      - checkout
+      # Load dependencies from cache
+      - *restore_dependencies
+      # Install dependencies
+      - run:
+          name: Install dependencies using Yarn
+          command: yarn install
+      # Save dependencies
+      - *save_dependencies
+      # Resolve components and plugins
+      - run:
+          name: Resolve Components and Plugins
+          command: yarn deps
+      # Build backoffice
+      - run:
+          name: Build library
+          command: yarn rebuild
+      # Save build into workspace
+      - *persist_workspace
+
+# Define workflows for this repository
+workflows:
+  version: 2
+
+  # Build
+  build:
+    jobs:
+      - build
