@@ -27,25 +27,18 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
-"@foxer360/composer@git+https://github.com/Foxer-360/composer#sandbox":
+"@foxer360/composer@git+https://github.com/Foxer-360/composer.git#v0.1.0":
   version "0.1.0"
-  resolved "git+https://github.com/Foxer-360/composer#e2e85b14c72d7e4bcb5702b93d60a2190a4fa999"
+  resolved "git+https://github.com/Foxer-360/composer.git#07b2ec4228e328ef349f127b141dcb31aa661333"
   dependencies:
-    "@foxer360/delta" "git+https://github.com/Foxer-360/delta.git#sandbox"
+    "@foxer360/delta" "git+https://github.com/Foxer-360/delta.git#v0.1.0"
     antd "^3.9.2"
     axios "^0.18.0"
     react-frame-component "^4.0.1"
 
-"@foxer360/delta@git+https://github.com/Foxer-360/delta#sandbox":
+"@foxer360/delta@git+https://github.com/Foxer-360/delta.git#v0.1.0":
   version "0.1.0"
-  uid "4152117a328864f7070964ffa9127346de3fe6e7"
-  resolved "git+https://github.com/Foxer-360/delta#4152117a328864f7070964ffa9127346de3fe6e7"
-  dependencies:
-    uuid "^3.3.2"
-
-"@foxer360/delta@git+https://github.com/Foxer-360/delta.git#sandbox":
-  version "0.1.0"
-  resolved "git+https://github.com/Foxer-360/delta.git#4152117a328864f7070964ffa9127346de3fe6e7"
+  resolved "git+https://github.com/Foxer-360/delta.git#170f50e0cb5e51ff093ade81d453209b9083d606"
   dependencies:
     uuid "^3.3.2"
 
