@@ -64,8 +64,8 @@ jobs:
           command: yarn deps
       # Build backoffice
       - run:
-          name: Build library
-          command: yarn rebuild
+          name: Build BackOffice
+          command: yarn build
       # Save build into workspace
       - *persist_workspace
 
