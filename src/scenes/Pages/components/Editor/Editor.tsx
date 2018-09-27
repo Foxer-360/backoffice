@@ -10,8 +10,9 @@ import ChatTasks from '@source/scenes/ChatTasks';
 import { adopt } from 'react-adopt';
 import { Query, Mutation } from 'react-apollo';
 import { IContent } from '@foxer360/delta';
-import { ComponentsModule } from '@source/services/modules';
+import { ComponentsModule, PluginsModule } from '@source/services/modules';
 import Seo from '@source/plugins/Seo/Seo';
+import { Context } from '@foxer360/composer';
 
 const { Component } = React;
 const socket = connect();
@@ -39,6 +40,7 @@ interface State {
   pageId: string;
   taskAndChatHidden: boolean;
   page: string;
+  context: Context;
 }
 
 const PageIdsQuery = adopt({
@@ -157,7 +159,13 @@ class Editor extends Component<Properties, State> {
       pageId: null,
       taskAndChatHidden: true,
       page: null,
+      context: new Context(),
     };
+
+    this.state.context.addListener('list', (property: string) => {
+      // tslint:disable-next-line:no-console
+      console.log(`{CONTEXT} Property ${property} was changed !`);
+    });
 
     // Bind socket to handle updates from server
     socket.on('composer/update', (payload: LooseObject) => {
@@ -264,7 +272,7 @@ class Editor extends Component<Properties, State> {
           await this.composer.setName(trans.name);
         }
         if (language) {
-          await this.composer.enablePlugins('seo');
+          await this.composer.enablePlugins(['seo', 'list']);
         }
       })();
 
@@ -382,7 +390,7 @@ class Editor extends Component<Properties, State> {
           onComponentStartEditing={this.props.startEditing}
           onComponentStopEditing={this.props.stopEditing}
           componentService={ComponentsModule}
-          pluginService={PluginService}
+          pluginService={PluginsModule}
           onComponentAdded={data => this.handleEvent('onComponentAdded', data)}
           onComponentTryAdd={data => this.handleEvent('onComponentTryAdd', data)}
           editors={editors}
@@ -396,6 +404,7 @@ class Editor extends Component<Properties, State> {
           activateComponentRemove={this.activatorRemoveComponent}
           activateCommit={this.activatorCommit}
           toggleChatAndTask={this.handleToggleDisplayTaskAndChat}
+          context={this.state.context}
         />
         <PageIdsQuery>
           {({ page, pageTranslation, savePluginData }: PageIdsQueryVars) => {
