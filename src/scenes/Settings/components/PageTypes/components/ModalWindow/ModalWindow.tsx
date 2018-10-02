@@ -107,7 +107,9 @@ class ModalWindow extends Component<Properties, State> {
                 placeholder="Select plugins for this page type"
                 value={this.state.plugins}
               >
-                <Select.Option key="seo" value="seo">SEO</Select.Option>
+                {PluginsModule.getPluginTypes().map((type: string) => (
+                  <Select.Option key={type} value={type}>{PluginsModule.getPluginTabName(type)}</Select.Option>
+                ))}
               </Select>
             </Col>
           </Row>

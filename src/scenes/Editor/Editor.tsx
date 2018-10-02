@@ -10,6 +10,7 @@ import { connect, StandardResponse } from '@source/services/socket';
 import ChatTasks from '@source/scenes/ChatTasks';
 import { ComponentsModule, PluginsModule } from '@source/services/modules';
 import history from '@source/services/history';
+import { client } from '@source/services/graphql';
 import { Alert, Card, Spin } from 'antd';
 import * as React from 'react';
 
@@ -78,6 +79,7 @@ class Editor extends React.Component<IProperties, IState> {
     this.activatorCommit = this.activatorCommit.bind(this);
     this.initComposerReference = this.initComposerReference.bind(this);
     this.initComposer = this.initComposer.bind(this);
+    this.writeInfoIntoContext = this.writeInfoIntoContext.bind(this);
   }
 
   public componentDidUpdate(prevProps: IProperties) {
@@ -100,6 +102,7 @@ class Editor extends React.Component<IProperties, IState> {
     }
 
     if (necessaryToReload) {
+      this.writeInfoIntoContext();
       this.stopEditPage(prevProps.pageTranslationId);
       this.startEditPage();
     }
@@ -110,6 +113,7 @@ class Editor extends React.Component<IProperties, IState> {
     socket.on('composer/update', this.handleSocketUpdate);
     socket.on('composer/updateCommits', this.handleComposerCommitUpdates);
 
+    this.writeInfoIntoContext();
     this.startEditPage();
   }
 
@@ -172,6 +176,16 @@ class Editor extends React.Component<IProperties, IState> {
   }
 
   /**
+   * Write context information into context
+   *
+   * @return {void}
+   */
+  private writeInfoIntoContext() {
+    this.state.context.writeProperty('website', this.props.websiteId);
+    this.state.context.writeProperty('language', this.props.languageId);
+  }
+
+  /**
    * Save reference of composer into this class
    *
    * @param {Composer} node reference of composer
@@ -196,7 +210,7 @@ class Editor extends React.Component<IProperties, IState> {
     await this.composer.setContent((this.state.content as any)); // tslint:disable-line:no-any
     await this.composer.importDelta((this.state.delta as any)); // tslint:disable-line:no-any
     await this.composer.setName(this.props.pageTranslation.name);
-    await this.composer.enablePlugins(this.props.pageType.plugins);
+    await this.composer.enablePlugins(this.props.pageType.plugins, client);
   }
 
   /**
