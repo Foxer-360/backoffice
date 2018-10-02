@@ -53,7 +53,7 @@ const TagQM = adopt({
       </Query>
     );
   },
-  createTag: ({ render, website }) => (
+  createTag: ({ website, render}) => (
     <Mutation
       mutation={mutations.CREATE_TAG}
       update={(cache, { data: { createTag } }) => {
@@ -68,7 +68,13 @@ const TagQM = adopt({
         });
       }}
     >
-      {createTag => render(createTag)}
+      {createTag => {
+        const fce = (data: LooseObject) => {
+          createTag({ variables: { ...data, website }});
+        };
+
+        return render(fce);
+      }}
     </Mutation>
   ),
   deleteTag: ({ render, website }) => (
@@ -89,7 +95,7 @@ const TagQM = adopt({
       {deleteTag => render(deleteTag)}
     </Mutation>
   ),
-  updateTag: ({ render, website }) => (
+  updateTag: ({ website, render }) => (
     <Mutation
       mutation={mutations.UPDATE_TAG}
       update={(cache, { data: { updateTag } }) => {
@@ -111,7 +117,13 @@ const TagQM = adopt({
         });
       }}
     >
-      {updateTag => render(updateTag)}
+      {updateTag => {
+        const fce = (data: LooseObject) => {
+          updateTag({ variables: { ...data }});
+        };
+
+        return render(fce);
+      }}
     </Mutation>
   ),
 });
@@ -129,25 +141,20 @@ interface State {
   showModal: boolean;
 }
 
-interface DeleteTagInput {
-  id: string;
-}
-
-interface CreateTagInput {
-  data: TagWithJoin;
-}
-
-interface UpdateTagInput {
-  id: string;
-  data: TagWithJoin;
-}
-
 interface CreateTagOutput {
   data: {
     createTag: {
       id: string;
     };
   };
+}
+
+interface QaMForModalVars {
+  tags: Tag[];
+  website: string;
+  createTag: (data: LooseObject) => Promise<void>;
+  updateTag: (data: LooseObject) => Promise<void>;
+  deleteTag: (data: LooseObject) => Promise<void>;
 }
 
 class Tags extends Component<Properties, State> {
@@ -195,13 +202,7 @@ class Tags extends Component<Properties, State> {
           Add new tag
         </Button>
         <TagQM>
-          {({ tags, website, createTag, updateTag, deleteTag }: {
-            tags: Tag[],
-            website: string,
-            createTag: (data: QueryVariables<CreateTagInput>) => Promise<CreateTagOutput>,
-            updateTag: (data: QueryVariables<UpdateTagInput>) => Promise<void>,
-            deleteTag: (data: QueryVariables<DeleteTagInput>) => Promise<void>
-          }) => {
+          {({ tags, website, createTag, updateTag, deleteTag }: QaMForModalVars) => {
             const tableData = tags.map((a: Tag) => ({ ...a, key: a.id }));
 
             const COLUMNS = [{
@@ -218,9 +219,11 @@ class Tags extends Component<Properties, State> {
               )
             }, {
               title: 'Color',
-              dataIndex: 'color',
               key: 'color',
               width: '12%',
+              render: (record: Tag) => (
+                <span style={{ color: record.color}}>{record.color}</span>
+              )
             }, {
               title: 'Actions',
               key: 'actions',
@@ -250,20 +253,19 @@ class Tags extends Component<Properties, State> {
                   }}
                   onSave={async (name: string, displayInNavigation: boolean, color: string, plugins: string[]) => {
                     this.setState({ showModal: false });
-                    const data: TagWithJoin = {
+                    const data = {
                       name,
                       displayInNavigation,
                       color,
-                      plugins,
-                      website: { connect: { id: website } }
+                      plugins
                     };
 
                     if (this.state.edit) {
-                      await updateTag({ variables: { data, id: this.state.id } });
+                      await updateTag({ ...data, id: this.state.id });
                       message.success('Tag updated!');
                       this.setState({ ...this.DEFAULT });
                     } else {
-                      await createTag({ variables: { data } });
+                      await createTag({ ...data, website: { connect: { id: website } } });
                       message.success('Tag created!');
                     }
                   }}

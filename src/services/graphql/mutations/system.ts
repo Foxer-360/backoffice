@@ -403,9 +403,25 @@ export const SAVE_PAGE_PLUGIN = gql`
 `;
 
 export const CREATE_TAG = gql`
-  mutation createTag($data: TagCreateInput!) {
+  mutation createTag(
+    $website: ID!,
+    $name: String!,
+    $displayInNavigation: Boolean!,
+    $color: String!,
+    $plugins: [String!]!
+  ) {
     createTag(
-      data: $data
+      data: {
+        website: {
+          connect: { id: $website }
+        }
+        name: $name,
+        displayInNavigation: $displayInNavigation,
+        color: $color,
+        plugins: {
+          set: $plugins,
+        },
+      }
     ) {
       id
       name
@@ -425,10 +441,23 @@ export const DELETE_TAG = gql`
 `;
 
 export const UPDATE_TAG = gql`
-  mutation updateTag($id: ID!, $data: TagUpdateInput!) {
+  mutation updateTag(
+    $id: ID!, 
+    $name: String!, 
+    $displayInNavigation: Boolean!, 
+    $color: String!, 
+    $plugins: [String!]!
+  ) {
     updateTag(
       where: { id: $id },
-      data: $data
+      data: {
+        name: $name,
+        displayInNavigation: $displayInNavigation,
+        color: $color,
+        plugins: {
+          set: $plugins,
+        },
+      }
     ) {
       id
       name

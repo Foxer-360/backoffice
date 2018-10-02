@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Col, Input, Checkbox, Modal, Row, message } from 'antd';
+import { Col, Input, Checkbox, Select, Modal, Row, message } from 'antd';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 
 const { Component } = React;
@@ -30,6 +30,7 @@ class ModalWindow extends Component<Properties, State> {
 
   constructor(props: Properties) {
     super(props);
+
     if (props.edit && props.data) {
       this.state = {
         name: props.data.name,
@@ -40,9 +41,11 @@ class ModalWindow extends Component<Properties, State> {
     } else {
       this.state = { ...this.DEFAULT };
     }
+
+    this.handleChangePlugins = this.handleChangePlugins.bind(this);
   }
 
-  componentWillReceiveProps(props: Properties) {
+  public componentWillReceiveProps(props: Properties) {
     if (props.edit && props.data) {
       this.setState({
         name: props.data.name,
@@ -53,26 +56,14 @@ class ModalWindow extends Component<Properties, State> {
     }
   }
 
-  handleCancel(): void {
-    this.props.onCancel();
-    this.setState({ ...this.DEFAULT });
-  }
+  public render() {
 
-  handleSave(): void {
-    if (this.state.name && this.state.name.length) {
-      this.props.onSave(
-        this.state.name,
-        this.state.displayInNavigation,
-        this.state.color,
-        this.state.plugins
-      );
-      this.setState({ ...this.DEFAULT });
-    } else {
-      message.error('Name can not be empty!');
-    }
-  }
+    const labelSize = 4;
+    const labelStyle = { padding: '6px 12px' };
+    const colorInputStyle = this.state.color
+      ? { borderBottom: `4px solid ${this.state.color}`, paddingBottom: '1px' }
+      : {};
 
-  render() {
     return (
       <Modal
         title={'Create new tag'}
@@ -82,7 +73,7 @@ class ModalWindow extends Component<Properties, State> {
         onOk={() => this.handleSave()}
       >
         <Row style={{ marginBottom: '20px' }}>
-          <Col span={4} style={{ padding: '6px 12px' }}>
+          <Col span={labelSize} style={labelStyle}>
             <span>Name:</span>
           </Col>
           <Col span={20} style={{ paddingRight: '20px' }}>
@@ -94,19 +85,37 @@ class ModalWindow extends Component<Properties, State> {
         </Row>
 
         <Row style={{ marginBottom: '20px' }}>
-          <Col span={4} style={{ padding: '6px 12px' }}>
+          <Col span={labelSize} style={labelStyle}>
             <span>Color:</span>
           </Col>
           <Col span={20} style={{ paddingRight: '20px' }}>
             <Input
               value={this.state.color}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ color: e.target.value })}
+              style={colorInputStyle}
             />
           </Col>
         </Row>
 
+        <Row style={{ marginBottom: '20px' }}>
+          <Col span={labelSize} style={labelStyle}>
+            <span>Plugins:</span>
+          </Col>
+          <Col span={24 - labelSize} style={{ paddingRight: '20px' }}>
+            <Select
+              mode="multiple"
+              style={{ width: '100%' }}
+              onChange={this.handleChangePlugins}
+              placeholder="Select plugins for this page type"
+              value={this.state.plugins}
+            >
+              <Select.Option key="seo" value="seo">SEO</Select.Option>
+            </Select>
+          </Col>
+        </Row>
+
         <Row>
-          <Col span={4} style={{ padding: '0 12px' }}>
+          <Col span={labelSize} style={{ padding: '0 12px' }}>
             &nbsp;
           </Col>
           <Col span={20}>
@@ -123,6 +132,30 @@ class ModalWindow extends Component<Properties, State> {
     );
   }
 
+  private handleChangePlugins(value: string[]) {
+    this.setState({
+      plugins: value
+    });
+  }
+
+  private handleCancel(): void {
+    this.props.onCancel();
+    this.setState({ ...this.DEFAULT });
+  }
+
+  private handleSave(): void {
+    if (this.state.name && this.state.name.length) {
+      this.props.onSave(
+        this.state.name,
+        this.state.displayInNavigation,
+        this.state.color,
+        this.state.plugins
+      );
+      this.setState({ ...this.DEFAULT });
+    } else {
+      message.error('Name can not be empty!');
+    }
+  }
 }
 
 export default ModalWindow;
