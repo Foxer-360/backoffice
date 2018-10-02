@@ -31,8 +31,9 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
-"@foxer360/composer@../composer":
+"@foxer360/composer@git+https://github.com/Foxer-360/composer.git#sandbox":
   version "0.1.0"
+  resolved "git+https://github.com/Foxer-360/composer.git#964b640c518fbae478c35430cb6b639ae00291ed"
   dependencies:
     "@foxer360/delta" "git+https://github.com/Foxer-360/delta.git#v0.1.0"
     antd "^3.9.2"
