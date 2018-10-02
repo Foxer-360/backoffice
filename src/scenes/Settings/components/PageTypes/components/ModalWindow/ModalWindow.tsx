@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { Button, Col, Input, Modal, Row, Select } from 'antd';
 import { Composer } from '@foxer360/composer';
-import { IComponentObject } from '@foxer360/composer';
+import { Context, IComponentObject } from '@foxer360/composer';
 // import componentService from '@source/services/components';
-import { ComponentsModule } from '@source/services/modules';
+import { ComponentsModule, PluginsModule } from '@source/services/modules';
 import pluginsService from '@source/services/plugins';
 import { IContent } from '@foxer360/delta';
 
@@ -107,7 +107,9 @@ class ModalWindow extends Component<Properties, State> {
                 placeholder="Select plugins for this page type"
                 value={this.state.plugins}
               >
-                <Select.Option key="seo" value="seo">SEO</Select.Option>
+                {PluginsModule.getPluginTypes().map((type: string) => (
+                  <Select.Option key={type} value={type}>{PluginsModule.getPluginTabName(type)}</Select.Option>
+                ))}
               </Select>
             </Col>
           </Row>
@@ -131,7 +133,7 @@ class ModalWindow extends Component<Properties, State> {
         >
           <Composer
             componentService={ComponentsModule}
-            pluginService={pluginsService}
+            pluginService={PluginsModule}
             onSave={this.handleCloseEditor}
             layouts={true}
             ref={node => {
@@ -142,6 +144,7 @@ class ModalWindow extends Component<Properties, State> {
                 }
               }
             }}
+            context={new Context()}
           />
         </Modal>
       </>
