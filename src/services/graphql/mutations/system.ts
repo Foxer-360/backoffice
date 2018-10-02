@@ -401,3 +401,40 @@ export const SAVE_PAGE_PLUGIN = gql`
         }
     }
 `;
+
+export const CREATE_TAG = gql`
+  mutation createTag($data: TagCreateInput!) {
+    createTag(
+      data: $data
+    ) {
+      id
+      name
+      displayInNavigation
+      color
+      plugins
+    }
+  }
+`;
+
+export const DELETE_TAG = gql`
+  mutation deleteTag($id: ID!) {
+    deleteTag( where: { id: $id } ) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_TAG = gql`
+  mutation updateTag($id: ID!, $data: TagUpdateInput!) {
+    updateTag(
+      where: { id: $id },
+      data: $data
+    ) {
+      id
+      name
+      displayInNavigation
+      color
+      plugins
+    }
+  }
+`;

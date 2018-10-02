@@ -278,3 +278,15 @@ export const PAGE_PLUGINS = gql`
     }
   }
 `;
+
+export const TAG_LIST = gql`
+  query getTags($website: ID!) {
+    tags( where: { website: { id: $website } } ) {
+      id
+      name
+      displayInNavigation
+      plugins
+      color
+    }
+  }
+`;
