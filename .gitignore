@@ -40,3 +40,4 @@ public/assets/*
 
 # ignore public of components
 public/components
+.prettierrc

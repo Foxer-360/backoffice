@@ -55,18 +55,7 @@ span.task-title-date {
   color: #a5a5a5;
 }
 
-.ant-list-item-meta {
-  flex: none;
-}
 
-.chat__message {
-  display: flex;
-  flex-direction: row;
-}
-
-.chat__author {
-  color: black;
-}
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -102,7 +91,7 @@ body ::-webkit-scrollbar-thumb {
 
 .chat-list-wrapper {
   overflow-y: scroll;
-  height: 272px;
+  height: 68vh;
 }
 
 .chat-control-wrapper {
