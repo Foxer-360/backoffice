@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Switch, Route } from 'react-router';
 import StructureList from './components/StructureList';
-import Editor from './components/Editor';
+import Editor from '@source/scenes/Editor';
 
 const { Component } = React;
 
