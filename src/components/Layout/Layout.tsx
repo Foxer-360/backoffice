@@ -20,17 +20,25 @@ export interface Properties {
 // tslint:disable-next-line:no-any
 const Wrapped = (Comp: any, withoutBackground?: boolean): any => {
   if (!withoutBackground) {
-    return () => <Content color="white"><Comp /></Content>;
+    return () => (
+      <Content color="white">
+        <Comp />
+      </Content>
+    );
   }
 
-  return () => <Content color="none"><Comp /></Content>;
+  return () => (
+    <Content color="none">
+      <Comp />
+    </Content>
+  );
 };
 
 class Layout extends Component<Properties, {}> {
-
   render() {
     return (
       <AntdLayout style={{ minHeight: '100vh' }}>
+    
         <Sider>
           <Sidebar />
         </Sider>
@@ -40,14 +48,13 @@ class Layout extends Component<Properties, {}> {
             <Route path="/pages" render={Wrapped(Pages)} />
             <Route path="/page" render={Wrapped(Pages, true)} />
             <Route path="/settings" render={Wrapped(Settings)} />
-            <Route path="/" exact={true} render={Wrapped(Home)} />
+            <Route path="/" exact={true} render={Wrapped(Home, true)} />
           </Switch>
           <Footer />
         </AntdLayout>
       </AntdLayout>
     );
   }
-
 }
 
 export default Layout;

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { List, Button, Input, Row } from 'antd';
+import ChatList from '@source/components/Ui/ChatList';
 
 const { Component } = React;
 const { TextArea } = Input;
@@ -62,14 +63,7 @@ class Chat extends Component<Properties, State> {
       <div className="chat-wrapper">
         {/* Chat */}
         <div className="chat-list-wrapper" style={{ paddingRight: '10px' }}>
-          <List
-            renderItem={(item: LooseObject) => (
-              <List.Item>
-                <List.Item.Meta title={Title('Author', item.createdAt)} description={item.text} />
-              </List.Item>
-            )}
-            dataSource={data}
-          />
+          <ChatList chats={data}/>
         </div>
 
         {/* Bottom control */}
