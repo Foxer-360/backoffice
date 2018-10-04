@@ -273,10 +273,30 @@ function linkLocalLib(lib) {
 
   if (!fs.existsSync(lib.paths.lib)) {
     console.log(`Linking lib ${lib.type}/${lib.name}...`);
-    fs.symlinkSync(lib.paths.target, lib.paths.lib, 'dir');
+
+    // Read folder and linklocal everything excepts node_modules
+    const list = fs.readdirSync(lib.paths.target);
+    fs.mkdirSync(lib.paths.lib);
+    for (const file of list) {
+      if (/node_modules/gi.test(file)) {
+        continue;
+      }
+      let type = 'file';
+      const stat = fs.statSync(path.resolve(lib.paths.target, file));
+      if (stat.isDirectory()) {
+        type = 'dir';
+      }
+      fs.symlinkSync(path.resolve(lib.paths.target, file), path.resolve(lib.paths.lib, file), type);
+    }
   } else {
     console.log(`Lib ${lib.type}/${lib.name} is already linked...`);
   }
+
+  // Install deps in linked package
+  console.log(`Called yarn install for ${lib.name}`);
+  execSync(`yarn install --production=true --check-files`, {
+    cwd: lib.paths.lib,
+  });
 
   copyLibStyle(lib);
   resolveCssImports(lib);
