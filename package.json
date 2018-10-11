@@ -80,7 +80,7 @@
     "buildCss": "node scripts/buildCss.js",
     "deps": "node scripts/deps.js",
     "removeDeps": "node scripts/removeDeps.js",
-    "updateDeps": "yarn removeDeps && yarn deps",
+    "updateDeps": "yarn removeDeps && yarn deps && yarn buildCss",
     "up": "yarn --check-files"
   },
   "devDependencies": {

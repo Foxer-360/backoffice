@@ -13,6 +13,7 @@ export interface IGalleryProps {
   // tslint:disable:no-any
   placeImg?: any;
   image?: any;
+  name: string;
 }
 
 export interface IGalleryState {
@@ -58,12 +59,7 @@ class Gallery extends React.Component<IGalleryProps, IGalleryState> {
             <div className={'mediaLibrary__gallery__row'}>
               {this.props.images &&
                 this.props.images.map((item, index) => (
-                  <GalleryCard
-                    key={index}
-                    toggleEdit={this.showDrawer}
-                    placeImg={this.props.placeImg}
-                    image={item}
-                  />
+                  <GalleryCard key={index} toggleEdit={this.showDrawer} placeImg={this.props.placeImg} image={item} />
                 ))}
             </div>
           </Col>
@@ -88,6 +84,7 @@ class Gallery extends React.Component<IGalleryProps, IGalleryState> {
         >
           <UploadImage closeEditor={() => this.closeDrawer()} onChange={this.props.placeImg}>
             <Editor
+              name={this.props.name}
               image={this.state.selectedImage}
               onChange={media => {
                 this.props.placeImg(media);
