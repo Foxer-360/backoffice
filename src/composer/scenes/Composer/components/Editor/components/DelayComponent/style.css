@@ -1,0 +1,9 @@
+.delay-component {
+  opacity: 1.0;
+  transition: opacity 200ms 200ms;
+}
+
+.delay-component.hide {
+  transition: opacity 200ms 0ms;
+  opacity: 0.0;
+}
