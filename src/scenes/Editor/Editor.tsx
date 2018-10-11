@@ -5,7 +5,7 @@ import {
   IAddComponentObject,
   IEditorInfo,
   ILockInfo,
-} from '@foxer360/composer';
+} from '@source/composer';
 import { connect, StandardResponse } from '@source/services/socket';
 import ChatTasks from '@source/scenes/ChatTasks';
 import { ComponentsModule, PluginsModule } from '@source/services/modules';

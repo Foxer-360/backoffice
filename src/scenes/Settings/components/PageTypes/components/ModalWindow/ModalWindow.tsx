@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Button, Col, Input, Modal, Row, Select } from 'antd';
-import { Composer } from '@foxer360/composer';
-import { Context, IComponentObject } from '@foxer360/composer';
+import { Composer } from '@source/composer';
+import { Context, IComponentObject } from '@source/composer';
 // import componentService from '@source/services/components';
 import { ComponentsModule, PluginsModule } from '@source/services/modules';
 import pluginsService from '@source/services/plugins';
@@ -31,7 +31,6 @@ class ModalWindow extends Component<Properties, State> {
     name: '',
     plugins: [],
     content: null,
-
     editorVisible: false,
   } as State;
 
