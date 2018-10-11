@@ -239,7 +239,7 @@ class Composer extends React.Component<IProperties, IState> {
    */
   public render(): JSX.Element {
     // tslint:disable-next-line:no-console
-    console.log('DELTA and CONTENT', this.delta.export(), this.state.content);
+    // console.log('DELTA and CONTENT', this.delta.export(), this.state.content);
 
     if (!this.state.content) {
       return <span>Waiting for content</span>;

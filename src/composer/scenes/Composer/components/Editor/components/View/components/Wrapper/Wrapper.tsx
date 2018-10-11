@@ -253,7 +253,7 @@ class Wrapper extends React.Component<IProperties, IState> {
 
   public render() {
     // tslint:disable-next-line:no-console
-    console.log(`[RENDER] Wrapper at position ${this.props.position}`, this.props.locks);
+    // console.log(`[RENDER] Wrapper at position ${this.props.position}`, this.props.locks);
     // Get component instance   om component service
     const Comp = this.props.componentsService.getComponent(this.props.name);
     // Simple style for wrapper
@@ -284,7 +284,7 @@ class Wrapper extends React.Component<IProperties, IState> {
 
     let navigations = this.props.context.readProperty('navigations');
     // tslint:disable-next-line:no-console
-    console.log('{CONTEXT}', this.props.context);
+    // console.log('{CONTEXT}', this.props.context);
     if (!navigations || navigations === undefined) {
       navigations = false;
     }
