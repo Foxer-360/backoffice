@@ -3,7 +3,7 @@ var sass = require("node-sass");
 
 sass.render(
   {
-    file: "../../kohinoorComponents/styles/main.scss"
+    file: "../../koh-i-noor/styles/main.scss"
   },
   function(error, result) {
     if (error) {
