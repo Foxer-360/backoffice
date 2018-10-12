@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
+var sass = require('node-sass');
 const gitClone = require('git-clone');
 const { execSync } = require('child_process');
-
 
 const appPath = path.resolve(__dirname, '../');
 const templatePath = path.resolve(appPath, 'scripts/deps.template.ts');
@@ -14,10 +14,9 @@ const paths = {
   config: {
     target: path.resolve(appPath, 'config/deps.json'),
     source: path.resolve(appPath, 'src/services/modules/deps.json'),
-    ts: path.resolve(appPath, 'src/services/modules/config.ts')
-  }
+    ts: path.resolve(appPath, 'src/services/modules/config.ts'),
+  },
 };
-
 
 /**
  * Convert JSON config file into array of objects.
@@ -113,8 +112,8 @@ async function cloneRepository(git, path) {
  * @param {json} options
  */
 async function gitCloneSync(git, path, options) {
-  const code = await new Promise((resolve) => {
-    gitClone(git, path, options, (err) => {
+  const code = await new Promise(resolve => {
+    gitClone(git, path, options, err => {
       if (err) {
         resolve(1);
       } else {
@@ -143,8 +142,8 @@ async function generateDefinition(name, type, libPath, json) {
     lib: path.resolve(libPath, name),
     relative: {
       import: `${type}/${name}`,
-      target: json.path
-    }
+      target: json.path,
+    },
   };
 
   // Check if it's repo or local
@@ -167,7 +166,7 @@ async function generateDefinition(name, type, libPath, json) {
 
   // If style is defined, add it
   if (json.style) {
-    _paths.style = path.resolve(paths.styles, `${name}.css`);
+    _paths.style = path.resolve(paths.styles, `${name}.`);
     _paths.styleTarget = path.resolve(_paths.target, json.style);
     _paths.relative.style = `/styles/${name}.css`;
   }
@@ -190,9 +189,9 @@ async function generateDefinition(name, type, libPath, json) {
 
   return {
     name,
-    git: (_paths.git) ? true : false,
+    git: _paths.git ? true : false,
     type,
-    paths: _paths
+    paths: _paths,
   };
 }
 
@@ -264,7 +263,7 @@ function saveGeneratedJson(target, source, ts, json) {
 function linkLocalLib(lib) {
   // Skip git libs
   if (lib.git) {
-    copyLibStyle(lib);
+    buildLibStyle(lib);
     resolveCssImports(lib);
     copyLibAssets(lib);
 
@@ -298,7 +297,7 @@ function linkLocalLib(lib) {
     cwd: lib.paths.lib,
   });
 
-  copyLibStyle(lib);
+  buildLibStyle(lib);
   resolveCssImports(lib);
   copyLibAssets(lib);
 }
@@ -341,8 +340,8 @@ function recursiveCopy(target, source) {
   }
 
   // List all files and folders in target
-  const list = fs.readdirSync(target)
-  list.forEach((name) => {
+  const list = fs.readdirSync(target);
+  list.forEach(name => {
     const t = path.resolve(target, name);
     const s = path.resolve(source, name);
 
@@ -355,7 +354,7 @@ function recursiveCopy(target, source) {
  *
  * @param {json} lib full lib definition object
  */
-function copyLibStyle(lib) {
+function buildLibStyle(lib) {
   if (!lib.paths.style) {
     return;
   }
@@ -365,8 +364,28 @@ function copyLibStyle(lib) {
     return;
   }
 
-  console.log(`Copy style for ${lib.type}/${lib.name} lib...`);
-  fs.copyFileSync(lib.paths.styleTarget, lib.paths.style);
+  console.log(`Building style for ${lib.type}/${lib.name} lib...`);
+  // fs.copyFileSync(lib.paths.styleTarget, lib.paths.style);
+
+  sass.render(
+    {
+      file: lib.paths.styleTarget,
+      outputStyle: 'compressed',
+    },
+
+    function(error, result) {
+      if (error) {
+        console.log('There was an error buildIng CSS', error);
+      }
+      if (!error) {
+        fs.writeFile(lib.paths.style + 'css', result.css, function(err) {
+          console.log('CSS compiled succesfuly!!', error);
+          if (!err) {
+          }
+        });
+      }
+    }
+  );
 }
 
 /**
@@ -434,7 +453,7 @@ function generateTsConfig(config) {
   const pluginsImport = [];
   const pluginsJson = [];
 
-  config.components.forEach((lib) => {
+  config.components.forEach(lib => {
     const importedName = `components${capitalizeFirstLetter(lib.name)}`;
     const imp = `import { ComponentsService as ${importedName} } from '${lib.paths.relative.import}';`;
     const json = `  ${lib.name}: ${importedName},`;
@@ -443,7 +462,7 @@ function generateTsConfig(config) {
     componentsJson.push(json);
   });
 
-  config.plugins.forEach((lib) => {
+  config.plugins.forEach(lib => {
     const importedName = `plugins${capitalizeFirstLetter(lib.name)}`;
     const imp = `import { PluginsService as ${importedName} } from '${lib.paths.relative.import}';`;
     const json = `  ${lib.name}: ${importedName},`;
