@@ -16,8 +16,6 @@ interface IMyInputProps {
 
 export default class MyInput extends React.Component<IMyInputProps> {
   public render() {
-    // tslint:disable-next-line:no-console
-    console.log('here', this.props.name, this.props.type);
     return (
       <div style={{ paddingBottom: '5px' }}>
         {this.props.notitle && this.props.notitle === true ? null
