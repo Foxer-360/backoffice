@@ -21,7 +21,7 @@ export interface IMediaLibraryState {
   visible: boolean;
   drawerType: string;
 }
-
+  
 class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryState> {
   constructor(props: IMediaLibraryProps) {
     super(props);
@@ -51,13 +51,13 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
   }
 
   public onChangeAlt = (altValue: string) => {
-    const data = { value: { ...this.props.mediaData, alt: altValue }, name: 'image' };
+    const data = { value: { ...this.props.mediaData, alt: altValue }, name: this.props.name };
 
     this.props.onChange(data);
   }
 
   public dropImage() {
-    this.props.onChange({ value: null, name: 'image' });
+    this.props.onChange({ value: null, name: this.props.name });
   }
 
   public render() {
@@ -66,7 +66,7 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
       <div>
         <div className={'ant-divider ant-divider-horizontal ant-divider-with-text-left'}>
           <span className={'ant-divider-inner-text'}>
-            {this.state.drawerType === 'editor' ? 'Media Editor' : 'Media Library'}
+            {this.state.drawerType === 'editor' ? 'Media Editor: ' + this.props.name.toUpperCase() : 'Media Library'}
           </span>
         </div>
 
@@ -95,10 +95,7 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
         </Row>
 
         <Row gutter={6} style={{ display: 'flex', justifyContent: 'left', padding: '0 3px' }}>
-          <Button
-            onClick={() => this.showDrawer('editor')}
-            style={{ marginRight: '16px', minWidth: '105px' }}
-          >
+          <Button onClick={() => this.showDrawer('editor')} style={{ marginRight: '16px', minWidth: '105px' }}>
             <Icon type={'upload'} /> Upload
           </Button>
           <Button
@@ -139,6 +136,7 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
           {this.state.drawerType === 'editor' ? (
             <UploadImage closeEditor={() => this.closeDrawer()} onChange={this.props.onChange}>
               <Editor
+                name={this.props.name}
                 image={mediaData}
                 onChange={media => {
                   this.props.onChange(media);
@@ -149,14 +147,14 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
             </UploadImage>
           ) : (
             <AllImagesQuery>
-              <Gallery placeImg={this.props.onChange} image={mediaData} />
+              <Gallery placeImg={this.props.onChange} image={mediaData} name={this.props.name} />
             </AllImagesQuery>
           )}
         </Drawer>
 
         <hr className={'hSep'} />
       </div>
-    );
+    ); 
   }
 }
 
