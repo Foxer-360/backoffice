@@ -49,10 +49,8 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
   }
 
   public mediaLibraryChange(media: { value: object; name: string }) {
-
     const newData = { ...this.props.data, [media.name]: media.value };
     this.props.onChange(newData);
-
   }
 
   public renderElements(schema: IFormSchema): JSX.Element[] | null {
@@ -85,11 +83,7 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
                 key={index}
                 name={elementName}
                 {...element}
-                value={
-                  this.props.data && this.props.data[elementName]
-                    ? this.props.data[elementName]
-                    : null
-                }
+                value={this.props.data && this.props.data[elementName] ? this.props.data[elementName] : null}
                 onChange={this.handleChange}
                 mediaLibraryChange={this.mediaLibraryChange}
               />
@@ -102,11 +96,7 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
   }
 
   public render() {
-    return (
-      <form>
-        {this.props.form && this.props.form.schema && this.renderElements(this.props.form.schema)}
-      </form>
-    );
+    return <form>{this.props.form && this.props.form.schema && this.renderElements(this.props.form.schema)}</form>;
   }
 }
 

@@ -13,6 +13,7 @@ export interface IEditorProps {
   loading?: boolean;
   onChange?: (media: object) => void;
   closeEditor?: () => void;
+  name: string;
 }
 
 export interface IEditorState {
@@ -119,7 +120,7 @@ class Editor extends React.Component<IEditorProps, IEditorState> {
                       }
                     } else {
                       if (this.props.onChange) {
-                        this.props.onChange({ value: image, name: 'image' });
+                        this.props.onChange({ value: image, name: this.props.name });
                       }
                     }
                   }}
