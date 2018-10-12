@@ -36,8 +36,6 @@ class InputRenderer extends React.Component<InputRendererProps & IFormSchemaElem
       case 'email':
       case 'password':
       case 'number':
-        // tslint:disable-next-line:no-console
-        console.log(this.props.type);
         return (
           <Input
             type={this.props.type}
@@ -118,7 +116,7 @@ class InputRenderer extends React.Component<InputRendererProps & IFormSchemaElem
             onChange={this.props.mediaLibraryChange}
           />
         );
-      case 'urlAutocomplete':
+      case 'urlautocomplete':
         return (
           <UrlAutocomplete
             label={this.props.title ? this.props.title : ''}

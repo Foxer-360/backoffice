@@ -34,13 +34,28 @@ export interface IState {
 
 class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
 
+  constructor(props: IUrlAutocomplete) {
+    super(props);
+
+    this.state = {
+      urlNewWindow: false
+    };
+  }
+
+  onChange = (newVal) => 
+    this.props.onChange({ 
+      target: { 
+        name: this.props.name, 
+        value: { ...(this.props.value || {}), ...newVal } 
+      } 
+    })
   render() {
-    const { onChange, value: { url, urlNewWindow } } = this.props;
+    const { onChange, value } = this.props;
 
     return (
       <Query query={GET_PAGES_URLS}>
       {({ data: { pagesUrls }, loading, error}) => {
-
+        
         if (loading) {
           return 'Loading...';
         }
@@ -51,40 +66,40 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
       return (<div style={{ paddingBottom: '5px' }}>
         {this.props.notitle && this.props.notitle === true ? null
           : <label>{this.props.label}</label>}
-        {pagesUrls && pagesUrls > 0 && (
-          <InputGroup compact={true}>
+        {pagesUrls && pagesUrls.length > 0 && (
+          <div>
             <AutoComplete
-              style={{ width: '66%' }}
               dataSource={pagesUrls.map(source => source.url).filter(u => u !== '')}
               filterOption={(inputValue, { props: { children }}: LooseObject) => children.toUpperCase().includes(inputValue.toUpperCase()) !== -1}
-              defaultValue={url}
-              onSearch={newUrl => onChange({ target: { name: this.props.name, value: { url: newUrl } } })}
-              onSelect={newUrl => onChange({ target: { name: this.props.name, value: { url: newUrl } } })}
+              defaultValue={value && value.url}
+              onSearch={newUrl => this.onChange({ url: newUrl })}
+              onSelect={newUrl => this.onChange({ url: newUrl })}
             />
 
             <Checkbox
-              checked={urlNewWindow}
+              checked={value && value.urlNewWindow}
               onChange={() => {
-                this.setState({ urlNewWindow: !this.state.urlNewWindow });
-                onChange({ target: { name: this.props.name, value: { urlNewWindow: this.state.urlNewWindow } } });
-                
+                this.setState({ urlNewWindow: !this.state.urlNewWindow }, () => {
+                  this.onChange({ urlNewWindow: this.state.urlNewWindow });
+                });
               }}
             >
               Open in New window
             </Checkbox>
-          </InputGroup>
+          </div>
         )}
         {pagesUrls &&
           pagesUrls.length === 0 &&
           <Input 
             type="text" 
             id="url" 
-            value={url} 
+            value={value && value.url} 
             onChange={e => 
               onChange({ 
                 target: { 
                   name: this.props.name,
-                  value: { 
+                  value: {
+                    ...(value || {}),
                     url: e.target.value 
                   } 
                 } 
