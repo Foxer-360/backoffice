@@ -35,8 +35,6 @@ class Sidebar extends React.Component<IProperties, {}> {
   public render() {
     // const isSelected = Number.isInteger(this.props.selectedComponent);
     const isSelected = (this.props.selectedComponent) ? true : false;
-    // tslint:disable-next-line:no-console
-    // console.log('SIDEBAR', isSelected);
 
     return (
       <div style={{ padding: '6px' }}>
