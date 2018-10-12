@@ -7,13 +7,15 @@ import MediaLibrary from '../MediaLibrary';
 import RadioGroup from '../RadioGroup';
 import Select from '../Select';
 import TextArea from '../TextArea';
+import UrlAutocomplete from '../UrlAutocomplete';
 
 // tslint:disable:jsx-no-multiline-js
 // tslint:disable:jsx-no-lambda
 
 interface InputRendererProps {
   name: string;
-  value?: string;
+  // tslint:disable-next-line:no-any
+  value?: any;
   // tslint:disable-next-line:no-any
   onChange: (e: React.ChangeEvent | any) => void;
   // tslint:disable-next-line:no-any
@@ -114,7 +116,16 @@ class InputRenderer extends React.Component<InputRendererProps & IFormSchemaElem
             onChange={this.props.mediaLibraryChange}
           />
         );
-
+      case 'urlautocomplete':
+        return (
+          <UrlAutocomplete
+            label={this.props.title ? this.props.title : ''}
+            name={this.props.name}
+            placeholder={this.props.placeholder}
+            value={this.props.value}
+            onChange={this.props.onChange}
+          />
+        );
       default:
         return null;
     }

@@ -38,11 +38,6 @@ export interface IComponentsServiceLikeClass {
   getForm(type: string): typeof React.Component;
 }
 
-// declare class PluginComponent extends React.Component<{
-//   onChange: (data: ILooseObject) => void;
-//   initData: ILooseObject;
-// }, {}> {};
-
 export interface IPluginServiceLikeClass {
   getPluginTabName(name: string): string;
   getPluginComponent(name: string): typeof React.Component;
@@ -238,8 +233,6 @@ class Composer extends React.Component<IProperties, IState> {
    * @return {JSX.Element}
    */
   public render(): JSX.Element {
-    // tslint:disable-next-line:no-console
-    console.log('DELTA and CONTENT', this.delta.export(), this.state.content);
 
     if (!this.state.content) {
       return <span>Waiting for content</span>;
