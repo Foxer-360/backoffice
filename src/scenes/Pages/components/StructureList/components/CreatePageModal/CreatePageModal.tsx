@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Alert, Col, Input, Modal, Row, Select } from 'antd';
+import { Alert, Col, Form, Input, Modal, Row, Select } from 'antd';
 import { urlize } from 'urlize';
 import './style.css';
 import { adopt } from 'react-adopt';
@@ -7,6 +7,7 @@ import { Query, Mutation } from 'react-apollo';
 import { queries, mutations } from '@source/services/graphql';
 
 const { Component } = React;
+const FormItem = Form.Item;
 
 const PageTypes = adopt({
   website: ({ render }) => (
@@ -73,6 +74,9 @@ export interface State {
 
   urlChanged: boolean;
   alert: string;
+
+  nameErr: boolean;
+  typeErr: boolean;
 }
 
 class CreatePageModal extends Component<Properties, State> {
@@ -84,7 +88,10 @@ class CreatePageModal extends Component<Properties, State> {
     status: 'DRAFT',
 
     urlChanged: false,
-    alert: 'alert-enter'
+    alert: 'alert-enter',
+
+    nameErr: false,
+    typeErr: false
   };
 
   constructor(props: Properties) {
@@ -101,6 +108,17 @@ class CreatePageModal extends Component<Properties, State> {
   }
 
   handleOk(website: string, createPage: (...args: LooseObject[]) => void) {
+
+    const { name, typeId } = this.state;
+
+    if (!name || !typeId) {
+      this.setState({
+        ...this.state,
+        nameErr: !name ? true : false,
+        typeErr: !typeId ? true : false,
+      });
+      return;
+    } 
     // Prepare data
     const variables = {
       website: {
@@ -230,16 +248,25 @@ class CreatePageModal extends Component<Properties, State> {
               <Col span={24 - labelSize}>
                 <PageTypes>
                   {({ pageTypes }: { pageTypes: LooseObject[] }) => (
-                    <Select
-                      style={{ width: 'auto', minWidth: '200px' }}
-                      onChange={this.handleChangeType}
-                      value={this.state.typeId ? this.state.typeId : undefined}
-                      placeholder="Select page type"
+                    <FormItem 
+                      {...(
+                        (this.state.typeErr && {
+                          validateStatus: 'error',
+                          help: 'Page type must be selected.'
+                        }) || {}
+                      )}
                     >
-                      {pageTypes.map((type: LooseObject) => (
-                        <Select.Option key={type.id} value={type.id}>{type.name}</Select.Option>
-                      ))}
-                    </Select>
+                      <Select
+                        style={{ width: 'auto', minWidth: '200px' }}
+                        onChange={this.handleChangeType}
+                        value={this.state.typeId ? this.state.typeId : undefined}
+                        placeholder="Select page type"
+                      >
+                        {pageTypes.map((type: LooseObject) => (
+                          <Select.Option key={type.id} value={type.id}>{type.name}</Select.Option>
+                        ))}
+                      </Select>
+                    </FormItem>
                   )}
                 </PageTypes>
               </Col>
@@ -253,10 +280,19 @@ class CreatePageModal extends Component<Properties, State> {
               </Col>
               <Col span={24 - labelSize}>
                 <div style={{ paddingRight: '16px' }}>
-                  <Input
-                    value={this.state.name}
-                    onChange={(e) => this.handleChangeName(e.target.value)}
-                  />
+                  <FormItem 
+                    {...(
+                      (this.state.nameErr && {
+                        validateStatus: 'error',
+                        help: 'Name must be filled.'
+                      }) || {}
+                    )}
+                  >
+                    <Input
+                      value={this.state.name}
+                      onChange={(e) => this.handleChangeName(e.target.value)}
+                    />
+                  </FormItem>
                 </div>
               </Col>
             </Row>
