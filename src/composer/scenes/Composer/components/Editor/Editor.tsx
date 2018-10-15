@@ -112,8 +112,6 @@ class Editor extends React.Component<IProperties, IState> {
     if (component !== null) {
       type = component.name;
       data = component.data;
-      // tslint:disable-next-line:no-console
-      console.log(component);
     }
 
     let Title = (

@@ -8,11 +8,13 @@ import RadioGroup from '../RadioGroup';
 import Select from '../Select';
 import TextArea from '../TextArea';
 import UrlAutocomplete from '../UrlAutocomplete';
+import MarkDown from '@source/composer/scenes/Composer/components/Editor/components/Sidebar/components/FormBuilder/components/MarkDown';
 
 // tslint:disable:jsx-no-multiline-js
 // tslint:disable:jsx-no-lambda
 
 interface InputRendererProps {
+  id?: string;
   name: string;
   // tslint:disable-next-line:no-any
   value?: any;
@@ -28,7 +30,6 @@ class InputRenderer extends React.Component<InputRendererProps & IFormSchemaElem
     if (!this.props.type) {
       return null;
     }
-
     switch (this.props.type.toLowerCase()) {
       case 'text':
       case 'string':
@@ -119,6 +120,17 @@ class InputRenderer extends React.Component<InputRendererProps & IFormSchemaElem
       case 'urlautocomplete':
         return (
           <UrlAutocomplete
+            label={this.props.title ? this.props.title : ''}
+            name={this.props.name}
+            placeholder={this.props.placeholder}
+            value={this.props.value}
+            onChange={this.props.onChange}
+          />
+        );
+      case 'markdown':
+        return (
+          <MarkDown
+            id={`${this.props.id}`}
             label={this.props.title ? this.props.title : ''}
             name={this.props.name}
             placeholder={this.props.placeholder}

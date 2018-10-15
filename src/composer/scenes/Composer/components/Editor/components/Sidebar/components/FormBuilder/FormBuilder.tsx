@@ -80,6 +80,7 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
           default:
             return (
               <InputRenderer
+                id={`${index}`}
                 key={index}
                 name={elementName}
                 {...element}

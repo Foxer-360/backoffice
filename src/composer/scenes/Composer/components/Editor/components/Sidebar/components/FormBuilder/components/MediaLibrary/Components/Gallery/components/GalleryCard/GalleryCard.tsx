@@ -8,7 +8,6 @@ import * as React from 'react';
 export interface IGalleryCardProps {
   toggleEdit: (image: object) => void;
   placeImg: (image: object) => void;
-  key: number;
   // tslint:disable:no-any
   image: any;
 }

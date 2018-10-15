@@ -56,8 +56,6 @@ class Slot extends React.Component<IProperties, IState> {
       return false;
     }
     if (source.container && source.container !== this.props.container) {
-      // tslint:disable-next-line:no-console
-      console.log('Hola', source, this.props);
       return false;
     }
 
