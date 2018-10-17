@@ -8,7 +8,7 @@ import { Query } from 'react-apollo';
 
 const GET_PAGES_URLS = gql`
   query {
-    pagesUrls(where: { language: "cjm69cpmg000m08728qa5oy02"}) {
+    pagesUrls(where: { languageCode: "cs"}) {
       url
       name
     }
