@@ -272,8 +272,6 @@ class Wrapper extends React.Component<IProperties, IState> {
         }
 
         if (l.id === this.props.id) {
-          // tslint:disable-next-line:no-console
-          console.log(`Component ${this.props.id} is locked`);
           locked = true;
           editor = l.editorId;
         }
