@@ -55,25 +55,21 @@ const RemovePageMutation = adopt({
  * Assume that in env.REACT_APP_FRONTEND_URL is specified server
  *
  * @param  {string} url relative
- * @return {void}
+ * @return {string} url abosulute
  */
-const openInNewTab = (url: string) => {
-  if (!window || window === undefined || window === null) {
-    return;
-  }
+const getFrontendUrl = (url: string) => {
 
   const server = process.env.REACT_APP_FRONTEND_URL;
-  if (!server || server === undefined || server === null || server.length < 2) {
-    return;
-  }
-
   if (url[0] !== '/') {
     url = `/${url}`;
   }
 
-  const win = window.open(`${server}${url}`, '_blank');
-  win.focus();
-};
+  if (!server || server === undefined || server === null || server.length < 2) {
+    return url;
+  }
+
+  return `${server}${url}`;
+}; 
 
 const Actions = (props: Properties) => (
   <>
@@ -86,7 +82,9 @@ const Actions = (props: Properties) => (
         </Popconfirm>
       )}
     </RemovePageMutation>
-    <Button size="small" icon="eye" style={{ marginLeft: 6 }} onClick={() => openInNewTab(props.url)} />
+    <a href={getFrontendUrl(props.url)} target="_blank">
+      <Button size="small" icon="eye" style={{ marginLeft: 6 }} />
+    </a>
   </>
 );
 
