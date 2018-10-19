@@ -53,15 +53,16 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
     this.props.onChange(newData);
   }
 
-  public renderElements(schema: IFormSchema): JSX.Element[] | null {
+  public renderElements(schema: IFormSchema, pass?: number): JSX.Element[] | null {
     if (schema && schema.properties) {
       return Object.keys(schema.properties).map((elementName: string, index: number) => {
         const element = schema.properties[elementName];
+
         switch (element.type.toLowerCase()) {
           case 'section':
             return (
               <Section key={index} title={element.title}>
-                {element && this.renderElements(element)}
+                {element && this.renderElements(element, index + 1)}
               </Section>
             );
 
@@ -80,7 +81,7 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
           default:
             return (
               <InputRenderer
-                id={`${index}`}
+                id={pass ? index + pass : index}
                 key={index}
                 name={elementName}
                 {...element}

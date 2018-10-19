@@ -1,4 +1,3 @@
-import TextArea from 'antd/es/input/TextArea';
 import * as React from 'react';
 import SimpleMDE from 'react-simplemde-editor';
 import 'simplemde/dist/simplemde.min.css';
@@ -19,26 +18,28 @@ interface IMyTextAreaProps {
 }
 
 export default class MarkDown extends React.Component<IMyTextAreaProps, {}> {
-
-  onChange = (value) => 
-  this.props.onChange({ 
-    target: { 
-      name: this.props.name, 
-      value
-    } 
-  })
+  onChange = value =>
+    this.props.onChange({
+      target: {
+        name: this.props.name,
+        value,
+      },
+    })
 
   public render() {
+
+    const { id, type, label, notitle, name, placeholder, value, onChange } = this.props;
+    
     return (
       <div style={{ paddingBottom: '5px' }}>
         <SimpleMDE
-          id={`markdown_${this.props.id}`}
-          label={this.props.notitle && this.props.notitle === true ? null
-            : this.props.label}
+          id={`markdown_${id}`}
+          label={notitle && notitle === true ? null : label}
           onChange={this.onChange}
-          value={this.props.value || ''}
+          value={value || ''}
           options={{
-            spellChecker: false
+            spellChecker: false,
+            placeholder: placeholder,
           }}
         />
       </div>

@@ -53,7 +53,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     });
 
     this.setState({
-      activeTab: newTab
+      activeTab: newTab,
     });
   }
 
@@ -82,7 +82,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     });
 
     this.setState({
-      activeTab: newTab
+      activeTab: newTab,
     });
   }
 
@@ -125,7 +125,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     return (
       <Section title={this.props.title}>
         <Tabs
-          type="editable-card"
+          type="editable-card"  
           activeKey={this.state.activeTab.toString()}
           onChange={(key: string) => this.onChangeTab(key)}
           onEdit={onEdit}
@@ -140,12 +140,11 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                     return (
                       <InputRenderer
                         key={j}
+                        id={index + j}
                         name={elementName}
                         {...element}
                         value={
-                          this.props.data &&
-                          this.props.data[index] &&
-                          this.props.data[index][elementName]
+                          this.props.data && this.props.data[index] && this.props.data[index][elementName]
                             ? this.props.data[index][elementName]
                             : null
                         }
