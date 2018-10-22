@@ -202,7 +202,7 @@ class StructureList extends Component<Properties, State> {
   }
 
   resolveFullUrls(node: TablePage, parentUrl: string | null) {
-    node.fullUrl = parentUrl ? `${parentUrl}/${node.url}` : `/${node.url}`;
+    node.fullUrl = parentUrl ? `${parentUrl}/${node.url}` : `${node.url.length > 0 ? `/${node.url}` : ``}`;
 
     if (node.children === null || node.children === undefined) {
       return;

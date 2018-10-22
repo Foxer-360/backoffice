@@ -1,5 +1,5 @@
 import { ILooseObject } from '@source/composer/types';
-import { Tabs } from 'antd';
+import { Tabs, Icon, Popconfirm } from 'antd';
 import * as React from 'react';
 import { IFormSchema } from '../../FormBuilder';
 import InputRenderer from '../InputRenderer';
