@@ -12,6 +12,7 @@ interface IArrayInputsProps {
   title: string;
   name: string;
   data: ILooseObject[];
+  language: string;
   items: IFormSchema;
   // tslint:disable-next-line:no-any
   onChange: (e: React.ChangeEvent | any) => void;
@@ -141,6 +142,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                       <InputRenderer
                         key={j}
                         name={elementName}
+                        language={this.props.language}
                         {...element}
                         value={
                           this.props.data &&

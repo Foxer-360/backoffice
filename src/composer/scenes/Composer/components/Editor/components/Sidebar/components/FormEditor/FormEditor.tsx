@@ -32,6 +32,8 @@ class FormEditor extends React.Component<IProperties, {}> {
 
     const navigations = this.props.context.readProperty('navigations');
 
+    const language = this.props.context.readProperty('language');
+
     return (
       <div className={'formEditor'}>
         {formResource ?
@@ -40,6 +42,7 @@ class FormEditor extends React.Component<IProperties, {}> {
             data={this.props.data}
             onChange={this.props.onChange}
             navigations={navigations}
+            language={language}
           />
           :
           <Form
