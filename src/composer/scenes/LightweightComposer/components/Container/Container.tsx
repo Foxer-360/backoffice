@@ -34,10 +34,13 @@ class Container extends React.Component<IProperties, {}> {
       } else {
         const Comp = this.props.componentModule.getComponent(node.name);
         const navigations = this.props.context.readProperty('navigations');
+        const languages = this.props.context.readProperty('languages');
+
         return (
           <Comp
             data={node.data}
             navigations={navigations}
+            languages={languages}
             key={node.id}
           />
         );
@@ -50,7 +53,6 @@ class Container extends React.Component<IProperties, {}> {
       </div>
     );
   }
-
 }
 
 export default Container;
