@@ -11,8 +11,8 @@ import Section from '../Section';
 interface IArrayInputsProps {
   title: string;
   name: string;
-  data: ILooseObject[];
   language: string;
+  data: ILooseObject[];
   items: IFormSchema;
   // tslint:disable-next-line:no-any
   onChange: (e: React.ChangeEvent | any) => void;
@@ -54,7 +54,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     });
 
     this.setState({
-      activeTab: newTab,
+      activeTab: newTab
     });
   }
 
@@ -83,7 +83,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     });
 
     this.setState({
-      activeTab: newTab,
+      activeTab: newTab
     });
   }
 
@@ -126,37 +126,59 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     return (
       <Section title={this.props.title}>
         <Tabs
-          type="editable-card"  
+          type="editable-card"
           activeKey={this.state.activeTab.toString()}
           onChange={(key: string) => this.onChangeTab(key)}
           onEdit={onEdit}
         >
           {this.props.data &&
-            this.props.data.map((dataRow: ILooseObject, index: number) => (
-              <Tabs.TabPane key={index} tab={index + 1} closable={true}>
+          this.props.data.map((dataRow: ILooseObject, index: number) => {
+            const tabTitle = (
+              <>
+              {index + 1}
+
+              <Popconfirm
+                title="Are you sure delete this tab?"
+                onConfirm={() => this.onEditTab(index.toString(), 'remove')}
+                okText="Yes"
+                cancelText="No"
+              >
+                <Icon
+                  type="close"
+                  theme="outlined"
+                  style={{ marginLeft: '5px', marginRight: '-13px', fontSize: '.6em' }}
+                  className="anticon anticon-close ant-tabs-close-x"
+                />
+              </Popconfirm>
+              </>
+            );
+            return (
+              <Tabs.TabPane key={index} tab={tabTitle} closable={false}>
                 {this.props.items &&
-                  this.props.items.properties &&
-                  Object.keys(this.props.items.properties).map((elementName: string, j: number) => {
-                    const element = this.props.items.properties[elementName];
-                    return (
-                      <InputRenderer
-                        key={j}
-                        id={index + j}
-                        name={elementName}
-                        language={this.props.language}
-                        {...element}
-                        value={
-                          this.props.data && this.props.data[index] && this.props.data[index][elementName]
-                            ? this.props.data[index][elementName]
-                            : null
-                        }
-                        onChange={this.onChange}
-                        mediaLibraryChange={this.mediaLibraryChange}
-                      />
-                    );
-                  })}
+                this.props.items.properties &&
+                Object.keys(this.props.items.properties).map((elementName: string, j: number) => {
+                  const element = this.props.items.properties[elementName];
+                  return (
+                    <InputRenderer
+                      key={j}
+                      name={elementName}
+                      language={this.props.language}
+                      {...element}
+                      value={
+                        this.props.data &&
+                        this.props.data[index] &&
+                        this.props.data[index][elementName]
+                          ? this.props.data[index][elementName]
+                          : null
+                      }
+                      onChange={this.onChange}
+                      mediaLibraryChange={this.mediaLibraryChange}
+                    />
+                  );
+                })}
               </Tabs.TabPane>
-            ))}
+            );
+          })}
         </Tabs>
       </Section>
     );
