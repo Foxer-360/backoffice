@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Tabs } from 'antd';
 import PageTypes from './components/PageTypes';
 import Navigations from './components/Navigations';
+import Tags from './components/Tags';
 
 const { Component } = React;
 
@@ -19,6 +20,9 @@ class Settings extends Component<{}, {}> {
           </Tabs.TabPane>
           <Tabs.TabPane tab="Navigations" key="3">
             <Navigations />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Tags" key="4">
+            <Tags />
           </Tabs.TabPane>
         </Tabs>
       </div>
