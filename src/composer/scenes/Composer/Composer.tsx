@@ -990,7 +990,9 @@ class Composer extends React.Component<IProperties, IState> {
     const comm = this.delta.pull();
 
     // Activator
-    this.spinner.enable();
+    if (this.spinner) {
+      this.spinner.enable();
+    }
     let activator = this.activateAlways();
     if (!activated) {
       activator = this.activateCommit(comm);
@@ -998,7 +1000,9 @@ class Composer extends React.Component<IProperties, IState> {
 
     return activator.then((can: boolean) => {
       if (!can) {
-        this.spinner.disable();
+        if (this.spinner) {
+          this.spinner.disable();
+        }
         this.delta.revert();
         return Promise.resolve(false);
       }
@@ -1013,7 +1017,9 @@ class Composer extends React.Component<IProperties, IState> {
           // this.eventComponentAdded(preparedData);
 
           // And just resolve this promise
-          this.spinner.disable();
+          if (this.spinner) {
+            this.spinner.disable();
+          }
           resolve(true);
         });
       }) as Promise<boolean>;
@@ -1115,7 +1121,9 @@ class Composer extends React.Component<IProperties, IState> {
     const comm = this.delta.pull();
 
     // Activator
-    this.spinner.enable();
+    if (this.spinner) {
+      this.spinner.enable();
+    }
     let activator = this.activateAlways();
     if (!activated) {
       activator = this.activateCommit(comm);
@@ -1123,7 +1131,9 @@ class Composer extends React.Component<IProperties, IState> {
 
     return activator.then((can: boolean) => {
       if (!can) {
-        this.spinner.disable();
+        if (this.spinner) {
+          this.spinner.disable();
+        }
         this.delta.revert();
         return Promise.resolve(false);
       }
@@ -1138,7 +1148,9 @@ class Composer extends React.Component<IProperties, IState> {
           // this.eventComponentAdded(preparedData);
 
           // And just resolve this promise
-          this.spinner.disable();
+          if (this.spinner) {
+            this.spinner.disable();
+          }
           resolve(true);
         });
       }) as Promise<boolean>;
@@ -1241,7 +1253,9 @@ class Composer extends React.Component<IProperties, IState> {
     const comm = this.delta.pull();
 
     // Activator
-    this.spinner.enable();
+    if (this.spinner) {
+      this.spinner.enable();
+    }
     let activator = this.activateAlways();
     if (!activated) {
       activator = this.activateCommit(comm);
@@ -1249,7 +1263,9 @@ class Composer extends React.Component<IProperties, IState> {
 
     return activator.then((can: boolean) => {
       if (!can) {
-        this.spinner.disable();
+        if (this.spinner) {
+          this.spinner.disable();
+        }
         this.delta.revert();
         return Promise.resolve(false);
       }
@@ -1264,7 +1280,9 @@ class Composer extends React.Component<IProperties, IState> {
           // this.eventComponentAdded(preparedData);
 
           // And just resolve this promise
-          this.spinner.disable();
+          if (this.spinner) {
+            this.spinner.disable();
+          }
           resolve(true);
         });
       }) as Promise<boolean>;
@@ -1333,7 +1351,9 @@ class Composer extends React.Component<IProperties, IState> {
     const comm = this.delta.pull();
 
     // Activator
-    this.spinner.enable();
+    if (this.spinner) {
+      this.spinner.enable();
+    }
     let activator = this.activateAlways();
     if (!activated) {
       activator = this.activateCommit(comm);
@@ -1341,7 +1361,9 @@ class Composer extends React.Component<IProperties, IState> {
 
     return activator.then((can: boolean) => {
       if (!can) {
-        this.spinner.disable();
+        if (this.spinner) {
+          this.spinner.disable();
+        }
         this.delta.revert();
         return Promise.resolve(false);
       }
@@ -1356,7 +1378,9 @@ class Composer extends React.Component<IProperties, IState> {
           // this.eventComponentAdded(preparedData);
 
           // And just resolve this promise
-          this.spinner.disable();
+          if (this.spinner) {
+            this.spinner.disable();
+          }
           resolve(true);
         });
       }) as Promise<boolean>;
@@ -1522,7 +1546,9 @@ class Composer extends React.Component<IProperties, IState> {
 
     // If there is some already editing component, try
     // to stop edit it
-    this.spinner.enable();
+    if (this.spinner) {
+      this.spinner.enable();
+    }
     let preparation = Promise.resolve(true);
     const prevId = this.state.componentEditor.id;
     if (prevId !== null) {
@@ -1531,7 +1557,9 @@ class Composer extends React.Component<IProperties, IState> {
 
     return preparation.then((res: boolean) => {
       if (!res) {
-        this.spinner.disable();
+        if (this.spinner) {
+          this.spinner.disable();
+        }
         return Promise.resolve(false);
       }
 
@@ -1548,7 +1576,9 @@ class Composer extends React.Component<IProperties, IState> {
 
       return activator.then((can: boolean) => {
         if (!can) {
-          this.spinner.disable();
+          if (this.spinner) {
+            this.spinner.disable();
+          }
           return Promise.resolve(false);
         }
 
@@ -1558,7 +1588,9 @@ class Composer extends React.Component<IProperties, IState> {
           }, () => {
             // Fire onComponentStartEdit event
             this.eventComponentStartEdit(id);
-            this.spinner.disable();
+            if (this.spinner) {
+              this.spinner.disable();
+            }
             resolve(true);
           });
         });
@@ -1586,7 +1618,9 @@ class Composer extends React.Component<IProperties, IState> {
     // Fire onComponentTryStopEdit event
     this.eventComponentTryStopEdit(id);
 
-    this.spinner.enable();
+    if (this.spinner) {
+      this.spinner.enable();
+    }
     let activator = this.activateAlways();
     if (!activated) {
       activator = this.activateComponentStopEdit(id);
@@ -1595,7 +1629,9 @@ class Composer extends React.Component<IProperties, IState> {
     return activator.then((can: boolean) => {
       // If we can not stop edit
       if (!can) {
-        this.spinner.disable();
+        if (this.spinner) {
+          this.spinner.disable();
+        }
         return Promise.resolve(false);
       }
 
@@ -1611,7 +1647,9 @@ class Composer extends React.Component<IProperties, IState> {
         }, () => {
           // Fire onComponentStopEdit event
           this.eventComponentStopEdit(id as number);
-          this.spinner.disable();
+          if (this.spinner) {
+            this.spinner.disable();
+          }
           resolve(true);
         });
       }) as Promise<boolean>;
