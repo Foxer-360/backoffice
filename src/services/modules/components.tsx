@@ -80,7 +80,11 @@ class ComponentsModule {
     const name = this.name2instance[type];
     const i = this.instances[name];
 
-    return i.getComponentResource(type);
+    if (i) {
+      return i.getComponentResource(type);
+    }
+
+    return null;
   }
 
   public getForm(type: string) {
