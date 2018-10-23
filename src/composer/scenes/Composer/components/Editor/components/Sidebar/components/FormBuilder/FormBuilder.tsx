@@ -24,6 +24,7 @@ export interface IFormSchema {
 
 interface IFormBuilderProps {
   navigations?: ILooseObject;
+  language: string;
   form?: {
     schema: IFormSchema;
   };
@@ -71,6 +72,7 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
               <ArrayInputs
                 key={index}
                 name={elementName}
+                language={this.props.language}
                 title={element.title}
                 items={element.items}
                 data={(this.props.data && this.props.data[elementName]) || []}
@@ -84,6 +86,7 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
                 id={pass ? index + pass : index}
                 key={index}
                 name={elementName}
+                language={this.props.language}
                 {...element}
                 value={this.props.data && this.props.data[elementName] ? this.props.data[elementName] : null}
                 onChange={this.handleChange}

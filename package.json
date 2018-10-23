@@ -7,7 +7,6 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@foxer360/composer": "../composer",
     "@foxer360/delta": "git+https://github.com/Foxer-360/delta.git#v0.1.0",
     "antd": "^3.5.1",
     "apollo-boost": "^0.1.12",
@@ -35,6 +34,7 @@
     "moment": "^2.22.2",
     "node-sass": "^4.9.3",
     "object-assign": "4.1.1",
+    "object-hash": "^1.3.0",
     "postcss-flexbugs-fixes": "3.2.0",
     "postcss-loader": "2.0.8",
     "promise": "8.0.1",
