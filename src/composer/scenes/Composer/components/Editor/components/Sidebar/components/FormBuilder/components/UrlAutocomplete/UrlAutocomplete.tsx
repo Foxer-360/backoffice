@@ -3,11 +3,13 @@ import { AutoComplete, Input, Checkbox } from 'antd';
 
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
+import { canNotDefineSchemaWithinExtensionMessage } from 'graphql/validation/rules/LoneSchemaDefinition';
 
 const GET_PAGES_URLS = gql`
   query
     pagesUrls($language: ID) {
       pagesUrls(where: { language: $language }) {
+        page
         url
         name
       }
@@ -22,6 +24,7 @@ export interface IUrlAutocomplete {
   value?: {
     url: string,
     urlNewWindow: boolean
+    pageId?: string
   };
   placeholder?: string;
   // tslint:disable-next-line:no-any
@@ -42,13 +45,23 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
     };
   }
 
-  onChange = (newVal) => 
+  onChange = (newVal, pagesUrls?: Array<LooseObject>) => { 
+    let pageUrlObj;
+    if (newVal.url && pagesUrls) {
+      pageUrlObj = pagesUrls.find(u => u.url === newVal.url);
+    }
+    
     this.props.onChange({ 
       target: { 
         name: this.props.name, 
-        value: { ...(this.props.value || {}), ...newVal } 
+        value: { 
+          ...(this.props.value || {}), 
+          ...newVal, 
+          ...(pageUrlObj ? { pageId: pageUrlObj.page } : {}) 
+        } 
       } 
-    })
+    });
+  }
 
   render() {
     const { onChange, value } = this.props;
@@ -65,6 +78,11 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
             return `Error: ${error}`;
           }
 
+          let pageUrlObj;
+          if (value && value.pageId && pagesUrls) {
+            pageUrlObj = pagesUrls.find(u => u.page === value.pageId);
+          }
+
           return (<div style={{ paddingBottom: '5px' }}>
             {this.props.notitle && this.props.notitle === true ? null
               : <label>{this.props.label}</label>}
@@ -73,9 +91,9 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
                 <AutoComplete
                   dataSource={pagesUrls.map(source => source.url).filter(u => u !== '')}
                   filterOption={(inputValue, { props: { children }}: LooseObject) => children.toUpperCase().includes(inputValue.toUpperCase()) !== -1}
-                  defaultValue={value && value.url}
-                  onSearch={newUrl => this.onChange({ url: newUrl })}
-                  onSelect={newUrl => this.onChange({ url: newUrl })}
+                  defaultValue={pageUrlObj ? pageUrlObj.url : value && value.url}
+                  onSearch={newUrl => this.onChange({ url: newUrl }, pagesUrls)}
+                  onSelect={newUrl => this.onChange({ url: newUrl }, pagesUrls)}
                 />
 
                 <Checkbox
