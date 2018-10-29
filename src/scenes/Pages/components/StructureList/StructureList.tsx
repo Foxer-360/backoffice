@@ -217,15 +217,18 @@ class StructureList extends Component<Properties, State> {
   }
 
   getUrlPrefix(website: LooseObject, language: string) {
-    const lang = website.languages.find((l: LooseObject) => {
-      if (l.id === language) {
-        return true;
-      }
+    let lang = null;
+    if (website && website.languages) {
+      lang = website.languages.find((l: LooseObject) => {
+        if (l.id === language) {
+          return true;
+        }
 
-      return false;
-    });
+        return false;
+      });
+    }
 
-    let websiteMask = website.urlMask;
+    let websiteMask = (website && website.urlMask ? website.urlMask : '/');
     if (websiteMask[websiteMask.length - 1] === '/') {
       websiteMask = websiteMask.slice(0, -1);
     }
