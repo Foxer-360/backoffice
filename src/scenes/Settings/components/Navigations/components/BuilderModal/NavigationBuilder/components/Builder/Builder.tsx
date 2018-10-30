@@ -32,8 +32,12 @@ class Builder extends Component<Properties> {
   }
 
   sortChildren(data: BuilderData[]): void {
+    // tslint:disable-next-line:no-console
+    console.log('data', data);
     data.forEach((segment: BuilderData) => {
-      if (segment.children) {
+      // tslint:disable-next-line:no-console
+      console.log('segment', segment);
+      if (segment && segment.children) {
         this.sortChildren(segment.children);
         segment.children.sort((a: BuilderData, b: BuilderData) => {
           const c = typeof a.order === 'number' ? a.order : 0;
@@ -138,16 +142,24 @@ class Builder extends Component<Properties> {
   }
 
   generateTree(data: BuilderData[]): React.ReactNode {
-    return data.map((item: BuilderData) => {
-      if (item.children && item.children.length) {
-        return (
-          <Tree.TreeNode key={item.key} title={item.title} >
-            {this.generateTree(item.children)}
-          </Tree.TreeNode>
-        );
-      }
-      return <Tree.TreeNode key={item.key} title={item.title} />;
-    });
+    const tree: React.ReactNode[] = [];
+
+    if (data) {
+      data.forEach((item: BuilderData) => {
+        if (item) {
+          if (item.children && item.children.length) {
+            tree.push(
+              <Tree.TreeNode key={item.key} title={item.title}>
+                {this.generateTree(item.children)}
+              </Tree.TreeNode>
+            );
+          }
+          tree.push(<Tree.TreeNode key={item.key} title={item.title}/>);
+        }
+      });
+    }
+
+    return tree;
   }
 
   render(): React.ReactNode {
