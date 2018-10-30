@@ -1,8 +1,9 @@
 import * as React from 'react';
 const { Component } = React;
-import { Tree } from 'antd';
+import { Row, Col, Tree } from 'antd';
 import { AntTreeNodeMouseEvent } from 'antd/lib/tree';
 import { NavigationPage, NavigationNode, BuilderData } from '../../../../../interfaces';
+import ExternalLink from './components/ExternalLink';
 
 interface Properties {
   pages: NavigationPage[];
@@ -15,7 +16,7 @@ class Builder extends Component<Properties> {
   createDataTree(data: BuilderData[], nodes: NavigationNode[]): BuilderData[] {
     const result: BuilderData[] = [];
 
-    nodes.forEach((node: NavigationNode) => {
+    nodes.forEach((node: NavigationNode, index: number) => {
       const segment = data.find((a: BuilderData) => (a.key === node.page));
       if (node.parent) {
         const parent = data.find((a: BuilderData) => (a.key === node.parent));
@@ -24,7 +25,21 @@ class Builder extends Component<Properties> {
         }
         parent.children.push(segment);
       } else {
-        result.push(segment);
+        if (!segment && node.title && node.link) {
+          const externalLinkSegment = {
+            key: index.toString(),
+            order: node.order,
+            title: `${node.title} (${node.link})`,
+          };
+          // tslint:disable-next-line:no-console
+          console.log('externalLinkSegment', externalLinkSegment);
+          result.push(externalLinkSegment);
+        }
+        // tslint:disable-next-line:no-console
+        console.log('segment', segment);
+        if (segment) {
+          result.push(segment);
+        }
       }
     });
 
@@ -67,7 +82,7 @@ class Builder extends Component<Properties> {
     const data: BuilderData[] = [];
     const { pages, nodes } = this.props;
 
-    nodes.forEach((node: NavigationNode) => {
+    nodes.forEach((node: NavigationNode, index: number) => {
       const page: NavigationPage = pages.find((a: NavigationPage) => (a.id === node.page));
       if (page) {
         data.push({
@@ -76,7 +91,17 @@ class Builder extends Component<Properties> {
           order: node.order || 0
         });
       }
+      if (!node.page && node.title && node.link) {
+        data.push({
+          key: index.toString(),
+          title: `${node.title} (${node.link})`,
+          order: node.order || 0
+        });
+      }
     });
+
+    // tslint:disable-next-line:no-console
+    console.log('data', data);
 
     const result: BuilderData[] = this.createDataTree(data, nodes);
     this.sortChildren(result);
@@ -158,17 +183,44 @@ class Builder extends Component<Properties> {
     return tree;
   }
 
+  onCreateExternalLink(data: LooseObject) {
+    // tslint:disable-next-line:no-console
+    console.log('onCreateExternalLink', data);
+    // tslint:disable-next-line:no-console
+    console.log('onCreateExternalLink current nodes', this.props.nodes);
+    // tslint:disable-next-line:no-console
+    console.log('onCreateExternalLink current pages', this.props.pages);
+    const newNodes = [...this.props.nodes];
+    newNodes.push({
+      page: null,
+      order: null,
+      parent: null,
+      title: (data.title ? data.title : null),
+      link: (data.link ? data.link : null)
+    });
+    this.props.structureChange(newNodes);
+  }
+
   render(): React.ReactNode {
     return (
-      <Tree
-        className="draggable-tree"
-        defaultExpandAll={true}
-        showLine={true}
-        draggable={true}
-        onDrop={(info: AntTreeNodeMouseEvent) => this.onDrop(info)}
-      >
-        {this.generateTree(this.getData())}
-      </Tree>
+      <Row>
+        <Col span={16} style={{ borderRight: '1px solid #DDD' }}>
+          <Tree
+            className="draggable-tree"
+            defaultExpandAll={true}
+            showLine={true}
+            draggable={true}
+            onDrop={(info: AntTreeNodeMouseEvent) => this.onDrop(info)}
+          >
+            {this.generateTree(this.getData())}
+          </Tree>
+        </Col>
+        <Col span={8} style={{ paddingLeft: '15px' }}>
+          <ExternalLink
+            onCreateNew={(data: LooseObject) => this.onCreateExternalLink(data)}
+          />
+        </Col>
+      </Row>
     );
   }
 }

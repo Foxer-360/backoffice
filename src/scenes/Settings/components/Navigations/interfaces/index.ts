@@ -45,7 +45,9 @@ export interface NavigationPage {
 }
 
 export interface NavigationNode {
-  page: string;
+  page?: string;
+  title?: string;
+  link?: string;
   order?: number;
   parent: string | null;
 }

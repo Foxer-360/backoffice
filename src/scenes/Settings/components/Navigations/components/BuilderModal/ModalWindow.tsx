@@ -48,6 +48,8 @@ const NavigationBuilderQM = adopt({
           const nodes: NavigationNode[] = data.navigationNodes.map((node: NavigationNode) => {
             const model: NavigationNode = {
               page: node.page,
+              title: node.title,
+              link: node.link,
               order: node.order,
               parent: node.parent
             };

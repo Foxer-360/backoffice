@@ -25,6 +25,7 @@ class NavigationBuilder extends Component<Properties, State> {
 
   constructor(props: Properties) {
     super(props);
+
     this.state = {
       pages: props.pages,
       nodes: props.nodes,
@@ -36,6 +37,8 @@ class NavigationBuilder extends Component<Properties, State> {
   }
 
   handleBuilderChange(nodes: NavigationNode[]): void {
+    // tslint:disable-next-line:no-console
+    console.log('handleBuilderChange nodes', nodes);
     this.setState({ nodes });
   }
 
