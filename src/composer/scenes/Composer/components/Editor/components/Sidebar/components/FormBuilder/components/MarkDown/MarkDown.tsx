@@ -47,7 +47,6 @@ export default class MarkDown extends React.Component<IMyTextAreaProps, {}> {
           onChange={this.handleChange}
           value={value || ''}
           options={{
-            autofocues: true,
             spellChecker: false,
             placeholder: placeholder,
           }}
