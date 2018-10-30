@@ -32,11 +32,7 @@ class Builder extends Component<Properties> {
   }
 
   sortChildren(data: BuilderData[]): void {
-    // tslint:disable-next-line:no-console
-    console.log('data', data);
     data.forEach((segment: BuilderData) => {
-      // tslint:disable-next-line:no-console
-      console.log('segment', segment);
       if (segment && segment.children) {
         this.sortChildren(segment.children);
         segment.children.sort((a: BuilderData, b: BuilderData) => {
