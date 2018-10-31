@@ -47,6 +47,11 @@
   dependencies:
     axios "*"
 
+"@types/codemirror@^0.0.65":
+  version "0.0.65"
+  resolved "https://registry.yarnpkg.com/@types/codemirror/-/codemirror-0.0.65.tgz#5f8d546d40c9d2acb1166167aae9e70d1b9a83b7"
+  integrity sha512-XJo1mbkiLI0M4zR1LqpM6ljDgnpIoDkqs3JPp0jLZ8DHbqbha+YNWemhlqQyJrLIame+eOkefrL8U+NNPB4FAQ==
+
 "@types/events@*":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@types/events/-/events-1.2.0.tgz#81a6731ce4df43619e5c8c945383b3e62a89ea86"
@@ -145,6 +150,11 @@
   resolved "https://registry.yarnpkg.com/@types/redux/-/redux-3.6.0.tgz#f1ebe1e5411518072e4fdfca5c76e16e74c1399a"
   dependencies:
     redux "*"
+
+"@types/simplemde@^1.11.7":
+  version "1.11.7"
+  resolved "https://registry.yarnpkg.com/@types/simplemde/-/simplemde-1.11.7.tgz#c8bd9f54ff46db7f311a989004eb5815acedf429"
+  integrity sha512-b3yirBar1gqb9clgJJKpx+Or3txkOOkm5sffhRKaBUfh7+1D2Aimx2RKXGS1LK9S5KyNmug3lwpGJtaID9cOnA==
 
 "@types/socket.io-client@^1.4.32":
   version "1.4.32"
@@ -6914,10 +6924,13 @@ react-router@^4.2.0, react-router@^4.3.1:
     prop-types "^15.6.1"
     warning "^4.0.1"
 
-react-simplemde-editor@3.6.15:
-  version "3.6.15"
-  resolved "https://registry.yarnpkg.com/react-simplemde-editor/-/react-simplemde-editor-3.6.15.tgz#b4991304c7e1cac79258bb225579d008c13b5991"
+react-simplemde-editor@3.6.21:
+  version "3.6.21"
+  resolved "https://registry.yarnpkg.com/react-simplemde-editor/-/react-simplemde-editor-3.6.21.tgz#7b402ae3dce8587a7538097ea5fc9a0e7ffc134f"
+  integrity sha512-RqRAZIitxDtpEiW/5z/wehKIfx5KPEqZFcLy2NJsIAhqCw8tySYH5wkGOFHjbNFqa87HNPUrUxq1NVzzp8HLqg==
   dependencies:
+    "@types/codemirror" "^0.0.65"
+    "@types/simplemde" "^1.11.7"
     simplemde "^1.11.2"
 
 react-slick@~0.23.1:
