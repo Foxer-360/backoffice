@@ -45,8 +45,6 @@ class ExternalLink extends React.Component<ExternalLinkProps, ExternalLinkState>
   }
 
   render() {
-    // tslint:disable-next-line:no-console
-    console.log('external link', this.state);
     return (
       <>
         <strong>Add external link</strong>

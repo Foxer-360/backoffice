@@ -37,8 +37,6 @@ class NavigationBuilder extends Component<Properties, State> {
   }
 
   handleBuilderChange(nodes: NavigationNode[]): void {
-    // tslint:disable-next-line:no-console
-    console.log('handleBuilderChange nodes', nodes);
     this.setState({ nodes });
   }
 

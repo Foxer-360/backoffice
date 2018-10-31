@@ -31,12 +31,8 @@ class Builder extends Component<Properties> {
             order: node.order,
             title: `${node.title} (${node.link})`,
           };
-          // tslint:disable-next-line:no-console
-          console.log('externalLinkSegment', externalLinkSegment);
           result.push(externalLinkSegment);
         }
-        // tslint:disable-next-line:no-console
-        console.log('segment', segment);
         if (segment) {
           result.push(segment);
         }
@@ -99,9 +95,6 @@ class Builder extends Component<Properties> {
         });
       }
     });
-
-    // tslint:disable-next-line:no-console
-    console.log('data', data);
 
     const result: BuilderData[] = this.createDataTree(data, nodes);
     this.sortChildren(result);
@@ -184,12 +177,6 @@ class Builder extends Component<Properties> {
   }
 
   onCreateExternalLink(data: LooseObject) {
-    // tslint:disable-next-line:no-console
-    console.log('onCreateExternalLink', data);
-    // tslint:disable-next-line:no-console
-    console.log('onCreateExternalLink current nodes', this.props.nodes);
-    // tslint:disable-next-line:no-console
-    console.log('onCreateExternalLink current pages', this.props.pages);
     const newNodes = [...this.props.nodes];
     newNodes.push({
       page: null,
