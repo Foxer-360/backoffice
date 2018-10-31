@@ -42,6 +42,7 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
 
   // tslint:disable-next-line:no-any
   public handleChange(e: React.ChangeEvent | any) {
+
     const newData = {
       ...this.props.data,
       [(e.target as HTMLInputElement).name]: (e.target as HTMLInputElement).value,
@@ -77,6 +78,8 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
                 items={element.items}
                 data={(this.props.data && this.props.data[elementName]) || []}
                 onChange={this.handleChange}
+                changeTab={this.handleChange}
+                activeTab={this.props.data.activeTab || 0}
               />
             );
 
