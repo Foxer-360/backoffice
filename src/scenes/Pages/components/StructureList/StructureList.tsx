@@ -243,7 +243,7 @@ class StructureList extends Component<Properties, State> {
   render() {
     return (
       <>
-        <PageList className={'waka  saass'}>
+        <PageList >
           {({ fullWebsite, language, pages }: PageListObject) => {
             if (!pages || pages.length < 1) {
               return (
