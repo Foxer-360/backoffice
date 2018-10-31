@@ -269,8 +269,6 @@ class StructureList extends Component<Properties, State> {
               };
               return res;
             }));
-            // tslint:disable-next-line:no-console
-            console.log('%c Emilio: ', 'background: #222; color: #bada55', data);
             return (
               <Table
                 columns={this.COLUMNS}
