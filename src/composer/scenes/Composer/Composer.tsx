@@ -7,6 +7,8 @@ import * as React from 'react';
 import Editor from './components/Editor';
 import Spinner from './components/Spinner';
 import Users from './components/Users';
+import Tags from './../../../components/Tags';
+
 // import './composer.css';
 
 // tslint:disable:jsx-no-multiline-js
@@ -67,7 +69,7 @@ export interface IProperties {
   onComponentStartEditing?: (id: number) => void;
   onComponentStopEditing?: (id: number) => void;
   toggleChatAndTask?: () => void;
-
+  pageId?: string;
   locked?: number[];
   componentService: IComponentsServiceLikeClass; // Service for components
   pluginService: IPluginServiceLikeClass; // Service for plugins
@@ -226,7 +228,6 @@ class Composer extends React.Component<IProperties, IState> {
     this.handleRemoveContainer = this.handleRemoveContainer.bind(this);
     this.handleLockContainer = this.handleLockContainer.bind(this);
   }
-
   /**
    * Standard React render method
    *
@@ -286,7 +287,6 @@ class Composer extends React.Component<IProperties, IState> {
         </div>
       </>
     );
-
     return (
       <div>
         <Tabs
@@ -302,6 +302,7 @@ class Composer extends React.Component<IProperties, IState> {
             <div style={{ position: 'relative' }}>
               <Spinner ref={(node: Spinner) => this.spinner = node}>
                 <Editor
+                  pageId={this.props.pageId}
                   content={this.state.content}
                   pageName={this.state.name}
                   selectedComponent={this.state.componentEditor.id}
