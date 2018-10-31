@@ -23,6 +23,7 @@ body {
   & > .ant-row {
     display: flex;
     justify-content: stretch;
+    min-height: calc(100vh - 100px);
   }
 
   .ant-col-16,
