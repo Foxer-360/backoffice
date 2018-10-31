@@ -12,6 +12,7 @@ import {
 import DelayComponent from './components/DelayComponent';
 import Sidebar from './components/Sidebar';
 import View from './components/View';
+import Tags from './../../../../../components/Tags';
 
 // tslint:disable:jsx-no-multiline-js
 // tslint:disable:jsx-no-lambda
@@ -20,6 +21,7 @@ export interface IProperties {
   // content: Array<ILooseObject>;
   content: ILooseObject;
   pageName: string;
+  pageId?: string;
 
   // Additional informations about other editors and
   // locks of components
@@ -106,6 +108,7 @@ class Editor extends React.Component<IProperties, IState> {
   }
 
   public render() {
+    const { pageId } = this.props;
     let type = '';
     let data = {};
     const component = this.getComponentFromContent();
@@ -137,7 +140,12 @@ class Editor extends React.Component<IProperties, IState> {
       <div className={'editor'}>
         <Row>
           <Col span={size}>
-            <Card title={PageName}>
+            <Card 
+              title={<div>
+                <span>PageName</span>
+                {pageId && <div style={{ marginTop: 12 }}><Tags pageId={pageId} /></div>} 
+              </div>}
+            >
               {!this.props.content || this.props.content.length < 1 ? (
                 <DelayComponent delay={100}>
                   <Alert

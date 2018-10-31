@@ -13,6 +13,7 @@ import history from '@source/services/history';
 import { client } from '@source/services/graphql';
 import { Alert, Card, Spin } from 'antd';
 import * as React from 'react';
+import Tags from './../../components/Tags';
 
 const socket = connect();
 
@@ -151,6 +152,7 @@ class Editor extends React.Component<IProperties, IState> {
     return (
       <>
         <Composer
+          pageId={this.props.pageId}
           onSave={this.handleSave}
           ref={this.initComposerReference}
           editors={this.state.editors}
