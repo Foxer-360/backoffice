@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Popconfirm, Table } from 'antd';
+import { Button, Popconfirm, Table, Card } from 'antd';
 import CreatePageModal from './components/CreatePageModal';
 import Actions from './components/Actions';
 import { Query } from 'react-apollo';
@@ -115,27 +115,29 @@ interface PageListObject {
 }
 
 class StructureList extends Component<Properties, State> {
-
   private readonly INITIAL_STATE: State = {
     modal: {
       visible: false,
-      parentId: null
-    }
+      parentId: null,
+    },
   };
 
   private readonly COLUMNS = [
     { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Url', dataIndex: 'url', key: 'url'},
+    { title: 'Url', dataIndex: 'url', key: 'url' },
     { title: 'Type', dataIndex: 'type', key: 'type' },
-    { title: 'Actions', key: 'actions',
-      render: Actions(this.handleAddPage.bind(this), this.handleEditPage.bind(this)) }
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: Actions(this.handleAddPage.bind(this), this.handleEditPage.bind(this)),
+    },
   ];
 
   constructor(props: Properties) {
     super(props);
 
     this.state = {
-      ...this.INITIAL_STATE
+      ...this.INITIAL_STATE,
     };
 
     this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -148,15 +150,15 @@ class StructureList extends Component<Properties, State> {
       ...this.state,
       modal: {
         ...this.state.modal,
-        visible: false
-      }
+        visible: false,
+      },
     });
   }
 
   handleAddPage(parentId: string | null) {
     this.setState({
       ...this.state,
-      modal: { visible: true, parentId }
+      modal: { visible: true, parentId },
     });
   }
 
@@ -228,7 +230,7 @@ class StructureList extends Component<Properties, State> {
       });
     }
 
-    let websiteMask = (website && website.urlMask ? website.urlMask : '/');
+    let websiteMask = website && website.urlMask ? website.urlMask : '/';
     if (websiteMask[websiteMask.length - 1] === '/') {
       websiteMask = websiteMask.slice(0, -1);
     }
@@ -248,35 +250,30 @@ class StructureList extends Component<Properties, State> {
             if (!pages || pages.length < 1) {
               return (
                 <>
-                  <Table columns={this.COLUMNS} dataSource={[]} defaultExpandAllRows={true} />
+                  <Card title={'No page found. Create your first.'} loading={true} />
                   <div>
-                  <br />
-                  <Button icon="plus-circle-o" onClick={() => this.handleAddPage(null)} type="primary">
-                    Add first page
-                  </Button>
-                </div>
+                    <br />
+                    <Button icon="plus-circle-o" onClick={() => this.handleAddPage(null)} type="primary">
+                      Add first page
+                    </Button>
+                  </div>
                 </>
               );
             }
 
             // const keysToExpand = [] as string[];
             const urlPrefix = this.getUrlPrefix(fullWebsite, language);
-            const data: Array<TablePage> = this.pagesToTree(pages.map((page: Page) => {
-              const res: TablePage = {
-                ...page,
-                key: page.id,
-                urlPrefix,
-              };
-              return res;
-            }));
-
-            return (
-              <Table
-                columns={this.COLUMNS}
-                dataSource={data}
-                defaultExpandAllRows={true}
-              />
+            const data: Array<TablePage> = this.pagesToTree(
+              pages.map((page: Page) => {
+                const res: TablePage = {
+                  ...page,
+                  key: page.id,
+                  urlPrefix,
+                };
+                return res;
+              })
             );
+            return <Table columns={this.COLUMNS} dataSource={data} defaultExpandAllRows={true} />;
           }}
         </PageList>
 
@@ -289,7 +286,6 @@ class StructureList extends Component<Properties, State> {
       </>
     );
   }
-
 }
 
 export default StructureList;
