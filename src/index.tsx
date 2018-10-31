@@ -16,7 +16,6 @@ import history from './services/history';
 import { connect as socketConnect } from './services/socket';
 import './styles/main.scss';
 import { client as graphqlClient } from '@source/services/graphql';
-import { ComponentsModule } from '@source/services/modules';
 
 ReactDOM.render(
   <ApolloProvider client={graphqlClient}>
@@ -36,6 +35,3 @@ ReactDOM.render(
 
 socketConnect(store);
 registerServiceWorker();
-
-// tslint:disable-next-line:no-console
-console.log(ComponentsModule.getAllowedTypes());

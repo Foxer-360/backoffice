@@ -250,6 +250,8 @@ export const NAVIGATION_NODES = gql`
     ) {
       id
       page
+      title
+      link
       order
       parent
       navigation {

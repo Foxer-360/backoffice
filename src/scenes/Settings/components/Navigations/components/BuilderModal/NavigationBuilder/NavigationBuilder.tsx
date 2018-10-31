@@ -25,6 +25,7 @@ class NavigationBuilder extends Component<Properties, State> {
 
   constructor(props: Properties) {
     super(props);
+
     this.state = {
       pages: props.pages,
       nodes: props.nodes,
