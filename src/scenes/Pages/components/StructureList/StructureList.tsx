@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Popconfirm, Table } from 'antd';
+import { Button, Popconfirm, Table, Card } from 'antd';
 import CreatePageModal from './components/CreatePageModal';
 import Actions from './components/Actions';
 import { Query } from 'react-apollo';
@@ -243,12 +243,12 @@ class StructureList extends Component<Properties, State> {
   render() {
     return (
       <>
-        <PageList>
+        <PageList className={'waka  saass'}>
           {({ fullWebsite, language, pages }: PageListObject) => {
             if (!pages || pages.length < 1) {
               return (
                 <>
-                  <Table columns={this.COLUMNS} dataSource={[]} defaultExpandAllRows={true} />
+                 <Card title={'No page found. Create your first.'}loading={true} />
                   <div>
                   <br />
                   <Button icon="plus-circle-o" onClick={() => this.handleAddPage(null)} type="primary">
@@ -269,7 +269,8 @@ class StructureList extends Component<Properties, State> {
               };
               return res;
             }));
-
+            // tslint:disable-next-line:no-console
+            console.log('%c Emilio: ', 'background: #222; color: #bada55', data);
             return (
               <Table
                 columns={this.COLUMNS}
