@@ -16,28 +16,21 @@ interface IArrayInputsProps {
   items: IFormSchema;
   // tslint:disable-next-line:no-any
   onChange: (e: React.ChangeEvent | any) => void;
-}
-
-interface IArrayInputsState {
+  // tslint:disable-next-line:no-any
+  changeTab?: (e: React.ChangeEvent | any) => void;
   activeTab: number;
 }
 
-class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> {
+class ArrayInputs extends React.Component<IArrayInputsProps> {
   constructor(props: IArrayInputsProps) {
     super(props);
-
-    this.state = {
-      activeTab: 0,
-    };
 
     this.onChange = this.onChange.bind(this);
     this.mediaLibraryChange = this.mediaLibraryChange.bind(this);
   }
 
-  public onChangeTab(key: string) {
-    this.setState({
-      activeTab: parseInt(key, 10),
-    });
+  public onChangeTab(key: number) {
+    this.props.changeTab({ target: { name: 'activeTab', value: key } });
   }
 
   public onNewTab() {
@@ -53,15 +46,13 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
       },
     });
 
-    this.setState({
-      activeTab: newTab,
-    });
+    this.onChangeTab(newTab);
   }
 
   public onEditTab(targetKey: string, action: string) {
     const iKey = parseInt(targetKey, 10);
     const newData = [...this.props.data];
-    let newTab = this.state.activeTab;
+    let newTab = this.props.activeTab;
 
     // remove tab
     if (action === 'remove') {
@@ -82,15 +73,13 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
       },
     });
 
-    this.setState({
-      activeTab: newTab,
-    });
+    this.onChangeTab(newTab);
   }
 
   // tslint:disable-next-line:no-any
   public onChange(key: any) {
     const newData = [...this.props.data];
-    newData[this.state.activeTab][key.target.name] = key.target.value;
+    newData[this.props.activeTab][key.target.name] = key.target.value;
 
     this.props.onChange({
       target: {
@@ -102,7 +91,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
 
   public mediaLibraryChange(media: { value: object; name: string }) {
     const newData = [...this.props.data];
-    newData[this.state.activeTab][media.name] = media.value;
+    newData[this.props.activeTab][media.name] = media.value;
 
     this.props.onChange({
       target: {
@@ -127,8 +116,8 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
       <Section title={this.props.title}>
         <Tabs
           type="editable-card"
-          activeKey={this.state.activeTab.toString()}
-          onChange={(key: string) => this.onChangeTab(key)}
+          activeKey={this.props.activeTab.toString()}
+          onChange={(key: string) => this.onChangeTab(parseInt(key, 10))}
           onEdit={onEdit}
         >
           {this.props.data &&
