@@ -142,7 +142,7 @@ class Editor extends React.Component<IProperties, IState> {
           <Col span={size}>
             <Card 
               title={<div>
-                <span>PageName</span>
+                <span>{PageName}</span>
                 {pageId && <div style={{ marginTop: 12 }}><Tags pageId={pageId} /></div>} 
               </div>}
             >
