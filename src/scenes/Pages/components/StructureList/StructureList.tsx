@@ -5,6 +5,7 @@ import Actions from './components/Actions';
 import { Query } from 'react-apollo';
 import { queries } from '@source/services/graphql';
 import { adopt } from 'react-adopt';
+import Tags from './../../../../components/Tags';
 
 const { Component } = React;
 
@@ -128,7 +129,14 @@ class StructureList extends Component<Properties, State> {
     { title: 'Url', dataIndex: 'url', key: 'url'},
     { title: 'Type', dataIndex: 'type', key: 'type' },
     { title: 'Actions', key: 'actions',
-      render: Actions(this.handleAddPage.bind(this), this.handleEditPage.bind(this)) }
+      render: Actions(this.handleAddPage.bind(this), this.handleEditPage.bind(this)) },
+    {
+      title: 'Tags',
+      dataIndex: 'tags',
+      render: (value, { id }) => {
+        return <Tags popOver={true} pageId={id} />;
+      }
+    }
   ];
 
   constructor(props: Properties) {

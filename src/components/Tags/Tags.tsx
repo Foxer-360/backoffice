@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Tag } from 'antd';
+import { Popover, Tag, Icon } from 'antd';
 import gql from 'graphql-tag';
 import { Query, Mutation } from 'react-apollo';
 import { adopt } from 'react-adopt';
@@ -65,6 +65,7 @@ const ComposedQuery = adopt({
 
 export interface Properties {
   pageId?: string;
+  popOver?: boolean;
 }
 
 export interface State {}
@@ -75,8 +76,33 @@ class Tags extends Component<Properties, State> {
     super(props);
   }
 
-  render(): JSX.Element {
+  isTagSelected(pages: Array<LooseObject>, pageId: string) {
+    return pages.some(({ id }) => pageId === id );
+  }
+
+  getUninsertedTags(tags: Array<LooseObject>, updateTag: Function) {
     const { pageId } = this.props;
+    
+    return tags.filter(({ pages }) => !this.isTagSelected(pages, pageId)).map(({ color, name, pages, id: tagId }, key) => {
+      return (
+        <Tag
+          key={key}
+          color={color}
+          onClick={() => {
+            updateTag({ variables: { ...(this.isTagSelected(pages, pageId) ? { 
+              disconnectedPages: [{ id: pageId }]
+            } : {
+              connectedPages: [{ id: pageId }]
+            }), tagId } });
+          }}
+        >
+          {name}
+        </Tag>);
+    });
+}
+
+  render(): JSX.Element {
+    const { pageId, popOver } = this.props;
 
     return (
       <div>
@@ -95,22 +121,39 @@ class Tags extends Component<Properties, State> {
             if (error) { return 'Error...'; }
             if (loading) { return 'Loading...'; }
 
-            return tags.map(({ color, name, pages, id: tagId }, key) => {
-              const isTagSelected = pages.some(({ id }) => pageId === id );
-              return <Tag
-                key={key} 
-                {...(isTagSelected ? { color } : {})}
-                onClick={() => {
-                  updateTag({ variables: { ...(isTagSelected ? { 
-                    disconnectedPages: [{ id: pageId }]
-                  } : {
-                    connectedPages: [{ id: pageId }]
-                  }), tagId } });
-                }}
-              >
-                {name}
-              </Tag>;
-            });
+            const content = (
+              <div>
+                {this.getUninsertedTags(tags, updateTag)}
+              </div>
+            );
+            const numberOfUnselectedTags = tags.filter(({ pages }) => !this.isTagSelected(pages, pageId)).length;
+            return (<div>
+              {tags.filter(({ pages }) => this.isTagSelected(pages, pageId)).map(({ color, name, pages, id: tagId }, key) => {
+                return <Tag
+                  onClick={() => {
+                    updateTag({ variables: { ...(this.isTagSelected(pages, pageId) ? { 
+                      disconnectedPages: [{ id: pageId }]
+                    } : {
+                      connectedPages: [{ id: pageId }]
+                    }), tagId } });
+                  }}
+                  key={key} 
+                  color={color}
+                >
+                  {name}
+                </Tag>;
+              })}
+
+              <Popover content={content} trigger="click" placement="bottomLeft">
+                <Popover content={content} trigger="hover" placement="bottomLeft">
+                  {numberOfUnselectedTags > 0 && <Tag
+                    style={{ background: '#fff', borderStyle: 'dashed' }}
+                  >
+                    <Icon type="plus" /> New Tag
+                  </Tag>}
+                </Popover>
+              </Popover>
+            </div>);
           }}
         </ComposedQuery>
       </div>
