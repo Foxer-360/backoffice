@@ -19,6 +19,11 @@ body {
   padding-top: 0;
 }
 
+.contentHolder {
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
 .editor {
   & > .ant-row {
     display: flex;
