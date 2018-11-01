@@ -61,7 +61,9 @@ class Container extends React.Component<IProperties, {}> {
             </button>
             <button
               className={`antBtn ${this.props.locked ? 'green' : 'red'}`}
-              onClick={() => this.props.lockContainer(this.props.container ? this.props.container : '', !this.props.locked)}
+              onClick={() =>
+                this.props.lockContainer(this.props.container ? this.props.container : '', !this.props.locked)
+              }
             >
               {this.props.locked ? 'Unlock' : 'Lock'}
             </button>
@@ -83,6 +85,7 @@ class Container extends React.Component<IProperties, {}> {
               // It it's container
               return (
                 <Container
+                  key={index}
                   {...this.props}
                   container={component.id}
                   content={component.content}

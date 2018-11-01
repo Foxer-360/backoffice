@@ -4,6 +4,7 @@ import * as React from 'react';
 import { IFormSchema } from '../../FormBuilder';
 import InputRenderer from '../InputRenderer';
 import Section from '../Section';
+import debounce from 'lodash/debounce';
 
 // tslint:disable:jsx-no-multiline-js
 // tslint:disable:jsx-no-lambda
@@ -16,21 +17,19 @@ interface IArrayInputsProps {
   items: IFormSchema;
   // tslint:disable-next-line:no-any
   onChange: (e: React.ChangeEvent | any) => void;
-  // tslint:disable-next-line:no-any
-  changeTab?: (e: React.ChangeEvent | any) => void;
   activeTab: number;
 }
 
 class ArrayInputs extends React.Component<IArrayInputsProps> {
   constructor(props: IArrayInputsProps) {
     super(props);
-
     this.onChange = this.onChange.bind(this);
     this.mediaLibraryChange = this.mediaLibraryChange.bind(this);
+    this.onChangeTab = debounce(this.onChangeTab.bind(this), 25);
   }
 
   public onChangeTab(key: number) {
-    this.props.changeTab({ target: { name: 'activeTab', value: key } });
+    this.props.onChange({ target: { name: 'activeTab', value: key } });
   }
 
   public onNewTab() {
@@ -50,11 +49,12 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
   }
 
   public onEditTab(targetKey: string, action: string) {
-    const iKey = parseInt(targetKey, 10);
-    const newData = [...this.props.data];
+    let iKey = parseInt(targetKey, 10);
+    let newData = [...this.props.data];
     let newTab = this.props.activeTab;
 
     // remove tab
+
     if (action === 'remove') {
       newData.splice(iKey, 1);
 

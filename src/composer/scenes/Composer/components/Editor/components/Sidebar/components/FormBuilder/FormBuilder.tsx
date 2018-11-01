@@ -78,7 +78,6 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
                 items={element.items}
                 data={(this.props.data && this.props.data[elementName]) || []}
                 onChange={this.handleChange}
-                changeTab={this.handleChange}
                 activeTab={this.props.data.activeTab || 0}
               />
             );
