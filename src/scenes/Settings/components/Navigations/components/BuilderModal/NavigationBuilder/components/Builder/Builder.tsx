@@ -12,17 +12,19 @@ interface Properties {
 }
 
 class Builder extends Component<Properties> {
-
   createDataTree(data: BuilderData[], nodes: NavigationNode[]): BuilderData[] {
     const result: BuilderData[] = [];
 
     nodes.forEach((node: NavigationNode, index: number) => {
-      const segment = data.find((a: BuilderData) => (a.key === node.page));
+      const segment = data.find((a: BuilderData) => a.key === node.page);
+
       if (node.parent) {
-        const parent = data.find((a: BuilderData) => (a.key === node.parent));
+        const parent = data.find((a: BuilderData) => a.key === node.parent);
+
         if (!parent.children) {
           parent.children = [];
         }
+
         parent.children.push(segment);
       } else {
         if (!segment && node.title && node.link) {
@@ -64,10 +66,11 @@ class Builder extends Component<Properties> {
           result.push(node);
         });
       }
+
       result.push({
         page: segment.key,
         order: index,
-        parent: parent ? parent : null
+        parent: parent ? parent : null,
       });
     });
 
@@ -79,24 +82,27 @@ class Builder extends Component<Properties> {
     const { pages, nodes } = this.props;
 
     nodes.forEach((node: NavigationNode, index: number) => {
-      const page: NavigationPage = pages.find((a: NavigationPage) => (a.id === node.page));
+      const page: NavigationPage = pages.find((a: NavigationPage) => a.id === node.page);
+
       if (page) {
         data.push({
           key: page.id,
           title: `${page.name} (${page.url})`,
-          order: node.order || 0
+          order: node.order || 0,
         });
       }
+
       if (!node.page && node.title && node.link) {
         data.push({
           key: index.toString(),
           title: `${node.title} (${node.link})`,
-          order: node.order || 0
+          order: node.order || 0,
         });
       }
     });
 
     const result: BuilderData[] = this.createDataTree(data, nodes);
+
     this.sortChildren(result);
 
     return result;
@@ -139,19 +145,21 @@ class Builder extends Component<Properties> {
         arr = _arr;
         index = _index;
       });
+
       if (dropPosition === -1) {
         arr.splice(index, 0, dragObj);
       } else {
         arr.splice(index + 1, 0, dragObj);
       }
     } else {
-      this.dropLoop(data, dropKey, (item) => {
+      this.dropLoop(data, dropKey, item => {
         item.children = item.children || [];
         item.children.push(dragObj);
       });
     }
 
     const result = this.parseDataTree(data);
+
     this.props.structureChange(result);
   }
 
@@ -167,8 +175,9 @@ class Builder extends Component<Properties> {
                 {this.generateTree(item.children)}
               </Tree.TreeNode>
             );
+          } else {
+            tree.push(<Tree.TreeNode key={item.key} title={item.title} />);
           }
-          tree.push(<Tree.TreeNode key={item.key} title={item.title}/>);
         }
       });
     }
@@ -178,12 +187,13 @@ class Builder extends Component<Properties> {
 
   onCreateExternalLink(data: LooseObject) {
     const newNodes = [...this.props.nodes];
+
     newNodes.push({
       page: null,
       order: null,
       parent: null,
-      title: (data.title ? data.title : null),
-      link: (data.link ? data.link : null)
+      title: data.title ? data.title : null,
+      link: data.link ? data.link : null,
     });
     this.props.structureChange(newNodes);
   }
@@ -203,9 +213,7 @@ class Builder extends Component<Properties> {
           </Tree>
         </Col>
         <Col span={8} style={{ paddingLeft: '15px' }}>
-          <ExternalLink
-            onCreateNew={(data: LooseObject) => this.onCreateExternalLink(data)}
-          />
+          <ExternalLink onCreateNew={(data: LooseObject) => this.onCreateExternalLink(data)} />
         </Col>
       </Row>
     );
