@@ -1,5 +1,4 @@
 import * as React from 'react';
-import Seo from '@source/plugins/Seo';
 
 interface PluginProps {
   onChange: (data: LooseObject) => void;
@@ -18,8 +17,6 @@ class PluginsService {
 
   public getPluginTabName(name: string): string {
     switch (name) {
-      case 'seo':
-        return 'SEO';
       default:
         return 'Undefined';
     }
@@ -27,8 +24,6 @@ class PluginsService {
 
   public getPluginComponent(name: string): typeof UndefinedComponent {
     switch (name) {
-      case 'seo':
-        return Seo;
       default:
         return UndefinedComponent;
     }
