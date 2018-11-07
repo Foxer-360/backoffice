@@ -6925,10 +6925,10 @@ react-router@^4.2.0, react-router@^4.3.1:
     prop-types "^15.6.1"
     warning "^4.0.1"
 
-react-simplemde-editor@3.6.21:
-  version "3.6.21"
-  resolved "https://registry.yarnpkg.com/react-simplemde-editor/-/react-simplemde-editor-3.6.21.tgz#7b402ae3dce8587a7538097ea5fc9a0e7ffc134f"
-  integrity sha512-RqRAZIitxDtpEiW/5z/wehKIfx5KPEqZFcLy2NJsIAhqCw8tySYH5wkGOFHjbNFqa87HNPUrUxq1NVzzp8HLqg==
+react-simplemde-editor@3.6.22:
+  version "3.6.22"
+  resolved "https://registry.yarnpkg.com/react-simplemde-editor/-/react-simplemde-editor-3.6.22.tgz#2c122dffbebc304c13aee804d16e3b4533e00345"
+  integrity sha512-5tyi1fly8h7ISQHIzvApQq3ZB4ManPPnH8t5Dr9l9/uGfO8dqofqfuHPih8EmnCkhBWxUfXufnEWi9Eo7Y2reg==
   dependencies:
     "@types/codemirror" "^0.0.65"
     "@types/simplemde" "^1.11.7"
