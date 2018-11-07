@@ -45,7 +45,7 @@ const NavigationBuilderQM = adopt({
             return render(null);
           }
 
-          const nodes: NavigationNode[] = data.navigationNodes.map((node: NavigationNode) => {
+          const nodes: NavigationNode[] = data.navigationNodes && data.navigationNodes.map((node: NavigationNode) => {
             const model: NavigationNode = {
               page: node.page,
               title: node.title,
