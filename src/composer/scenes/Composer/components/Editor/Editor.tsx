@@ -13,6 +13,7 @@ import DelayComponent from './components/DelayComponent';
 import Sidebar from './components/Sidebar';
 import View from './components/View';
 import Tags from './../../../../../components/Tags';
+import PageNameManager from './../../../../../components/PageNameManager';
 
 // tslint:disable:jsx-no-multiline-js
 // tslint:disable:jsx-no-lambda
@@ -46,6 +47,7 @@ export interface IProperties {
   lockContainer: (id: string, lock: boolean) => void;
 
   componentsService: IComponentsServiceLikeClass;
+  language?: ILooseObject; 
 }
 
 export interface IState {
@@ -142,7 +144,7 @@ class Editor extends React.Component<IProperties, IState> {
           <Col span={size}>
             <Card 
               title={<div>
-                <span>{PageName}</span>
+                <span><PageNameManager pageId={pageId} language={this.props.language} /></span>
                 {pageId && <div style={{ marginTop: 12 }}><Tags pageId={pageId} /></div>} 
               </div>}
             >
