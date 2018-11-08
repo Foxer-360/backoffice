@@ -1115,46 +1115,49 @@ class Composer extends React.Component<IProperties, IState> {
    */
   private handleRemoveComponent(id: number, activated?: boolean): Promise<boolean> {
     // Using delta
-    this.delta.commit('remove', {
-      data: {},
-      id: '' + id,
-    });
-    const comm = this.delta.pull();
 
-    // Activator
-    if (this.spinner) {
-      this.spinner.enable();
-    }
-    let activator = this.activateAlways();
-    if (!activated) {
-      activator = this.activateCommit(comm);
-    }
-
-    return activator.then((can: boolean) => {
-      if (!can) {
-        if (this.spinner) {
-          this.spinner.disable();
-        }
-        this.delta.revert();
-        return Promise.resolve(false);
+    return this.handleCancelComponent().then(() => {
+      this.delta.commit('remove', {
+        data: {},
+        id: '' + id,
+      });
+      const comm = this.delta.pull();
+  
+      // Activator
+      if (this.spinner) {
+        this.spinner.enable();
       }
-
-      this.delta.push();
-
-      return new Promise((resolve) => {
-        this.setState({
-          content: builder(this.delta, this.state.content),
-        }, () => {
-          // Fire onComponentAdd event
-          // this.eventComponentAdded(preparedData);
-
-          // And just resolve this promise
+      let activator = this.activateAlways();
+      if (!activated) {
+        activator = this.activateCommit(comm);
+      }
+  
+      return activator.then((can: boolean) => {
+        if (!can) {
           if (this.spinner) {
             this.spinner.disable();
           }
-          resolve(true);
-        });
-      }) as Promise<boolean>;
+          this.delta.revert();
+          return Promise.resolve(false);
+        }
+  
+        this.delta.push();
+  
+        return new Promise((resolve) => {
+          this.setState({
+            content: builder(this.delta, this.state.content),
+          }, () => {
+            // Fire onComponentAdd event
+            // this.eventComponentAdded(preparedData);
+  
+            // And just resolve this promise
+            if (this.spinner) {
+              this.spinner.disable();
+            }
+            resolve(true);
+          });
+        }) as Promise<boolean>;
+      });
     });
 
     // this.delta.push();
