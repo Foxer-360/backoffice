@@ -50,7 +50,7 @@ const GET_PAGE = gql`
 `;
 
 const ComposedQuery = adopt({
-  pageData: ({ render, variables: { pageId } }) => <Query query={GET_PAGE} variables={{ pageId }}>{page => render(page)}</Query>,
+  pageData: ({ render, variables: { pageId, languageCode } }) => <Query query={GET_PAGE} variables={{ pageId, languageCode }}>{page => render(page)}</Query>,
   updatePageTranslation: ({ render, variables: { pageId } }) => (
     <Mutation
       mutation={UPDATE_PAGE_TRANSLATION}
@@ -159,7 +159,7 @@ class TranslationManager extends Component<Properties, State> {
       },
       style: { marginBottom: 5 }
     };
-    console.log(translation);
+    console.log('ahoj', translation);
     return (
     <div>
       <FormItem
