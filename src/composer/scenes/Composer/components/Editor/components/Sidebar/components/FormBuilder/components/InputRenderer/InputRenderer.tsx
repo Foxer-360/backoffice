@@ -8,6 +8,7 @@ import RadioGroup from '../RadioGroup';
 import Select from '../Select';
 import TextArea from '../TextArea';
 import UrlAutocomplete from '../UrlAutocomplete';
+import Tags from '../Tags';
 import MarkDown from '@source/composer/scenes/Composer/components/Editor/components/Sidebar/components/FormBuilder/components/MarkDown';
 
 // tslint:disable:jsx-no-multiline-js
@@ -26,7 +27,6 @@ interface InputRendererProps {
 }
 
 class InputRenderer extends React.Component<InputRendererProps & IFormSchemaElement, {}> {
-
   public render() {
     if (!this.props.type) {
       return null;
@@ -113,11 +113,7 @@ class InputRenderer extends React.Component<InputRendererProps & IFormSchemaElem
 
       case 'image':
         return (
-          <MediaLibrary
-            name={this.props.name}
-            mediaData={this.props.value}
-            onChange={this.props.mediaLibraryChange}
-          />
+          <MediaLibrary name={this.props.name} mediaData={this.props.value} onChange={this.props.mediaLibraryChange} />
         );
 
       case 'urlautocomplete':
@@ -129,6 +125,17 @@ class InputRenderer extends React.Component<InputRendererProps & IFormSchemaElem
             placeholder={this.props.placeholder}
             value={this.props.value}
             onChange={this.props.onChange}
+          />
+        );
+
+      case 'tags':
+        return (
+          <Tags
+            name={this.props.name}
+            language={this.props.language}
+            label={this.props.title ? this.props.title : ''}
+            onChange={this.props.onChange}
+            value={this.props.value}
           />
         );
 
