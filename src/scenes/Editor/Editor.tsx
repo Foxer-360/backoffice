@@ -165,6 +165,7 @@ class Editor extends React.Component<IProperties, IState> {
           activateCommit={this.activatorCommit}
           toggleChatAndTask={this.handleToggleDisplayTaskAndChat}
           context={this.state.context}
+          language={this.props.language}
         />
 
         <ChatTasks
