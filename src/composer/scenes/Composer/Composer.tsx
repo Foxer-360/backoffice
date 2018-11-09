@@ -7,7 +7,6 @@ import * as React from 'react';
 import Editor from './components/Editor';
 import Spinner from './components/Spinner';
 import Users from './components/Users';
-import Tags from './../../../components/Tags';
 
 // import './composer.css';
 
@@ -106,6 +105,7 @@ export interface IProperties {
   activateComponentStartEdit?: (id: number) => Promise<boolean>;
   activateComponentStopEdit?: (id: number) => Promise<boolean>;
   activateCommit?: (data: ILooseObject) => Promise<boolean>;
+  language?: ILooseObject;
 }
 
 // Controls
@@ -321,6 +321,7 @@ class Composer extends React.Component<IProperties, IState> {
                   removeContainer={this.handleRemoveContainer}
                   lockContainer={this.handleLockContainer}
                   layouts={this.props.layouts}
+                  language={this.props.language}
                   context={this.props.context}
                 />
               </Spinner>
