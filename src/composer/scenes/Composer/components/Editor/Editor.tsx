@@ -12,8 +12,8 @@ import {
 import DelayComponent from './components/DelayComponent';
 import Sidebar from './components/Sidebar';
 import View from './components/View';
-import Tags from './../../../../../components/Tags';
-import PageNameManager from './../../../../../components/PageNameManager';
+import Tags from '@source/components/Tags';
+import TranslationManager from '@source/components/TranslationManager';
 
 // tslint:disable:jsx-no-multiline-js
 // tslint:disable:jsx-no-lambda
@@ -144,7 +144,7 @@ class Editor extends React.Component<IProperties, IState> {
           <Col span={size}>
             <Card 
               title={<div>
-                <span><PageNameManager pageId={pageId} language={this.props.language} /></span>
+                <span><TranslationManager pageId={pageId} language={this.props.language} /></span>
                 {pageId && <div style={{ marginTop: 12 }}><Tags pageId={pageId} /></div>} 
               </div>}
             >
