@@ -1,8 +1,6 @@
 import {
   Composer,
   Context,
-  IComponentObject,
-  IAddComponentObject,
   IEditorInfo,
   ILockInfo,
 } from '@source/composer';
@@ -13,7 +11,6 @@ import history from '@source/services/history';
 import { client } from '@source/services/graphql';
 import { Alert, Card, Spin } from 'antd';
 import * as React from 'react';
-import Tags from './../../components/Tags';
 
 const socket = connect();
 
@@ -74,6 +71,7 @@ class Editor extends React.Component<IProperties, IState> {
     this.handleGetPage = this.handleGetPage.bind(this);
     this.handleComposerCommitUpdates = this.handleComposerCommitUpdates.bind(this);
     this.handleToggleDisplayTaskAndChat = this.handleToggleDisplayTaskAndChat.bind(this);
+    this.handlePageContentReseted = this.handlePageContentReseted.bind(this);
     this.handleSave = this.handleSave.bind(this);
     this.activatorStartEditComponent = this.activatorStartEditComponent.bind(this);
     this.activatorStopEditComponent = this.activatorStopEditComponent.bind(this);
@@ -113,9 +111,25 @@ class Editor extends React.Component<IProperties, IState> {
     // Bind socket to handle editors and locks updates
     socket.on('composer/update', this.handleSocketUpdate);
     socket.on('composer/updateCommits', this.handleComposerCommitUpdates);
+    socket.on('composer/reset-page-content', this.handlePageContentReseted);
 
     this.writeInfoIntoContext();
     this.startEditPage();
+  }
+
+  public handlePageContentReseted(payload: ILooseObject): void {
+    const { delta, content } = payload;
+    this.setState({ delta, content }, async () => {
+      await this.composer.setContent((this.state.content as any)); // tslint:disable-line:no-any
+      await this.composer.importDelta((this.state.delta as any)); // tslint:disable-line:no-any
+    });
+  }
+
+  public resetPageContent(id: String, content: LooseObject): void {
+    socket.emit('composer/reset-page-content', {
+      pageId: id,
+      content
+    });
   }
 
   public componentWillUnmount() {
@@ -166,6 +180,7 @@ class Editor extends React.Component<IProperties, IState> {
           toggleChatAndTask={this.handleToggleDisplayTaskAndChat}
           context={this.state.context}
           language={this.props.language}
+          resetPageContent={this.resetPageContent}
         />
 
         <ChatTasks
