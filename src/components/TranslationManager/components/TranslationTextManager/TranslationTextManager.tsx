@@ -232,11 +232,6 @@ class TranslationTextManager extends Component<Properties, State> {
         <Button
           size={'small'}
           onClick={() => {
-            console.log({ variables: { 
-              ...translation,
-              ...this.state.translation,
-              translationId: translation.id
-            }});
             updatePageTranslation({ variables: { 
               ...translation,
               ...this.state.translation
