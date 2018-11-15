@@ -79,7 +79,6 @@ class View extends React.Component<IProperties, {}> {
               Scroll Up
             </div>
           }
-
           <Container
             {...this.props}
             container={this.props.content.id}

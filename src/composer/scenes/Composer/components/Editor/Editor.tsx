@@ -45,7 +45,7 @@ export interface IProperties {
   addContainer: () => void;
   removeContainer: (id: string) => void;
   lockContainer: (id: string, lock: boolean) => void;
-
+  resetPageContent: (id: String, content: LooseObject) => void;
   componentsService: IComponentsServiceLikeClass;
   language?: ILooseObject; 
 }
@@ -144,7 +144,13 @@ class Editor extends React.Component<IProperties, IState> {
           <Col span={size}>
             <Card 
               title={<div>
-                <span><TranslationManager pageId={pageId} language={this.props.language} /></span>
+                <span>
+                  <TranslationManager 
+                    pageId={pageId} 
+                    language={this.props.language}
+                    resetPageContent={this.props.resetPageContent}
+                  />
+                </span>
                 {pageId && <div style={{ marginTop: 12 }}><Tags pageId={pageId} /></div>} 
               </div>}
             >

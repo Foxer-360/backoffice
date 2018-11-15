@@ -105,6 +105,7 @@ export interface IProperties {
   activateComponentStartEdit?: (id: number) => Promise<boolean>;
   activateComponentStopEdit?: (id: number) => Promise<boolean>;
   activateCommit?: (data: ILooseObject) => Promise<boolean>;
+  resetPageContent?: (id: String, content: LooseObject) => void;
   language?: ILooseObject;
 }
 
@@ -210,7 +211,7 @@ class Composer extends React.Component<IProperties, IState> {
     this.handleCancel = this.handleCancel.bind(this);
     this.handleSave = this.handleSave.bind(this);
     this.handleTabChange = this.handleTabChange.bind(this);
-
+    this.setContent = this.setContent.bind(this);
     // Private events
     this._eventUpdateComponent = this._eventUpdateComponent.bind(this);
     this._eventRemoveComponent = this._eventRemoveComponent.bind(this);
@@ -323,6 +324,7 @@ class Composer extends React.Component<IProperties, IState> {
                   layouts={this.props.layouts}
                   language={this.props.language}
                   context={this.props.context}
+                  resetPageContent={this.props.resetPageContent}
                 />
               </Spinner>
             </div>
