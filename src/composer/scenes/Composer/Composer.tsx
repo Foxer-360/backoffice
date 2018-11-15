@@ -380,8 +380,6 @@ class Composer extends React.Component<IProperties, IState> {
     // Reset delta
     this.delta = new Delta();
 
-    console.log('setContent', content);
-
     return new Promise((resolve) => {
       this.setState({
         content: { ...content },
@@ -562,7 +560,6 @@ class Composer extends React.Component<IProperties, IState> {
   }
 
   public importDelta(data: IOperation[]): Promise<boolean> {
-    console.log(data);
     this.delta.import(data);
 
     return new Promise(resolve => {
