@@ -2,14 +2,15 @@ import * as React from 'react';
 import gql from 'graphql-tag';
 import { Query, Mutation } from 'react-apollo';
 import { adopt } from 'react-adopt';
-import { Row, Popover, Icon, Button } from 'antd';
+import { Row, Popover, Icon, Button, TreeSelect } from 'antd';
 import { ILooseObject } from '@foxer360/delta/lib/@types/@types';
 
+const TreeNode = TreeSelect.TreeNode;
 const { Component } = React;
 
-const GET_PAGE = gql`
-  query page($pageId: ID!){
-    page(where: { id: $pageId }) {
+const GET_PAGES = gql`
+  query pages{
+    pages {
       id
       type {
         id
@@ -41,7 +42,7 @@ const GET_PAGE = gql`
 `;
 
 const ComposedQuery = adopt({
-  pageData: ({ render, variables: { pageId } }) => <Query query={GET_PAGE} variables={{ pageId }}>{page => render(page)}</Query>
+  pageData: ({ render }) => <Query query={GET_PAGES} >{page => render(page)}</Query>
 });
 
 export interface Properties {
@@ -63,18 +64,15 @@ class TranslationContentCloner extends Component<Properties, State> {
     };
   }
 
-  cloneTranslation = (translations) => (sourceTranslationId) => {
-    const { language, resetPageContent } = this.props;
-    const { content: sourceTranslationContent } = translations
-      .find(translation => sourceTranslationId === translation.id);
-    const { id: targetTranslationId } = translations
-      .find(translation => translation.language.id === language.id);
-        resetPageContent(targetTranslationId, sourceTranslationContent);
-        this.setState({ editingMode: false });
+  cloneTranslation = (sourceTranslationContent, targetTranslationId) => {
+    const { resetPageContent } = this.props;
+    
+    resetPageContent(targetTranslationId, sourceTranslationContent);
+    this.setState({ editingMode: false });
   }
 
   render() {
-    const { pageId, language } = this.props;
+    const { pageId } = this.props;
     const { editingMode } = this.state;
 
     return (
@@ -93,15 +91,16 @@ class TranslationContentCloner extends Component<Properties, State> {
           if (error) {
             return 'Error...';
           } 
-          const { page: { translations } } = data;
+          const { pages } = data;
 
           return (
           <Popover
             visible={editingMode} 
             trigger="click" 
             content={this.getPopOverContent(
-              translations.filter((translation) => translation.language.code !== language.code), 
-              this.cloneTranslation(translations))}
+              pages, 
+              pageId,
+              this.cloneTranslation)}
             placement="bottomLeft"
           >
             <Icon
@@ -116,23 +115,82 @@ class TranslationContentCloner extends Component<Properties, State> {
       </ComposedQuery>);
   }
 
-  getPopOverContent = (translations, updatePageTranslation) => {
+  getPopOverContent = (pages, pageId, updatePageTranslation) => {
+    const { language } = this.props;
+    const currentPage = pages.find(p => p.id === pageId);
     return (
     <div>
-      <Row type="flex">
-      {translations
+      <Row type="flex" style={{ margin: '10px 0' }}>
+        <strong>Copy content from current page:</strong>
+      </Row>
+      <Row type="flex" style={{ margin: '0 0 10px' }}>
+      {currentPage && currentPage.translations
+        .filter((translation) => translation.language.code !== language.code)
         .map((translation) => (
           <Button
-            style={{ marginRight: 10 }} 
+            style={{ marginRight: 10, width: 100 }} 
             size={'small'}
-            onClick={() => updatePageTranslation(translation.id)}
+            onClick={() => 
+              updatePageTranslation(
+                translation.content, currentPage.translations
+                .find((t) => t.language.code === language.code).id
+              )}
           >
-            Copy content from {translation.language.englishName}
+            From {translation.language.englishName}
           </Button>)
         )
       }
+      </Row>
+      <Row type="flex" style={{ margin: '0 0 10px' }}>
+        <strong>Copy from another page:</strong>
+      </Row>
+      <Row type="flex">
+        {pages &&
+          pages.length > 0  &&
+
+          (<TreeSelect
+            showSearch={true}
+            size={'small'}
+            style={{ width: 100, marginRight: 10 }}
+            dropdownStyle={{ maxHeight: 300, maxWidth: 300, overflow: 'auto' }}
+            placeholder="Click"
+            allowClear={true}
+            treeDefaultExpandAll={true}
+          >
+            {
+              pages.filter(p => p.id !== pageId).map((p, i) =>
+              (<TreeNode 
+                selectable={false} 
+                value={JSON.stringify(p.translations.map(t => t.name))} 
+                title={`${p.translations[0].name}`} 
+                key={p.id}
+              >
+                {p.translations.map(t =>
+                  <TreeNode
+                    value={`${t.name}`}
+                    title={
+                      <Button
+                        size={'small'}
+                        style={{ marginRight: 10 }}
+                        onClick={() => 
+                          updatePageTranslation(
+                            t.content, currentPage.translations
+                            .find((tr) => tr.language.code === language.code).id
+                          )}
+                      >
+                        Copy from {t.language.englishName} ({t.name})  
+                      </Button>} 
+                    key={t.id} 
+                  />
+                )}
+              </TreeNode>))
+            }
+          </TreeSelect>)
+        }
         <Button
           size={'small'}
+          style={{ width: 100 }}
+          type="danger"
           onClick={() => {
             this.setState({ editingMode: false });
           }}
