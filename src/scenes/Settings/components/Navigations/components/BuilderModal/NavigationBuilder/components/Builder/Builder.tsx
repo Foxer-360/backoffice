@@ -1,6 +1,6 @@
 import * as React from 'react';
 const { Component } = React;
-import { Row, Col, Tree } from 'antd';
+import { Row, Col, Tree, Button } from 'antd';
 import { AntTreeNodeMouseEvent } from 'antd/lib/tree';
 import { NavigationPage, NavigationNode, BuilderData } from '../../../../../interfaces';
 import ExternalLink from './components/ExternalLink';
@@ -29,7 +29,7 @@ class Builder extends Component<Properties> {
       } else {
         if (!segment && node.title && node.link) {
           const externalLinkSegment = {
-            key: index.toString(),
+            key: node.id,
             order: node.order,
             title: `${node.title} (${node.link})`,
           };
@@ -163,7 +163,7 @@ class Builder extends Component<Properties> {
     this.props.structureChange(result);
   }
 
-  generateTree(data: BuilderData[]): React.ReactNode {
+  generateTree(data: BuilderData[], onLinkDelete: Function): React.ReactNode {
     const tree: React.ReactNode[] = [];
 
     if (data) {
@@ -172,11 +172,25 @@ class Builder extends Component<Properties> {
           if (item.children && item.children.length) {
             tree.push(
               <Tree.TreeNode key={item.key} title={item.title}>
-                {this.generateTree(item.children)}
+                {this.generateTree(item.children, onLinkDelete)}
               </Tree.TreeNode>
             );
           } else {
-            tree.push(<Tree.TreeNode key={item.key} title={item.title} />);
+            tree.push((
+            <Tree.TreeNode 
+              key={item.key} 
+              title={(<div>
+                  {item.title}
+                  <Button 
+                    type="danger"
+                    size="small"
+                    onClick={() => onLinkDelete(item.key, item.title)}
+                    style={{ marginLeft: 10 }}
+                  >
+                    Remove
+                  </Button>
+                </div>)} 
+            />));
           }
         }
       });
@@ -198,6 +212,15 @@ class Builder extends Component<Properties> {
     this.props.structureChange(newNodes);
   }
 
+  onLinkDelete = (key: string, title: string) => {
+    const newNodes = [...this.props.nodes.filter(
+      n => 
+        !(n.page === key || n.id === key) ||
+        (!key && !title.includes(n.title))
+    )];
+    this.props.structureChange(newNodes);
+  }
+
   render(): React.ReactNode {
     return (
       <Row>
@@ -209,7 +232,7 @@ class Builder extends Component<Properties> {
             draggable={true}
             onDrop={(info: AntTreeNodeMouseEvent) => this.onDrop(info)}
           >
-            {this.generateTree(this.getData())}
+            {this.generateTree(this.getData(), this.onLinkDelete)}
           </Tree>
         </Col>
         <Col span={8} style={{ paddingLeft: '15px' }}>

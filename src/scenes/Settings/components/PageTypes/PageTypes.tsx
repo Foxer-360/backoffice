@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Button, Col, Input, Modal, Row, Table } from 'antd';
-import PageTypesQuery from '@source/query/PageTypes';
 import Actions from './components/Actions';
 import ModalWindow from './components/ModalWindow';
 import { adopt } from 'react-adopt';
