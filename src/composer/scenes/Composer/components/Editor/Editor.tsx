@@ -3,12 +3,7 @@ import { ILooseObject } from '@source/composer/types';
 import { Context } from '@source/composer/utils';
 import { Alert, Card, Col, Icon, Row } from 'antd';
 import * as React from 'react';
-import {
-  IAddComponentObject,
-  IComponentsServiceLikeClass,
-  IEditorInfo,
-  ILockInfo,
-} from '../../Composer';
+import { IAddComponentObject, IComponentsServiceLikeClass, IEditorInfo, ILockInfo } from '../../Composer';
 import DelayComponent from './components/DelayComponent';
 import Sidebar from './components/Sidebar';
 import View from './components/View';
@@ -47,7 +42,7 @@ export interface IProperties {
   lockContainer: (id: string, lock: boolean) => void;
   resetPageContent: (id: String, content: LooseObject) => void;
   componentsService: IComponentsServiceLikeClass;
-  language?: ILooseObject; 
+  language?: ILooseObject;
 }
 
 export interface IState {
@@ -71,7 +66,6 @@ class Editor extends React.Component<IProperties, IState> {
 
   // When drag start
   public onDragStart(data: ILooseObject) {
-
     this.setState({
       activeSourceData: data,
       isSomethingDragging: true,
@@ -142,17 +136,25 @@ class Editor extends React.Component<IProperties, IState> {
       <div className={'editor'}>
         <Row>
           <Col span={size}>
-            <Card 
-              title={<div>
-                <span>
-                  <TranslationManager 
-                    pageId={pageId} 
-                    language={this.props.language}
-                    resetPageContent={this.props.resetPageContent}
-                  />
-                </span>
-                {pageId && <div style={{ marginTop: 12 }}><Tags pageId={pageId} /></div>} 
-              </div>}
+            <Card
+              title={
+                <div>
+                  {this.props.language && pageId && (
+                    <span>
+                      <TranslationManager
+                        pageId={pageId}
+                        language={this.props.language}
+                        resetPageContent={this.props.resetPageContent}
+                      />
+                    </span>
+                  )}
+                  {pageId && (
+                    <div style={{ marginTop: 12 }}>
+                      <Tags pageId={pageId} />
+                    </div>
+                  )}
+                </div>
+              }
             >
               {!this.props.content || this.props.content.length < 1 ? (
                 <DelayComponent delay={100}>
