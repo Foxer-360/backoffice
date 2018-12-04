@@ -11,7 +11,6 @@ import { SeoFormDataAndOperations, SeoFormQM, SeoFormState } from '../../interfa
 import FormController from './formController';
 
 const QueriesAndMutations = adopt({
-  // Production components in the bottom of this file 
   language: ({ render }) => (
     <Query query={queries.LOCAL_SELECTED_LANGUAGE}>
       {({ data: { language } }) => render(language)}
@@ -28,7 +27,24 @@ const QueriesAndMutations = adopt({
     </Query>
   ),
   createSeo: ({ render, page, language, plugin }) => (
-    <Mutation mutation={mutations.CREATE_PAGE_PLUGIN} variables={{ page, language, plugin }}>
+    <Mutation
+      mutation={mutations.CREATE_PAGE_PLUGIN}
+      variables={{ page, language, plugin }}
+      update={(cache, { data }) => {
+        const { pagePlugins } = cache.readQuery({ query: queries.PAGE_PLUGINS, variables: { page, language, plugin } });
+        const index = pagePlugins.findIndex(p => p.id === data.createPagePlugin.id);
+        if (index) { pagePlugins.splice(index, 1); }
+        pagePlugins.push(data.createPagePlugin);
+        cache.writeQuery({
+          query: queries.PAGE_PLUGINS,
+          data: { pagePlugins }
+        });
+      }}
+      refetchQueries={[{
+        query: queries.PAGE_PLUGINS,
+        variables: { page, language, plugin }
+      }]}
+    >
       {(createSeo) => render((newVariables) => createSeo({ variables: { ...newVariables, page, language, plugin } }))}
     </Mutation>
   ),
@@ -45,8 +61,10 @@ interface Properties {
 
 class SeoForm extends Component<Properties> {
 
+  readonly PLUGIN_NAME: string = 'seo';
+
   public getSeoFormState({ seo, updateSeo, createSeo }: SeoFormQM): SeoFormState {
-    const seoData = seo.data.pagePlugins && seo.data.pagePlugins.find(a => a.plugin === 'SEO');
+    const seoData = seo.data.pagePlugins && seo.data.pagePlugins.find(a => a.plugin === this.PLUGIN_NAME);
     return {
       error: seo.error,
       loading: seo.loading,
@@ -58,7 +76,7 @@ class SeoForm extends Component<Properties> {
 
   public render() {
     return (
-      <QueriesAndMutations plugin="SEO">
+      <QueriesAndMutations plugin={this.PLUGIN_NAME}>
         {(seoData: SeoFormQM) => {
           const formatedSeoData = this.getSeoFormState(seoData);
 
@@ -93,60 +111,6 @@ class SeoForm extends Component<Properties> {
 export default SeoForm;
 
 /*
-
-+----------------------------------+
-|          Graphiql query          |
-+----------------------------------+
-
-query {
-  project (where: { id: "cjm69k17m001v0872m0nd1mwo" }) {
-    id
-    name
-    websites (where: { id: "cjm69kd1g00240872187gyn3k" }) {
-      id
-      title
-      pages (where: { id: "cjm988oxn00jw0861rwa83541" }) {
-        id
-        type {
-          id
-          name
-          plugins
-        }
-      }
-    }
-    languages {
-      id
-      code
-    }
-    defaultLanguage {
-      id	
-      code
-      isEnabled
-    }
-  }
-  pagePlugins (where: { page: { id: "cjm988oxn00jw0861rwa83541" } }) {
-    id
-    plugin
-    content
-  }
-}
-
-+------------------------------------+
-|          Adopt components          |
-+------------------------------------+
-
-{
-  language: ({ render }) => (
-    <Query query={queries.LOCAL_SELECTED_LANGUAGE}>
-      {({ data: { language } }) => render(language && language.id)}
-    </Query>
-  ),
-  page: ({ render }) => (
-    <Query query={queries.LOCAL_SELECTED_PAGE}>
-      {({ data: { page }}) => render(page && page.id)}
-    </Query>
-  ),
-}
 
 +-------------------------------------------------+
 |          SEO plugin content interface           |

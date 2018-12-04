@@ -396,6 +396,12 @@ export const CREATE_PAGE_PLUGIN = gql`
       }
     ) {
       id
+      page {
+        id
+      }
+      language {
+        id
+      }
       plugin
       content
     }
@@ -416,6 +422,12 @@ export const UPDATE_PAGE_PLUGIN = gql`
       }
     ) {
       id
+      page {
+        id
+      }
+      language {
+        id
+      }
       plugin
       content
     }

@@ -10,8 +10,8 @@ export interface SeoQueryData {
 // data from seo form adopt component
 export interface SeoFormQM {
   seo: QueryData<{ pagePlugins: SeoQueryData[] }>;
-  createSeo: (data: { content: any }) => Promise<QueryData<SeoQueryData>>;
-  updateSeo: (data: { variables: { content: any, id: string } }) => Promise<QueryData<SeoQueryData>>;
+  createSeo: (data: { content: any }) => Promise<QueryData<{ createPagePlugin: SeoQueryData }>>;
+  updateSeo: (data: { variables: { content: any, id: string } }) => Promise<QueryData<{ updatePagePlugin: SeoQueryData }>>;
 }
 
 // state of seo form
@@ -19,8 +19,8 @@ export interface SeoFormState {
   error?: Error;
   loading: boolean;
   seo: SeoQueryData;
-  createSeo: (data: { content: any }) => Promise<QueryData<SeoQueryData>>;
-  updateSeo: (data: { variables: { content: any, id: string } }) => Promise<QueryData<SeoQueryData>>;
+  createSeo: (data: { content: any }) => Promise<QueryData<{ createPagePlugin: SeoQueryData }>>;
+  updateSeo: (data: { variables: { content: any, id: string } }) => Promise<QueryData<{ updatePagePlugin: SeoQueryData }>>;
 }
 
 // data provided by seo form controller
@@ -29,7 +29,7 @@ export interface SeoFormDataAndOperations {
   updateDefault: (key: string, value: string) => void;
   updateFacebook: (key: string, value: string) => void;
   updateTwitter: (key: string, value: string) => void;
-  saveSeoContent: () => Promise<QueryData<SeoQueryData>>;
+  saveSeoContent: () => void;
 }
 
 // data structure of `basic seo`

@@ -137,16 +137,16 @@ class BasicSeo extends Component<Properties, State> {
     const keywords = seoData.keywords.split(',').map(a => a.trim().toLowerCase()).filter(a => !!a);
     const hints: GuideHint[] = [{
       okMessage: 'The focused keyword is in the title of the page.',
-      notOkMessage: 'The focused keyword is not in the title of the page.',
-      ok: seoData.title.toLowerCase().includes(seoData.focusKeyword.trim().toLowerCase())
+      notOkMessage: seoData.title.length ? 'The focused keyword is not in the title of the page.' : 'Missing title',
+      ok: seoData.title.length ? seoData.title.toLowerCase().includes(seoData.focusKeyword.trim().toLowerCase()) : false
     }, /*{
       okMessage: 'The focused keyword is in the URL of the page.',
       notOkMessage: 'The focused keyword is not in the URL of the page.',
       ok: false
     },*/ {
       okMessage: 'The focused keyword is in the description of the page.',
-      notOkMessage: 'The focused keyword is not in the description of the page.',
-      ok: seoData.description.toLowerCase().includes(seoData.focusKeyword.trim().toLowerCase())
+      notOkMessage: seoData.description.length ? 'The focused keyword is not in the description of the page.' : 'Missing description',
+      ok: seoData.description.length ? seoData.description.toLowerCase().includes(seoData.focusKeyword.trim().toLowerCase()) : false
     }, {
       okMessage: 'The length of the description is sufficient.',
       notOkMessage: 'The length of the description is not sufficient.',

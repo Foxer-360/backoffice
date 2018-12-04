@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { Component } from 'react';
 
-import { SeoContent, SeoFormDataAndOperations, SeoFormState, SeoQueryData } from '../../interfaces';
+import { notification } from 'antd';
+
+import { SeoContent, SeoFormDataAndOperations, SeoFormState } from '../../interfaces';
 
 interface Properties {
   seoData: SeoFormState;
@@ -16,8 +18,13 @@ class FormController extends Component<Properties, State> {
 
   constructor(props: Properties) {
     super(props);
-    const content = this.getDefaultContent(props.seoData.seo.content);
+    const content = this.getDefaultContent(props.seoData.seo && props.seoData.seo.content);
     this.state = { content };
+  }
+
+  componentWillReceiveProps(props: Properties) {
+    const content = this.getDefaultContent(props.seoData.seo && props.seoData.seo.content);
+    this.setState({ content });
   }
 
   public updateDefault = (key: string, value: string): void => {
@@ -38,12 +45,34 @@ class FormController extends Component<Properties, State> {
     this.setState({ content });
   }
 
-  public saveSeoContent = (): Promise<QueryData<SeoQueryData>> => {
+  public saveSeoContent = (): void => {
     const { seo, updateSeo, createSeo } = this.props.seoData;
-    if (seo.id) {
-      return updateSeo({ variables: { content: this.state.content, id: seo.id } });
+    if (seo && seo.id) {
+      updateSeo({ variables: { content: this.state.content, id: seo.id } })
+        .then(() => notification.success({
+          message: 'Success!',
+          description: 'SEO successfully updated'
+        }))
+        .catch(() => notification.error({
+          message: 'Error!',
+          description: 'Error occurred while updating SEO'
+        }));
+    } else {
+      createSeo({ content: this.state.content })
+        .then((response) => {
+          if (response.data.createPagePlugin && response.data.createPagePlugin.content) {
+            this.setState({ content: response.data.createPagePlugin.content });
+          }
+          notification.success({
+            message: 'Success!',
+            description: 'SEO successfully created'
+          });
+        })
+        .catch(() => notification.error({
+          message: 'Error!',
+          description: 'Error occurred while creating SEO'
+        }));
     }
-    return createSeo({ content: this.state.content });
   }
 
   public render(): JSX.Element {
