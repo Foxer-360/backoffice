@@ -1,16 +1,22 @@
 import * as React from 'react';
 import { Component } from 'react';
 
-import { Col, Icon, Input, Row } from 'antd';
+import { Alert, Col, Icon, Input, Row } from 'antd';
 import { ColorResult, SwatchesPicker } from 'react-color';
 
+import { getImgUrl } from '@source/composer/utils';
 import { DefaultSeoContent } from '../../interfaces';
 
 import InputWrap from '../inputWrap';
-
-import UploadImage from '../../../Editor/components/Sidebar/components/FormBuilder/components/MediaLibrary';
+import UploadImage from '../MediaLibrary';
 
 import './styles.scss';
+
+interface GuideHint {
+  okMessage: string;
+  notOkMessage: string;
+  ok: boolean;
+}
 
 interface Properties {
   seoData: DefaultSeoContent;
@@ -19,13 +25,17 @@ interface Properties {
 
 interface State {
   showColorPicker: boolean;
+  mediaData: LooseObject;
 }
 
 class BasicSeo extends Component<Properties, State> {
 
   constructor(props: Properties) {
     super(props);
-    this.state = { showColorPicker: false };
+    this.state = {
+      showColorPicker: false,
+      mediaData: null
+    };
   }
 
   public render(): JSX.Element {
@@ -63,13 +73,6 @@ class BasicSeo extends Component<Properties, State> {
               onChange={this.changeText('focusKeyword')}
             />
           </InputWrap>
-          <InputWrap title="Default Image">
-            <Input
-              value={seoData.defaultImage}
-              placeholder="URL of the image"
-              onChange={this.changeText('defaultImage')}
-            />
-          </InputWrap>
           <InputWrap title="Theme Color">
             {this.state.showColorPicker && (
               <div style={{ marginBottom: 5 }}>
@@ -91,16 +94,34 @@ class BasicSeo extends Component<Properties, State> {
               addonBefore={<div style={{ background: seoData.themeColor, width: 30, height: 20, borderRadius: 1 }} />}
               addonAfter={<Icon type="setting" onClick={this.openColorPicker} style={{ cursor: 'pointer' }} />}
             />
-            {/* <UploadImage mediaData={null} name="asd" onChange={console.log} /> */}
+          </InputWrap>
+          <InputWrap title="Default Image">
+            <UploadImage
+              mediaData={this.state.mediaData}
+              onChange={this.mediaChange}
+              mediaUrl={seoData.defaultImage}
+            />
           </InputWrap>
         </Col>
         <Col xs={24} xl={12} style={{ padding: '0 10px' }}>
           <InputWrap title="Preview">
             {this.getPreview(seoData)}
           </InputWrap>
+          <InputWrap title="Tips">
+            {this.getGuide()}
+          </InputWrap>
         </Col>
       </Row>
     );
+  }
+
+  private mediaChange = (mediaData: LooseObject) => {
+    if (mediaData && mediaData.filename) {
+      this.props.change('defaultImage', getImgUrl(mediaData));
+    } else {
+      this.props.change('defaultImage', '');
+    }
+    this.setState({ mediaData });
   }
 
   private changeText = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => this.props.change(key, e.target.value);
@@ -110,6 +131,41 @@ class BasicSeo extends Component<Properties, State> {
   private openColorPicker = () => this.setState({ showColorPicker: true });
 
   private closeColorPicker = () => this.setState({ showColorPicker: false });
+
+  private getGuide(): JSX.Element[] {
+    const { seoData } = this.props;
+    const keywords = seoData.keywords.split(',').map(a => a.trim().toLowerCase()).filter(a => !!a);
+    const hints: GuideHint[] = [{
+      okMessage: 'The focused keyword is in the title of the page.',
+      notOkMessage: 'The focused keyword is not in the title of the page.',
+      ok: seoData.title.toLowerCase().includes(seoData.focusKeyword.trim().toLowerCase())
+    }, /*{
+      okMessage: 'The focused keyword is in the URL of the page.',
+      notOkMessage: 'The focused keyword is not in the URL of the page.',
+      ok: false
+    },*/ {
+      okMessage: 'The focused keyword is in the description of the page.',
+      notOkMessage: 'The focused keyword is not in the description of the page.',
+      ok: seoData.description.toLowerCase().includes(seoData.focusKeyword.trim().toLowerCase())
+    }, {
+      okMessage: 'The length of the description is sufficient.',
+      notOkMessage: 'The length of the description is not sufficient.',
+      ok: seoData.description.length > 50
+    }, {
+      okMessage: 'Keywords are unique',
+      notOkMessage:  keywords.length ? 'Keywords are not unique' : 'Missing keywords',
+      ok: keywords.length ? !keywords.some(keyword => keywords.filter(item => item.includes(keyword)).length > 1) : false
+    }];
+
+    return hints.map((hint, key) => (
+      <div key={key} style={{ padding: '5px 0' }}>
+        <Alert
+          message={hint.ok ? hint.okMessage : hint.notOkMessage}
+          type={hint.ok ? 'success' : 'warning'}
+        />
+      </div>
+    ));
+  }
 
   private getPreview(seoData: DefaultSeoContent): JSX.Element {
     return (

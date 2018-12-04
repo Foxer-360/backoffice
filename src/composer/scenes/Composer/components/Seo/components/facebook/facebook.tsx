@@ -3,8 +3,10 @@ import { Component } from 'react';
 
 import { Col, Icon, Input, Row } from 'antd';
 
+import { getImgUrl } from '@source/composer/utils';
 import { FacebookSeoContent } from '../../interfaces';
 
+import UploadImage from '../MediaLibrary';
 import InputWrap from '../inputWrap';
 
 import FacebookIcon from './fb.svg';
@@ -15,7 +17,16 @@ interface Properties {
   change: (key: string, value: string) => void;
 }
 
-class FacebookSeo extends Component<Properties> {
+interface State {
+  mediaData: LooseObject;
+}
+
+class FacebookSeo extends Component<Properties, State> {
+
+  constructor(props: Properties) {
+    super(props);
+    this.state = { mediaData: null };
+  }
 
   public render(): JSX.Element {
     const { seoData } = this.props;
@@ -38,10 +49,10 @@ class FacebookSeo extends Component<Properties> {
             />
           </InputWrap>
           <InputWrap title="Image">
-            <Input
-              value={seoData.image}
-              placeholder="https://example.com/image.png"
-              onChange={this.changeText('image')}
+            <UploadImage
+              mediaData={this.state.mediaData}
+              onChange={this.mediaChange}
+              mediaUrl={seoData.image}
             />
           </InputWrap>
         </Col>
@@ -52,6 +63,15 @@ class FacebookSeo extends Component<Properties> {
         </Col>
       </Row>
     );
+  }
+
+  private mediaChange = (mediaData: LooseObject) => {
+    if (mediaData && mediaData.filename) {
+      this.props.change('image', getImgUrl(mediaData));
+    } else {
+      this.props.change('image', '');
+    }
+    this.setState({ mediaData });
   }
 
   private changeText = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => this.props.change(key, e.target.value);
