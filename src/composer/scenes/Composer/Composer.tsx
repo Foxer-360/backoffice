@@ -7,6 +7,7 @@ import * as React from 'react';
 import Editor from './components/Editor';
 import Spinner from './components/Spinner';
 import Users from './components/Users';
+import Seo from './components/Seo';
 
 // import './composer.css';
 
@@ -330,6 +331,13 @@ class Composer extends React.Component<IProperties, IState> {
             </div>
           </Tabs.TabPane>
 
+          <Tabs.TabPane tab={<span><Icon type="database" />{'SEO'}</span>} key={'SEO'}>
+            <Card title={'SEO'}>
+              <Seo url={this.state.name} />
+            </Card>
+          </Tabs.TabPane>
+
+          {/*}
           {this.state.plugins.map((name: string) => {
             const Plugin = this.props.pluginService.getPluginComponent(name);
             const tabName = this.props.pluginService.getPluginTabName(name);
@@ -351,6 +359,7 @@ class Composer extends React.Component<IProperties, IState> {
               </Tabs.TabPane>
             );
           })}
+          {*/}
         </Tabs>
       </div>
     );
