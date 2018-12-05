@@ -5,10 +5,10 @@ import { Button, Tabs } from 'antd';
 
 import { SeoFormDataAndOperations } from './interfaces';
 
-import BasicSeo from './components/basic';
-import FacebookSeo from './components/facebook';
-import SeoForm from './components/form';
-import TwitterSeo from './components/twitter';
+import BasicSeo from './components/Basic';
+import FacebookSeo from './components/Facebook';
+import SeoForm from './components/Form';
+import TwitterSeo from './components/Twitter';
 
 const TabPane = Tabs.TabPane;
 const TabContentWrap = ({ children }: { children: JSX.Element }) => <div style={{ padding: 15 }}>{children}</div>;

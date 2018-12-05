@@ -7,7 +7,7 @@ import { getImgUrl } from '@source/composer/utils';
 import { FacebookSeoContent } from '../../interfaces';
 
 import UploadImage from '../MediaLibrary';
-import InputWrap from '../inputWrap';
+import InputWrap from '../InputWrap';
 
 import FacebookIcon from './fb.svg';
 import Placeholder from '../../imageWhite.svg';

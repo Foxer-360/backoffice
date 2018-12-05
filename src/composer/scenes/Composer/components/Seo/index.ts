@@ -1,2 +1,2 @@
-import SeoModule from './seo';
+import SeoModule from './Seo';
 export default SeoModule;

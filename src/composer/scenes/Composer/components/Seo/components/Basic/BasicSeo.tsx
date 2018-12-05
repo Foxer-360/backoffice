@@ -7,7 +7,7 @@ import { ColorResult, SwatchesPicker } from 'react-color';
 import { getImgUrl } from '@source/composer/utils';
 import { DefaultSeoContent } from '../../interfaces';
 
-import InputWrap from '../inputWrap';
+import InputWrap from '../InputWrap';
 import UploadImage from '../MediaLibrary';
 
 import './styles.scss';

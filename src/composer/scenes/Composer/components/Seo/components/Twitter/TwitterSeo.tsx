@@ -7,7 +7,7 @@ import { getImgUrl } from '@source/composer/utils';
 import { TwitterSeoContent } from '../../interfaces';
 
 import UploadImage from '../MediaLibrary';
-import InputWrap from '../inputWrap';
+import InputWrap from '../InputWrap';
 
 import Placeholder from '../../image.svg';
 

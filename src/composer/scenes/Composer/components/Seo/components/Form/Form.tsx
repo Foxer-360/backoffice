@@ -8,7 +8,7 @@ import { Mutation, Query } from 'react-apollo';
 import { mutations, queries } from '@source/services/graphql';
 import { SeoFormDataAndOperations, SeoFormQM, SeoFormState } from '../../interfaces';
 
-import FormController from './formController';
+import FormController from './FormController';
 
 const QueriesAndMutations = adopt({
   language: ({ render }) => (
