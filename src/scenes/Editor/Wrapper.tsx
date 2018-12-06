@@ -61,8 +61,8 @@ const InformationGatherer = adopt({
             data: null,
           });
         }
-
-        const found = data.languages.find((lang: ILooseObject) => {
+        console.log(data);
+        const found = data.languages && data.languages.find((lang: ILooseObject) => {
           if (lang.id === language) {
             return true;
           }
@@ -71,7 +71,7 @@ const InformationGatherer = adopt({
         });
 
         if (!found) {
-          return ({
+          return render({
             loading,
             error,
             data: null,
@@ -96,6 +96,7 @@ const InformationGatherer = adopt({
   pageData: ({ render, page }) => (
     <Query query={queries.PAGE_DETAIL} variables={{ id: page }}>
       {({ loading, error, data }) => {
+        console.log(page);
         return render({
           loading,
           error,
@@ -196,6 +197,8 @@ const validator = (data: InformationGathererData) => {
   let loading = false;
   let someNull = false;
 
+  console.log(data);
+  
   if (data.projectData.loading) {
     loading = true;
   }
@@ -277,9 +280,10 @@ const editorWrapper = () => (Editor: typeof React.Component) => {
           {(data: InformationGathererData) => {
             const validation = validator(data);
             if (validation.loading || validation.errors.length > 0 || validation.someNull) {
+              console.log('someNull');
               return null;
             }
-
+            console.log('inside gatherer.');
             const EditorProperties = {
               projectId: data.project,
               project: data.projectData.data,
@@ -293,7 +297,6 @@ const editorWrapper = () => (Editor: typeof React.Component) => {
               pageTranslationId: data.pageTranslation,
               pageTranslation: data.pageTranslationData,
             };
-
             return <Editor {...EditorProperties} />;
           }}
         </InformationGatherer>

@@ -228,7 +228,6 @@ class Editor extends React.Component<IProperties, IState> {
     await this.composer.setContent((this.state.content as any)); // tslint:disable-line:no-any
     await this.composer.importDelta((this.state.delta as any)); // tslint:disable-line:no-any
     await this.composer.setName(this.props.pageTranslation.name);
-    await this.composer.enablePlugins(this.props.pageType.plugins, client);
   }
 
   /**
