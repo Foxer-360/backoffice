@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { adopt } from 'react-adopt';
 import { Query, Mutation } from 'react-apollo';
-import { queries } from '@source/services/graphql';
+import { queries, client } from '@source/services/graphql';
+import gql from 'graphql-tag';
 
 export interface ILooseObject { // tslint:disable-line:interface-name
   [key: string]: any; // tslint:disable-line:no-any
@@ -96,7 +97,6 @@ const InformationGatherer = adopt({
   pageData: ({ render, page }) => (
     <Query query={queries.PAGE_DETAIL} variables={{ id: page }}>
       {({ loading, error, data }) => {
-        console.log(page);
         return render({
           loading,
           error,
@@ -169,6 +169,35 @@ const InformationGatherer = adopt({
 
     return render(pageTranslationData.id);
   },
+  navigationsData: ({ render, website }) => (
+    <Query
+      query={gql`query($website: ID!) {
+        navigations(where: { website: { id: $website }}) {
+          id
+          name
+          nodes {
+            id
+            page
+            title
+            link
+            order
+            parent
+            __typename
+          }
+          __typename
+        }
+      }`} 
+      variables={{ website }}
+    >
+      {({ loading, error, data }) => {
+        return render({
+          loading,
+          error,
+          data: data.navigations || null,
+        });
+      }}
+    </Query>
+  )
 });
 
 interface AsyncData {
@@ -186,6 +215,7 @@ interface InformationGathererData {
   languageData: AsyncData;
   page: string;
   pageData: AsyncData;
+  navigationsData: AsyncData;
   pageType: string;
   pageTypeData: AsyncData;
   pageTranslation: string;
@@ -208,6 +238,9 @@ const validator = (data: InformationGathererData) => {
   if (data.pageData.loading) {
     loading = true;
   }
+  if (data.navigationsData.loading) {
+    loading = true;
+  }
   if (data.pageTypeData.loading) {
     loading = true;
   }
@@ -220,6 +253,9 @@ const validator = (data: InformationGathererData) => {
   }
   if (data.pageData.error) {
     errors.push(data.pageData.error);
+  }
+  if (data.navigationsData.error) {
+    errors.push(data.navigationsData.error);
   }
   if (data.pageTypeData.error) {
     errors.push(data.pageTypeData.error);
@@ -259,10 +295,52 @@ const validator = (data: InformationGathererData) => {
   if (data.pageData.data === null) {
     someNull = true;
   }
+  if (data.navigationsData.data === null) {
+    someNull = true;
+  }
   if (data.pageTypeData.data === null) {
     someNull = true;
   }
+  if (someNull !== true) {
+    console.log('just trying');
+    const {
+      pageData: {
+        data: pageData
+      },
+      pageTypeData,
+      websiteData: {
+        data: websiteData
+      },
+      projectData,
+      languageData: {
+        data: languageData
+      },
+      navigationsData: {
+        data: navigationsData
+      }
+    } = data;
 
+    const query = gql`
+      query {
+        languageData,
+        pageData,
+        websiteData,
+        navigationsData
+      }
+    `;
+    console.log('here', languageData,
+    pageData,
+    websiteData);
+    client.writeQuery({
+      query,
+      data: {
+        languageData,
+        pageData,
+        websiteData,
+        navigationsData
+      },
+    });
+  } 
   return {
     errors,
     loading,
