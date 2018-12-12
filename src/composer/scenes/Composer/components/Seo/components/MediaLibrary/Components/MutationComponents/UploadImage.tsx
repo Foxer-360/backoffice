@@ -31,7 +31,7 @@ class UploadImage extends React.Component<IUploadImageProps, IUploadImageState> 
     // tslint:disable:no-any
     fileList.forEach((file: any) => {
       formData.append('file', file);
-      formData.append('category', 'others');
+      formData.append('category', process.env.REACT_APP_MEDIA_LIBRARY_SERVER__CATEGORY);
     });
 
     this.setState({ loading: true });
