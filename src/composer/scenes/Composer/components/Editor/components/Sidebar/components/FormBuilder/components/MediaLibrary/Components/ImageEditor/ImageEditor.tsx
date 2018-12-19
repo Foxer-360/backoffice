@@ -6,7 +6,7 @@ import * as React from 'react';
 // tslint:disable:jsx-no-multiline-js
 // tslint:disable:jsx-no-lambda
 
-export interface IEditorProps {
+export interface IImageEditorProps {
   // tslint:disable:no-any
   image?: any;
   uploadImage?: (fileList: ILooseObject, mediaData?: ILooseObject) => void;
@@ -16,7 +16,7 @@ export interface IEditorProps {
   name: string;
 }
 
-export interface IEditorState {
+export interface IImageEditorState {
   // tslint:disable:no-any
   fileList: any;
   image64: any;
@@ -28,8 +28,8 @@ function getBase64(img: any, callback: any) {
   reader.readAsDataURL(img);
 }
 
-class Editor extends React.Component<IEditorProps, IEditorState> {
-  constructor(props: IEditorProps) {
+class ImageEditor extends React.Component<IImageEditorProps, IImageEditorState> {
+  constructor(props: IImageEditorProps) {
     super(props);
     this.state = {
       fileList: [],
@@ -148,4 +148,4 @@ class Editor extends React.Component<IEditorProps, IEditorState> {
   }
 }
 
-export default Editor;
+export default ImageEditor;

@@ -1,10 +1,8 @@
 import { getImgUrl } from '@source/composer/utils';
 import { Button, Col, Drawer, Icon, Input, Popconfirm, Row } from 'antd';
 import * as React from 'react';
-import Editor from './Components/Editor';
-import Gallery from './Components/Gallery';
-import UploadImage from './Components/MutationComponents/UploadImage';
-import AllImagesQuery from './Components/QueryComponents';
+import GalleryTabs from './Components/GalleryTabs';
+import UploadTabs from './Components/UploadTabs';
 // import './style.scss';
 
 // tslint:disable:jsx-no-multiline-js
@@ -21,7 +19,7 @@ export interface IMediaLibraryState {
   visible: boolean;
   drawerType: string;
 }
-  
+
 class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryState> {
   constructor(props: IMediaLibraryProps) {
     super(props);
@@ -66,22 +64,25 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
       <div>
         <div className={'ant-divider ant-divider-horizontal ant-divider-with-text-left'}>
           <span className={'ant-divider-inner-text'}>
-            {this.state.drawerType === 'editor' ? 'Media Editor: ' + this.props.name.toUpperCase() : 'Media Library'}
+            {this.state.drawerType === 'editor' ? 'Media Editor: ' : 'Media Library'}
           </span>
         </div>
 
-        {mediaData &&
-          mediaData.filename && (
-            <div
-              className={'ant-upload ant-upload-select ant-upload-select-picture-card'}
-              onClick={() => this.showDrawer('editor')}
-              style={{ margin: '32px auto', width: '100%', maxWidth: '250px' }}
-            >
-              <span className={'ant-upload'}>
-                <img style={{ width: '100%' }} src={getImgUrl(mediaData)} alt="file" />
-              </span>
-            </div>
-          )}
+        {mediaData && mediaData.filename && (
+          <div
+            className={'ant-upload ant-upload-select ant-upload-select-picture-card'}
+            onClick={() => this.showDrawer('editor')}
+            style={{ margin: '32px auto', width: '100%', maxWidth: '250px' }}
+          >
+            <span className={'ant-upload'}>
+              <img style={{ width: '100%' }} src={getImgUrl(mediaData)} alt="file" />
+            </span>
+          </div>
+        )}
+
+        {mediaData && mediaData.type === 'embeddedVideo' && (
+          <iframe src={mediaData.url} style={{ width: '100%', height: '300px' }} />
+        )}
 
         <Row style={{ margin: '0 0 24px' }}>
           <Col span={24}>
@@ -134,27 +135,20 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
           destroyOnClose={true}
         >
           {this.state.drawerType === 'editor' ? (
-            <UploadImage closeEditor={() => this.closeDrawer()} onChange={this.props.onChange}>
-              <Editor
-                name={this.props.name}
-                image={mediaData}
-                onChange={media => {
-                  this.props.onChange(media);
-                  this.closeDrawer();
-                }}
-                closeEditor={() => this.closeDrawer()}
-              />
-            </UploadImage>
+            <UploadTabs
+              onChange={this.props.onChange}
+              name={this.props.name}
+              mediaData={mediaData}
+              closeDrawer={this.closeDrawer}
+            />
           ) : (
-            <AllImagesQuery>
-              <Gallery placeImg={this.props.onChange} image={mediaData} name={this.props.name} />
-            </AllImagesQuery>
+            <GalleryTabs placeMedia={this.props.onChange} name={this.props.name} media={mediaData} />
           )}
         </Drawer>
 
         <hr className={'hSep'} />
       </div>
-    ); 
+    );
   }
 }
 

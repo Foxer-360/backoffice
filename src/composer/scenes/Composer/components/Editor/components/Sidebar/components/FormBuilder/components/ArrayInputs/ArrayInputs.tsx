@@ -122,7 +122,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
         >
           {this.props.data &&
             this.props.data.map((dataRow: ILooseObject, index: number) => {
-              const tabTitle = (
+              const tabTitle = (  
                 <>
                   {index + 1}
 
@@ -142,15 +142,16 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
                 </>
               );
               return (
-                <Tabs.TabPane key={index} tab={tabTitle} closable={false}>
+                <Tabs.TabPane key={index.toString()} tab={tabTitle} closable={false}>
                   {this.props.items &&
                     this.props.items.properties &&
                     Object.keys(this.props.items.properties).map((elementName: string, j: number) => {
                       const element = this.props.items.properties[elementName];
+
                       return (
                         <InputRenderer
                           key={j}
-                          id={index}
+                          id={j}
                           name={elementName}
                           language={this.props.language}
                           {...element}

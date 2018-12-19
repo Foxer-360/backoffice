@@ -105,7 +105,7 @@
     "@types/socket.io-client": "^1.4.32",
     "@types/ws": "^5.1.2",
     "git-clone": "^0.1.0",
-    "typescript": "^2.8.1",
+    "typescript": "^3.2.2",
     "webpack-bundle-analyzer": "^2.13.1"
   },
   "jest": {

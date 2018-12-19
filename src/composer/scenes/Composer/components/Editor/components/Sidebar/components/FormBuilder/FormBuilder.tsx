@@ -42,7 +42,6 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
 
   // tslint:disable-next-line:no-any
   public handleChange(e: React.ChangeEvent | any) {
-
     const newData = {
       ...this.props.data,
       [(e.target as HTMLInputElement).name]: (e.target as HTMLInputElement).value,
@@ -51,11 +50,13 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
   }
 
   public mediaLibraryChange(media: { value: object; name: string }) {
+    console.log('%c Emilio: ', 'background: #222; color: #bada55', media);
     const newData = { ...this.props.data, [media.name]: media.value };
     this.props.onChange(newData);
   }
 
   public renderElements(schema: IFormSchema, pass?: number): JSX.Element[] | null {
+
     if (schema && schema.properties) {
       return Object.keys(schema.properties).map((elementName: string, index: number) => {
         const element = schema.properties[elementName];
@@ -84,7 +85,7 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
 
           default:
             return (
-              <InputRenderer
+              <InputRenderer 
                 id={pass ? index + pass : index}
                 key={index}
                 name={elementName}

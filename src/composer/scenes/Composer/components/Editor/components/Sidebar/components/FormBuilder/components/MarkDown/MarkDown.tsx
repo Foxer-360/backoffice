@@ -6,7 +6,7 @@ import debounce from 'lodash/debounce';
 // tslint:disable:jsx-no-multiline-js
 // tslint:disable:jsx-no-lambda
 
-interface IMyTextAreaProps {  
+interface IMyTextAreaProps {
   id?: string;
   type?: string | 'text';
   label: string;

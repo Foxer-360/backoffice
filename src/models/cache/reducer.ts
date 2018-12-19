@@ -26,62 +26,56 @@ const reducer = (state = initState, action: ReduxAction) => {
         ...state,
         [payload.name]: {
           name: payload.name,
-          update: new Date,
+          update: new Date(),
           valid: true,
 
-          data: payload.data
-        }
+          data: payload.data,
+        },
       };
-    case types.APPEND_DATA_WITH_ID:
-      {
-        const ids = state[payload.name].data.map((item: LooseObject) => item.id);
-        let data = state[payload.name].data;
-        payload.data.forEach((item: LooseObject) => {
-          if (indexOf(ids, item.id) > -1) {
-            data[indexOf(ids, item.id)] = item;
-          } else {
-            data.push(item);
-          }
-        }, this);
+    case types.APPEND_DATA_WITH_ID: {
+      const ids = state[payload.name].data.map((item: LooseObject) => item.id);
+      let data = state[payload.name].data;
+      payload.data.forEach((item: LooseObject) => {
+        if (indexOf(ids, item.id) > -1) {
+          data[indexOf(ids, item.id)] = item;
+        } else {
+          data.push(item);
+        }
+      }, this);
 
-        const dataObj = {
-          ...state[payload.name],
-          update: new Date,
-          valid: true,
-          data: [
-            ...data
-          ]
-        };
+      const dataObj = {
+        ...state[payload.name],
+        update: new Date(),
+        valid: true,
+        data: [...data],
+      };
 
-        return {
-          ...state,
-          [payload.name]: dataObj
-        };
-      }
+      return {
+        ...state,
+        [payload.name]: dataObj,
+      };
+    }
     case types.ADD_ITEM:
       let dataObject: GeneralData;
       if (state[payload.name]) {
         dataObject = {
           ...state[payload.name],
-          update: new Date,
-          data: [
-            ...state[payload.name].data,
-            payload.item
-          ]
+          update: new Date(),
+          data: [...state[payload.name].data, payload.item],
         };
       } else {
         // If data object doesnt exist, create new
         dataObject = {
           name: payload.name,
-          update: new Date,
+          update: new Date(),
           valid: true,
-          data: [payload.item]
+          data: [payload.item],
         };
       }
 
       return {
         ...state,
-        [payload.name]: dataObject
+        [payload.name]: dataObject,
       };
     case types.EDIT_ITEM:
       // No data, create empty data object and mark as invalid
@@ -90,12 +84,12 @@ const reducer = (state = initState, action: ReduxAction) => {
           name: payload.name,
           update: new Date(),
           valid: false,
-          data: []
+          data: [],
         };
 
         return {
           ...state,
-          [payload.name]: dataObject
+          [payload.name]: dataObject,
         };
       }
 
@@ -105,7 +99,7 @@ const reducer = (state = initState, action: ReduxAction) => {
           if (item.id === payload.id) {
             return {
               ...item,
-              ...payload.item
+              ...payload.item,
             };
           }
 
@@ -114,13 +108,13 @@ const reducer = (state = initState, action: ReduxAction) => {
 
         dataObject = {
           ...state[payload.name],
-          data: state[payload.name].data.map(mapFce)
+          data: state[payload.name].data.map(mapFce),
         };
       }
 
       return {
         ...state,
-        [payload.name]: dataObject
+        [payload.name]: dataObject,
       };
     case types.REMOVE_ITEM:
       // Nothing to remove
@@ -140,13 +134,13 @@ const reducer = (state = initState, action: ReduxAction) => {
 
         dataObject = {
           ...state[payload.name],
-          data: state[payload.name].data.filter(filterFce)
+          data: state[payload.name].data.filter(filterFce),
         };
       }
 
       return {
         ...state,
-        [payload.name]: dataObject
+        [payload.name]: dataObject,
       };
     default:
       return state;

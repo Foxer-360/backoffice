@@ -28,12 +28,11 @@ interface State {
 }
 
 class WebsiteForm extends Component<Properties, State> {
-
   private RESET_ERROR_VALUES = {
     titleError: false,
     langsError: false,
     defLangError: false,
-    urlMaskError: false
+    urlMaskError: false,
   };
 
   private RESET_STATE_VALUES: State = {
@@ -42,14 +41,14 @@ class WebsiteForm extends Component<Properties, State> {
     defLang: null,
     urlMask: '',
 
-    ...this.RESET_ERROR_VALUES
+    ...this.RESET_ERROR_VALUES,
   };
 
   constructor(props: Properties) {
     super(props);
 
     this.state = {
-      ...this.RESET_STATE_VALUES
+      ...this.RESET_STATE_VALUES,
     };
 
     this.handleSave = this.handleSave.bind(this);
@@ -97,7 +96,7 @@ class WebsiteForm extends Component<Properties, State> {
     if (someError) {
       this.setState({
         ...this.state,
-        ...errors
+        ...errors,
       });
 
       return;
@@ -107,7 +106,7 @@ class WebsiteForm extends Component<Properties, State> {
     let languages = {} as LooseObject;
     if (!this.props.data || !this.props.data.languages) {
       languages = {
-        connect: this.state.langs.map((lang: string) => ({ id: lang }))
+        connect: this.state.langs.map((lang: string) => ({ id: lang })),
       };
     } else {
       const langs = this.props.data.languages.map((lang: LooseObject) => {
@@ -115,22 +114,26 @@ class WebsiteForm extends Component<Properties, State> {
       });
 
       // connect - Find what is new
-      const connect = this.state.langs.filter((lang: string) => {
-        if (langs.indexOf(lang) > -1) {
-          return false;
-        }
+      const connect = this.state.langs
+        .filter((lang: string) => {
+          if (langs.indexOf(lang) > -1) {
+            return false;
+          }
 
-        return true;
-      }).map((lang: string) => ({ id: lang }));
+          return true;
+        })
+        .map((lang: string) => ({ id: lang }));
 
       // disconnect - Find what is missing
-      const disconnect = langs.filter((lang: string) => {
-        if (this.state.langs.indexOf(lang) > -1) {
-          return false;
-        }
+      const disconnect = langs
+        .filter((lang: string) => {
+          if (this.state.langs.indexOf(lang) > -1) {
+            return false;
+          }
 
-        return true;
-      }).map((lang: string) => ({ id: lang }));
+          return true;
+        })
+        .map((lang: string) => ({ id: lang }));
 
       if (connect.length > 0) {
         languages.connect = connect;
@@ -154,7 +157,7 @@ class WebsiteForm extends Component<Properties, State> {
     }
 
     this.setState({
-      ...this.RESET_STATE_VALUES
+      ...this.RESET_STATE_VALUES,
     });
   }
 
@@ -164,14 +167,14 @@ class WebsiteForm extends Component<Properties, State> {
     }
 
     this.setState({
-      ...this.RESET_STATE_VALUES
+      ...this.RESET_STATE_VALUES,
     });
   }
 
   handleInputChange(name: string, value: string) {
     this.setState({
       ...this.state,
-      [name]: value
+      [name]: value,
     });
   }
 
@@ -180,7 +183,7 @@ class WebsiteForm extends Component<Properties, State> {
       if (indexOf(value, this.state.defLang) < 0) {
         this.setState({
           [name]: value as string[],
-          defLang: null
+          defLang: null,
         });
 
         return;
@@ -189,7 +192,7 @@ class WebsiteForm extends Component<Properties, State> {
 
     this.setState({
       ...this.state,
-      [name]: value
+      [name]: value,
     });
   }
 
@@ -198,29 +201,19 @@ class WebsiteForm extends Component<Properties, State> {
     const labelStyle = {
       textAlign: 'right',
       paddingTop: '4px',
-      paddingRight: '8px'
+      paddingRight: '8px',
     } as React.CSSProperties;
     const labelSize = 6;
 
     if (!this.props.projectId) {
       return (
-        <Alert
-          message="Error"
-          description="No project was selected. Please first select some project."
-          type="error"
-        />
+        <Alert message="Error" description="No project was selected. Please first select some project." type="error" />
       );
     }
 
     return (
       <>
-        <div style={{ textAlign: 'center' }}>
-        {isNew ?
-          <h1>Create Website</h1>
-        :
-          <h1>Edit Website</h1>
-        }
-        </div>
+        <div style={{ textAlign: 'center' }}>{isNew ? <h1>Create Website</h1> : <h1>Edit Website</h1>}</div>
 
         <div style={{ margin: '12px 0px 18px 0px', padding: '0px 20px' }}>
           <Row>
@@ -244,13 +237,13 @@ class WebsiteForm extends Component<Properties, State> {
               <span>Title:</span>
             </Col>
             <Col span={24 - labelSize}>
-              <Input value={this.state.title} onChange={(e) => this.handleInputChange('title', e.target.value)} />
+              <Input value={this.state.title} onChange={e => this.handleInputChange('title', e.target.value)} />
             </Col>
           </Row>
           <Row style={{ paddingTop: '6px', display: this.state.titleError ? '' : 'none' }}>
             <Col span={labelSize} />
             <Col span={24 - labelSize} style={{ textAlign: 'center' }}>
-                <span style={{ color: 'red' }}>Please enter some title!</span>
+              <span style={{ color: 'red' }}>Please enter some title!</span>
             </Col>
           </Row>
           <Row style={{ marginTop: '8px' }}>
@@ -276,7 +269,7 @@ class WebsiteForm extends Component<Properties, State> {
                       mode="multiple"
                       style={{ width: '100%' }}
                       placeholder="Please select languages"
-                      onChange={(val) => this.handleSelectChange('langs', val as Array<string>)}
+                      onChange={val => this.handleSelectChange('langs', val as Array<string>)}
                       value={this.state.langs}
                     >
                       {data.project.languages.map((lang: LooseObject) => {
@@ -291,7 +284,7 @@ class WebsiteForm extends Component<Properties, State> {
           <Row style={{ paddingTop: '6px', display: this.state.langsError ? '' : 'none' }}>
             <Col span={labelSize} />
             <Col span={24 - labelSize} style={{ textAlign: 'center' }}>
-                <span style={{ color: 'red' }}>Please select at least one language!</span>
+              <span style={{ color: 'red' }}>Please select at least one language!</span>
             </Col>
           </Row>
           <Row style={{ marginTop: '8px' }}>
@@ -302,19 +295,13 @@ class WebsiteForm extends Component<Properties, State> {
               <Query query={queries.GET_PROJECT} variables={{ id: this.props.projectId }}>
                 {({ loading, data }) => {
                   if (loading) {
-                    return (
-                      <Select
-                        style={{ width: '100%' }}
-                        placeholder="Loading..."
-                        value={this.state.langs}
-                      />
-                    );
+                    return <Select style={{ width: '100%' }} placeholder="Loading..." value={this.state.langs} />;
                   }
 
                   return (
                     <Select
                       style={{ width: '100%' }}
-                      onChange={(val) => this.handleSelectChange('defLang', val as string)}
+                      onChange={val => this.handleSelectChange('defLang', val)}
                       value={[this.state.defLang]}
                       notFoundContent="Please select firstly some languages"
                     >
@@ -334,7 +321,7 @@ class WebsiteForm extends Component<Properties, State> {
           <Row style={{ paddingTop: '6px', display: this.state.defLangError ? '' : 'none' }}>
             <Col span={labelSize} />
             <Col span={24 - labelSize} style={{ textAlign: 'center' }}>
-                <span style={{ color: 'red' }}>Please select default language!</span>
+              <span style={{ color: 'red' }}>Please select default language!</span>
             </Col>
           </Row>
           <Row style={{ marginTop: '8px' }}>
@@ -344,20 +331,24 @@ class WebsiteForm extends Component<Properties, State> {
               </Tooltip>
             </Col>
             <Col span={24 - labelSize}>
-              <Input value={this.state.urlMask} onChange={(e) => this.handleInputChange('urlMask', e.target.value)} />
+              <Input value={this.state.urlMask} onChange={e => this.handleInputChange('urlMask', e.target.value)} />
             </Col>
           </Row>
           <Row style={{ paddingTop: '6px', display: this.state.urlMaskError ? '' : 'none' }}>
             <Col span={labelSize} />
             <Col span={24 - labelSize} style={{ textAlign: 'center' }}>
-                <span style={{ color: 'red' }}>Please enter url mask!</span>
+              <span style={{ color: 'red' }}>Please enter url mask!</span>
             </Col>
           </Row>
         </div>
 
         <div style={{ textAlign: 'center' }}>
-          <Button type="primary" onClick={this.handleSave}>{isNew ? 'Create' : 'Save'}</Button>
-          <Button style={{ marginLeft: '12px' }} onClick={this.handleCancel}>Cancel</Button>
+          <Button type="primary" onClick={this.handleSave}>
+            {isNew ? 'Create' : 'Save'}
+          </Button>
+          <Button style={{ marginLeft: '12px' }} onClick={this.handleCancel}>
+            Cancel
+          </Button>
         </div>
       </>
     );
@@ -376,10 +367,9 @@ class WebsiteForm extends Component<Properties, State> {
       title: data.title,
       langs,
       defLang,
-      urlMask: data.urlMask
+      urlMask: data.urlMask,
     });
   }
-
 }
 
 export default WebsiteForm;
