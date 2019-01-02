@@ -29,8 +29,32 @@ class EmbedVideoEditor extends React.Component<IEmbedVideoEditorProps, IEmbedVid
   }
 
   handleInputChange = value => {
+    let videoSrc = null;
+    let youtubeVideo = value.split('v=')[1];
+    let vimeoVideo = value.split('vimeo.com/')[1];
+
+    console.log('%c Emilio: ', 'background: #222; color: #bada55',  value.split('vimeo.com/')[1], youtubeVideo);
+
+    if (youtubeVideo) {
+      let ampersandPosition = youtubeVideo.indexOf('&');
+      if (ampersandPosition !== -1) {
+        youtubeVideo = youtubeVideo.substring(0, ampersandPosition);
+      }
+      videoSrc = 'https://www.youtube.com/embed/' + youtubeVideo;  
+    }
+
+    if (vimeoVideo) {
+      videoSrc = `https://player.vimeo.com/video/${vimeoVideo}`;
+    }
+    
+    if (!vimeoVideo && !youtubeVideo) {
+      videoSrc = 'error';
+    }
+
+    console.log('%c Emilio: dada', 'background: #222; color: #bada55', videoSrc);
+
     this.setState({
-      embeddedVideoUrl: value,
+      embeddedVideoUrl: videoSrc,
     });
   }
 
@@ -42,21 +66,26 @@ class EmbedVideoEditor extends React.Component<IEmbedVideoEditorProps, IEmbedVid
             <Col span={24}>
               <label>Video Url:</label>
               <Input onChange={e => this.handleInputChange(e.target.value)} style={{ marginTop: '10px' }} />
+              {this.state.embeddedVideoUrl === 'error' && (
+                <div style={{ color: 'red', fontSize: '16px' }}>Non valid URL.</div>
+              )}
             </Col>
           </Row>
           <hr className={'hSep'} />
 
           <Row>
             <Col span={24}>
-              <iframe
-                src={this.state.embeddedVideoUrl}
-                style={{
-                  width: '100%',
-                  height: '300px',
-                  border: '1px solid #d9d9d9',
-                  borderRadius: '4px',
-                }}
-              />
+              {this.state.embeddedVideoUrl !== 'error' && (
+                <iframe
+                  src={this.state.embeddedVideoUrl}
+                  style={{
+                    width: '100%',
+                    height: '300px',
+                    border: '1px solid #d9d9d9',
+                    borderRadius: '4px',
+                  }}
+                />
+              )}
             </Col>
           </Row>
           <hr className={'hSep'} />
