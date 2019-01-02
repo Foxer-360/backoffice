@@ -39,7 +39,7 @@ const InformationGatherer = adopt({
         return render({
           loading,
           error,
-          data: data.project || null,
+          data: data && data.project || null,
         });
       }}
     </Query>

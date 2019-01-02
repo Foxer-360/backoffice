@@ -50,7 +50,6 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
   }
 
   public mediaLibraryChange(media: { value: object; name: string }) {
-    console.log('%c Emilio: ', 'background: #222; color: #bada55', media);
     const newData = { ...this.props.data, [media.name]: media.value };
     this.props.onChange(newData);
   }
@@ -85,7 +84,7 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
 
           default:
             return (
-              <InputRenderer 
+              <InputRenderer   
                 id={pass ? index + pass : index}
                 key={index}
                 name={elementName}

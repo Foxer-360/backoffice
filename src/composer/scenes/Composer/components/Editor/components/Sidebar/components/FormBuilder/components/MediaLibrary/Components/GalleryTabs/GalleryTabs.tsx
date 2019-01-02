@@ -7,7 +7,7 @@ export interface GalleryTabsProps {
   // tslint:disable:no-any
   placeMedia?: any;
   media?: any;
-  name: string;  
+  name: string;
 }
 
 export interface GalleryTabsState {
@@ -27,11 +27,16 @@ export default class GalleryTabs extends React.Component<GalleryTabsProps, Galle
     this.setState({
       activeTab: tabIndex,
     });
-  }
+  }   
 
   public render() {
     return (
-      <Tabs activeKey={this.state.activeTab} onChange={(key: string) => this.setTab(key)} type="card">
+      <Tabs
+        activeKey={this.state.activeTab}
+        onChange={(key: string) => this.setTab(key)}
+        type="card"
+        style={{ zIndex: 200 }}
+      >
         <Tabs.TabPane tab="Images" key="0">
           <AllImagesQuery>
             <ImageGallery placeImg={this.props.placeMedia} image={this.props.media} name={this.props.name} />

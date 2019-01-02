@@ -108,7 +108,7 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
             Search
           </Button>
 
-          {mediaData && (
+          {mediaData && Object.keys(mediaData).length !== 0 && (
             <Popconfirm
               placement="topLeft"
               title={'Are you sure you want to delete the image?'}
@@ -131,7 +131,8 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
           onClose={this.onClose}
           visible={this.state.visible}
           width={500}
-          zIndex={1}
+          zIndex={1200}
+          style={{ position: 'relative' }}
           destroyOnClose={true}
         >
           {this.state.drawerType === 'editor' ? (

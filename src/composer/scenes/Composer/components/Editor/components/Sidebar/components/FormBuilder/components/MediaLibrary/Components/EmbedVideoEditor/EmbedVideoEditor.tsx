@@ -1,5 +1,4 @@
-import { ILooseObject } from '@source/composer/types';
-import { Button, Col, Icon, Row, Spin, Upload, Input } from 'antd';
+import { Button, Col, Row, Input } from 'antd';
 import * as React from 'react';
 
 // tslint:disable:jsx-no-multiline-js

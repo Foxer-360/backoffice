@@ -91,7 +91,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
 
   public mediaLibraryChange(media: { value: object; name: string }) {
     const newData = [...this.props.data];
-    newData[this.props.activeTab][media.name] = media.value;
+    newData[this.props.activeTab][media.name] = { ...media.value };
 
     this.props.onChange({
       target: {
@@ -122,7 +122,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
         >
           {this.props.data &&
             this.props.data.map((dataRow: ILooseObject, index: number) => {
-              const tabTitle = (  
+              const tabTitle = (
                 <>
                   {index + 1}
 
