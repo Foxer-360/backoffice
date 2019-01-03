@@ -1,5 +1,5 @@
 import { ILooseObject } from '@source/composer/types';
-import { Tabs, Icon, Popconfirm } from 'antd';
+import { Icon, Popconfirm, Collapse } from 'antd';
 import * as React from 'react';
 import { IFormSchema } from '../../FormBuilder';
 import InputRenderer from '../InputRenderer';
@@ -26,6 +26,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
     this.onChange = this.onChange.bind(this);
     this.mediaLibraryChange = this.mediaLibraryChange.bind(this);
     this.onChangeTab = debounce(this.onChangeTab.bind(this), 25);
+    console.log(this.props.activeTab);
   }
 
   public onChangeTab(key: number) {
@@ -48,13 +49,12 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
     this.onChangeTab(newTab);
   }
 
-  public onEditTab(targetKey: string, action: string) {
+  public onEditTab(targetKey: string, action?: string) {
     let iKey = parseInt(targetKey, 10);
     let newData = [...this.props.data];
     let newTab = this.props.activeTab;
 
     // remove tab
-
     if (action === 'remove') {
       newData.splice(iKey, 1);
 
@@ -102,29 +102,29 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
   }
 
   public render() {
-    // tslint:disable-next-line:no-any
-    const onEdit = (targetKey: string | any, action: string) => {
-      if (action === 'add') {
-        this.onNewTab();
-      }
-      if (typeof targetKey === 'string') {
-        this.onEditTab(targetKey, action);
-      }
-    };
-
     return (
       <Section title={this.props.title}>
-        <Tabs
-          type="editable-card"
-          activeKey={this.props.activeTab.toString()}
-          onChange={(key: string) => this.onChangeTab(parseInt(key, 10))}
-          onEdit={onEdit}
-        >
+        {/* 
+          TODO: If there accordion=false the bugs is commig beacause activeTab just a single number
+        */}
+        <Collapse accordion={true} onChange={(key: string) => this.onChangeTab(parseInt(key, 10))}>
           {this.props.data &&
             this.props.data.map((dataRow: ILooseObject, index: number) => {
-              const tabTitle = (
+              const dataRowKeys = dataRow && Object.keys(dataRow);
+              let title = '—';
+              if (Array.isArray(dataRowKeys) && dataRowKeys.length > 0) {
+                title = dataRow[dataRowKeys[0]];
+              }
+
+              const panelTitle = (
                 <>
-                  {index + 1}
+                  {title}
+
+                  {/* TODO: onClick */}
+                  <div style={{position: 'absolute', top: '30%', right: '35px' }}>
+                    <Icon onClick={() => alert('UP')} type="arrow-up" style={{ marginRight: '5px' }} />
+                    <Icon onClick={() => alert('DOWN')} type="arrow-down" />
+                  </div>
 
                   <Popconfirm
                     title="Are you sure delete this tab?"
@@ -135,14 +135,15 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
                     <Icon
                       type="close"
                       theme="outlined"
-                      style={{ marginLeft: '5px', marginRight: '-13px', fontSize: '.6em' }}
+                      style={{ color: '#f5222d', position: 'absolute', top: '40%', right: '15px' }}
                       className="anticon anticon-close ant-tabs-close-x"
                     />
                   </Popconfirm>
                 </>
               );
+
               return (
-                <Tabs.TabPane key={index} tab={tabTitle} closable={false}>
+                <Collapse.Panel key={index.toString()} header={panelTitle}>
                   {this.props.items &&
                     this.props.items.properties &&
                     Object.keys(this.props.items.properties).map((elementName: string, j: number) => {
@@ -164,10 +165,19 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
                         />
                       );
                     })}
-                </Tabs.TabPane>
+                </Collapse.Panel>
               );
             })}
-        </Tabs>
+            <div className={'ant-collapse-item'}>
+              <a 
+                className={'ant-collapse-header'} 
+                onClick={() => this.onNewTab()} 
+                style={{ display: 'block', padding: '10px 0', textAlign: 'center', color: '#1890ff' }}
+              >
+                Add new element
+              </a>
+            </div>
+        </Collapse>
       </Section>
     );
   }
