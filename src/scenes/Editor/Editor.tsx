@@ -238,6 +238,7 @@ class Editor extends React.Component<IProperties, IState> {
    * @return {IEditorInfo[]}
    */
   private transformEditors(editors: string[]): IEditorInfo[] {
+    console.log({ editors });
     const transformedEditors = editors.map((id: string) => {
       let name = undefined as string;
       if (id === socket.id) {

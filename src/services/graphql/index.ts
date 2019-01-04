@@ -9,7 +9,6 @@ import { getMainDefinition } from 'apollo-utilities';
 import { defaults, resolvers, typeDefs } from './local';
 import { queries } from './queries';
 import { mutations } from './mutations';
-import { fragments } from './fragments';
 import { subscriptions } from './subscriptions';
 import { OperationDefinitionNode } from 'graphql';
 import { setContext } from 'apollo-link-context';
@@ -67,7 +66,6 @@ export const client = new ApolloClient({
 });
 
 export {
-  fragments,
   queries,
   mutations,
   subscriptions

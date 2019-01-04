@@ -25,6 +25,7 @@ class Users extends React.Component<IProperties, {}> {
   public render() {
     return (
       <ul style={style}>
+        {console.log('editors', this.props.editors)}
         {this.props.editors.map((e: IEditorInfo, i: number) => {
           let name = e.id;
           if (e.name && e.name.length > 0) {

@@ -32,6 +32,7 @@ export interface TaskItem {
   description: string;
   done: boolean;
   updatedAt: Date;
+  user?: LooseObject;
 }
 
 const Title = (name: string, date: Date) => (
@@ -63,7 +64,10 @@ const ListRenderItem = (
         </div>
 
         <div className={'dashBoard__card__task__detail'}>
-          <span style={{ color: '#c6c6c6' }}>By Emilio Herrera</span>
+          {item.user &&
+            item.user.name &&
+            <span style={{ color: '#c6c6c6' }}>By {item.user.name}</span>
+          }
 
           <div>
             <Icon type={'tag'} />
