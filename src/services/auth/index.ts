@@ -98,10 +98,10 @@ export function setIdToken() {
     {
       idToken
     },
-  ).then((user) => {
-    localStorage.setItem(ID_TOKEN_KEY, idToken);
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
-  }).catch(console.error);
+  ).catch((e) => {
+    console.error(e);
+  });
+  localStorage.setItem(ID_TOKEN_KEY, idToken);
 }
 
 export function getError() {
