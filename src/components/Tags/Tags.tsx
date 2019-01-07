@@ -182,7 +182,7 @@ class Tags extends Component<Properties, State> {
                   </Popover>
                 </Popover>
 
-                {numberOfUnselectedTags < 5 && (
+                {numberOfUnselectedTags < 5 && data.tagsLength > 0 && (
                   <Icon 
                     type={'ellipsis'} 
                     style={{ color: 'grey', cursor: 'pointer' }}
