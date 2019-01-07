@@ -64,11 +64,29 @@ export interface Properties {
   popOver?: boolean;
 }
 
-export interface State {}
+export interface State {
+  itemsToShow: number;
+  expanded: boolean;
+}
 
 class Tags extends Component<Properties, State> {
   constructor(props: Properties) {
     super(props);
+
+    this.state = {
+      itemsToShow: 5,
+      expanded: false
+    };
+
+    this.showMore = this.showMore.bind(this);
+  }
+
+  showMore(tagsLength: number) {
+    this.state.itemsToShow === 5 ? (
+      this.setState({ itemsToShow: tagsLength, expanded: true })
+    ) : (
+      this.setState({ itemsToShow: 5, expanded: false })
+    );
   }
 
   isTagSelected(pages: Array<LooseObject>, pageId: string) {
@@ -128,6 +146,7 @@ class Tags extends Component<Properties, State> {
                 {data.tags &&
                   data.tags
                     .filter(({ pages }) => this.isTagSelected(pages, pageId))
+                    .slice(0, this.state.itemsToShow)
                     .map(({ color, name, pages, id: tagId }, key) => {
                       return (
                         <Tag
@@ -162,6 +181,14 @@ class Tags extends Component<Properties, State> {
                     )}
                   </Popover>
                 </Popover>
+
+                {numberOfUnselectedTags < 5 && (
+                  <Icon 
+                    type={'ellipsis'} 
+                    style={{ color: 'grey', cursor: 'pointer' }}
+                    onClick={() => this.showMore(data.tagsLength)}
+                  />
+                )}
               </div>
             );
           }}

@@ -264,8 +264,6 @@ body {
   top: -24px;
 }
 
-.ant-table-thead > tr > th, .ant-table-tbody > tr > td {
-  min-width: 200px;
-}
+.ant-table-thead > tr > th, .ant-table-tbody > tr > td { min-width: 200px; }
 
 .ant-tag { margin-bottom: 4px; }

@@ -123,7 +123,7 @@ class StructureList extends Component<Properties, State> {
     },
   };
   private readonly COLUMNS = [
-    { title: 'Name', dataIndex: 'name', key: 'name', width: 350,
+    { title: 'Name', dataIndex: 'name', key: 'name', width: 400,
       render: (name, row) => {
         return (
           <div style={{ display: 'inline-block' }}>
@@ -286,10 +286,6 @@ class StructureList extends Component<Properties, State> {
                 return res;
               })
             );
-
-            let urls = [];
-            data[0].children.map((value, i) => urls.push(value.url));
-            console.log(urls);
 
             return <Table columns={this.COLUMNS} dataSource={data} defaultExpandAllRows={true} />;
           }}
