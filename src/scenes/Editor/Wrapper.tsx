@@ -62,7 +62,6 @@ const InformationGatherer = adopt({
             data: null,
           });
         }
-        console.log(data);
         const found = data.languages && data.languages.find((lang: ILooseObject) => {
           if (lang.id === language) {
             return true;
@@ -227,8 +226,6 @@ const validator = (data: InformationGathererData) => {
   let loading = false;
   let someNull = false;
 
-  console.log(data);
-  
   if (data.projectData.loading) {
     loading = true;
   }
@@ -302,7 +299,6 @@ const validator = (data: InformationGathererData) => {
     someNull = true;
   }
   if (someNull !== true) {
-    console.log('just trying');
     const {
       pageData: {
         data: pageData
@@ -323,21 +319,20 @@ const validator = (data: InformationGathererData) => {
     const query = gql`
       query {
         languageData,
+        languagesData,
         pageData,
         websiteData,
         navigationsData
       }
     `;
-    console.log('here', languageData,
-    pageData,
-    websiteData);
     client.writeQuery({
       query,
       data: {
         languageData,
+        languagesData: websiteData.languages,
         pageData,
         websiteData,
-        navigationsData
+        navigationsData,
       },
     });
   } 

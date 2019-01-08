@@ -48,7 +48,7 @@ class UserEditor extends React.Component<IProperties, {}> {
     }
 
     const user = this.props.editors.find((e: IEditorInfo) => {
-      if (e.id === this.props.id) {
+      if (e.socketId === this.props.id) {
         return true;
       }
 
