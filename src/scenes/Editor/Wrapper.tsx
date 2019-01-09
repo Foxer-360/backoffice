@@ -353,10 +353,8 @@ const editorWrapper = () => (Editor: typeof React.Component) => {
           {(data: InformationGathererData) => {
             const validation = validator(data);
             if (validation.loading || validation.errors.length > 0 || validation.someNull) {
-              console.log('someNull');
               return null;
             }
-            console.log('inside gatherer.');
             const EditorProperties = {
               projectId: data.project,
               project: data.projectData.data,
