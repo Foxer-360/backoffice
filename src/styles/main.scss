@@ -32,7 +32,9 @@ body {
   }
 
   .ant-col-16,
-  .ant-col-8 {
+  .ant-col-8,
+  .ant-col-18,
+  .ant-col-6 {
     .ant-card {
       height: 100%;
       .ant-card-body {
@@ -42,7 +44,7 @@ body {
     }
   }
 
-  .ant-col-8 {
+  .ant-col-8, .ant-col-6 {
     .ant-card-body {
       overflow-y: scroll;
     }

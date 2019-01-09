@@ -130,7 +130,7 @@ class Editor extends React.Component<IProperties, IState> {
 
     const PageName = <h3 style={{ paddingBottom: 0, marginBottom: 0 }}>{this.props.pageName}</h3>;
 
-    const size = 16;
+    const size = 18;
 
     return (
       <div className={'editor'}>
