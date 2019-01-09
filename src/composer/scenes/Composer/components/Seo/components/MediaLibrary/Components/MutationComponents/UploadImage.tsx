@@ -20,7 +20,6 @@ export interface IUploadImageState {
 class UploadImage extends React.Component<IUploadImageProps, IUploadImageState> {
   constructor(props: IUploadImageProps) {
     super(props);
-
     this.state = {
       loading: false,
     };
@@ -69,6 +68,7 @@ class UploadImage extends React.Component<IUploadImageProps, IUploadImageState> 
         if (this.props.closeEditor) {
           this.props.closeEditor();
         }
+
       })
       .catch(() => {
         this.setState({ loading: false });

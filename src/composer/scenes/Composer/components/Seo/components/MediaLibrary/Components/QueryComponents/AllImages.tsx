@@ -24,8 +24,7 @@ class AllImages extends React.Component<{}, IAllImagesState> {
         'Access-Control-Allow-Origin': '*',
       },
       method: 'get',
-      url: `${process.env.REACT_APP_MEDIA_LIBRARY_SERVER}/find${'?category=' +
-        process.env.REACT_APP_MEDIA_LIBRARY_SERVER__CATEGORY}/`,
+      url: `${process.env.REACT_APP_MEDIA_LIBRARY_SERVER}/find`,
     })
       .then(response => {
         this.setState({ images: response.data.files });

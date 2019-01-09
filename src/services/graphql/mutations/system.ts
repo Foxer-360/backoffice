@@ -300,34 +300,66 @@ export const CREATE_NAVIGATION_STRUCTURE = gql`
   }
 `;
 
-export const SAVE_PAGE_PLUGIN = gql`
-    mutation savePagePlugin(
-        $page: ID,
-        $language: ID,
-        $plugin: String!,
-        $content: Json,
+export const CREATE_PAGE_PLUGIN = gql`
+  mutation createPagePlugin(
+    $page: ID!,
+    $language: ID!,
+    $plugin: String!,
+    $content: Json!
+  ) {
+    createPagePlugin(
+      data: {
+        page: {
+          connect: {
+            id: $page
+          }
+        },
+        language: {
+          connect: {
+            id: $language
+          }
+        },
+        plugin: $plugin,
+        content: $content
+      }
     ) {
-        savePagePlugin(
-            data: {
-                page: {
-                    connect: {
-                        id: $page
-                    }
-                },
-                language: {
-                    connect: {
-                        id: $language
-                    }
-                },
-                plugin: $plugin,
-                content: $content
-            }
-        ) {
-            id
-            plugin
-            content
-        }
+      id
+      page {
+        id
+      }
+      language {
+        id
+      }
+      plugin
+      content
     }
+  }
+`;
+
+export const UPDATE_PAGE_PLUGIN = gql`
+  mutation updatePagePlugin(
+    $id: ID!
+    $content: Json!
+  ) {
+    updatePagePlugin(
+      data: {
+        content: $content
+      },
+      where: {
+        id: $id
+      }
+    ) {
+      id
+      page {
+        id
+      }
+      language {
+        id
+      }
+      plugin
+      content
+    }
+  }
 `;
 
 export const CREATE_TAG = gql`

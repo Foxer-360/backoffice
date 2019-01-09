@@ -8,6 +8,7 @@
   "private": true,
   "dependencies": {
     "@foxer360/delta": "git+https://github.com/Foxer-360/delta.git#v0.1.0",
+    "@types/react-color": "^2.13.6",
     "@types/zen-observable": "^0.8.0",
     "antd": "^3.5.1",
     "apollo-boost": "^0.1.12",
@@ -46,6 +47,7 @@
     "react": "^16.3.2",
     "react-adopt": "^0.6.0",
     "react-apollo": "^2.1.9",
+    "react-color": "^2.14.1",
     "react-dev-utils": "4.2.1",
     "react-dom": "^16.3.2",
     "react-frame-component": "^4.0.2",
