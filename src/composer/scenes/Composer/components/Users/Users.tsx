@@ -36,8 +36,6 @@ class Users extends React.Component<IProperties, {}> {
             hasOwnIcon = true;
           }
 
-          console.log(e);
-
           return (
               <li key={i} style={{ display: 'inline-block' }}>
                 <Tooltip key={i} title={name}>
