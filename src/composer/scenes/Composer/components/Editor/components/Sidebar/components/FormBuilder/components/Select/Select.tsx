@@ -49,7 +49,7 @@ export default class MySelect extends React.Component<IMySelectProps> {
           {Object.keys(options).map((key: string, index: number) => {
             return (
               <Select.Option
-                key={index}
+                key={`${index}`}
                 value={key}
               >
                 {options[key]}

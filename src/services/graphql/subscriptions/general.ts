@@ -14,6 +14,11 @@ export const PAGE_CHAT_SUBSCRIPTION = gql`
         id
         text
         createdAt
+        user {
+          name
+          avatar
+          email
+        }
       }
     }
   }
@@ -35,6 +40,11 @@ export const PAGE_TASK_SUBSCRIPTION = gql`
         description
         done
         updatedAt
+        user {
+          name
+          avatar
+          email
+        }
       }
     }
   }

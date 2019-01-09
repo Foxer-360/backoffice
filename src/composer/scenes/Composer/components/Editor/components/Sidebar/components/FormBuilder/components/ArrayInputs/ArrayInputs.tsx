@@ -12,7 +12,6 @@ import debounce from 'lodash/debounce';
 interface IArrayInputsProps {
   title: string;
   name: string;
-  language: string;
   data: ILooseObject[];
   items: IFormSchema;
   // tslint:disable-next-line:no-any
@@ -142,7 +141,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
                 </>
               );
               return (
-                <Tabs.TabPane key={index} tab={tabTitle} closable={false}>
+                <Tabs.TabPane key={`${index}`} tab={tabTitle} closable={false}>
                   {this.props.items &&
                     this.props.items.properties &&
                     Object.keys(this.props.items.properties).map((elementName: string, j: number) => {
@@ -152,7 +151,6 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
                           key={j}
                           id={index}
                           name={elementName}
-                          language={this.props.language}
                           {...element}
                           value={
                             this.props.data && this.props.data[index] && this.props.data[index][elementName]

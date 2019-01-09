@@ -9,8 +9,6 @@ export interface IProperties {
 
   componentModule: IComponentModule;
   pluginModule: IPluginModule;
-
-  context: Context;
   plugins: string[];
 
   client: any; // tslint:disable-line:no-any
@@ -25,15 +23,6 @@ class LightweightComposer extends React.Component<IProperties, {}> {
 
     this.pluginsInstances = [];
 
-    props.plugins.forEach((name: string) => {
-      const Plugin = props.pluginModule.getPlugin(name);
-      if (Plugin) {
-        this.pluginsInstances[name] = new Plugin(props.context, null, props.client);
-        props.context.addListener(name, () => {
-          this.forceUpdate();
-        });
-      }
-    });
   }
 
   public render(): JSX.Element {
@@ -41,7 +30,6 @@ class LightweightComposer extends React.Component<IProperties, {}> {
       <Container
         content={this.props.content.content}
         componentModule={this.props.componentModule}
-        context={this.props.context}
       />
     );
   }

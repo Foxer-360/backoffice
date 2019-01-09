@@ -276,17 +276,6 @@ class Wrapper extends React.Component<IProperties, IState> {
       });
     }
 
-    // tslint:disable-next-line:no-any
-    let compProps: any = {};
-    let navigations = this.props.context.readProperty('navigations');
-    if (navigations && navigations !== undefined) {
-      compProps.navigations = navigations;
-    }
-    let languages = this.props.context.readProperty('languages');
-    if (languages && languages !== undefined) {
-      compProps.languages = languages;
-    }
-
     return (
       <div
         style={wrapperStyle}
@@ -316,7 +305,6 @@ class Wrapper extends React.Component<IProperties, IState> {
         <RenderErrorCatcher>
           <Comp
             data={this.props.content[this.props.position].data}
-            {...compProps}
           />
         </RenderErrorCatcher>
       </div>
