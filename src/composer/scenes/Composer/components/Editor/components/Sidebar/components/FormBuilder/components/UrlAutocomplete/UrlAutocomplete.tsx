@@ -7,7 +7,7 @@ import { canNotDefineSchemaWithinExtensionMessage } from 'graphql/validation/rul
 
 const GET_PAGES_URLS = gql`
   query
-    pagesUrls($language: ID) {
+    pagesUrls($language: ID!) {
       pagesUrls(where: { language: $language }) {
         id
         page
