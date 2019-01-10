@@ -16,17 +16,21 @@ const InformationGatherer = adopt({
       }}
     </Query>
   ),
-  websiteData: ({ render, website }) => (
-    <Query query={queries.WEBSITE_DETAIL} variables={{ id: website }}>
-      {({ loading, error, data }) => {
-        return render({
-          loading,
-          error,
-          data: data.website || null,
-        });
-      }}
-    </Query>
-  ),
+  websiteData: ({ render, website }) => {
+    if (!website) {
+      return render({ loading: true });
+    }
+    return (
+      <Query query={queries.WEBSITE_DETAIL} variables={{ id: website }}>
+        {({ loading, error, data }) => {
+          return render({
+            loading,
+            error,
+            data: data && data.website || null,
+          });
+        }}
+      </Query>);
+  },
   project: ({ render, websiteData }) => {
     if (!websiteData.data) {
       return render(null);
@@ -34,7 +38,12 @@ const InformationGatherer = adopt({
 
     return render(websiteData.data.project.id);
   },
-  projectData: ({ render, project }) => (
+  projectData: ({ render, project }) => {
+    if (!project) {
+      return render({ loading: true });
+    }
+
+    return (
     <Query query={queries.GET_PROJECT} variables={{ id: project }}>
       {({ loading, error, data }) => {
         return render({
@@ -43,8 +52,8 @@ const InformationGatherer = adopt({
           data: data.project || null,
         });
       }}
-    </Query>
-  ),
+    </Query>);
+  },
   language: ({ render }) => (
     <Query query={queries.LOCAL_SELECTED_LANGUAGE}>
       {({ data: { language } }) => {
@@ -93,7 +102,12 @@ const InformationGatherer = adopt({
       }}
     </Query>
   ),
-  pageData: ({ render, page }) => (
+  pageData: ({ render, page }) => {
+
+    if (!page) {
+      return render({ loading: true });
+    }
+    return (
     <Query query={queries.PAGE_DETAIL} variables={{ id: page }}>
       {({ loading, error, data }) => {
         return render({
@@ -102,8 +116,8 @@ const InformationGatherer = adopt({
           data: data.page || null,
         });
       }}
-    </Query>
-  ),
+    </Query>);
+  },
   pageType: ({ render, pageData }) => {
     if (!pageData.data) {
       return render(null);
@@ -111,7 +125,13 @@ const InformationGatherer = adopt({
 
     return render(pageData.data.type.id);
   },
-  pageTypeData: ({ render, pageType, website }) => (
+  pageTypeData: ({ render, pageType, website }) => {
+
+    if (!pageType || !website) {
+      return render({ loading: true });
+    }
+
+    return (
     <Query query={queries.PAGE_TYPE_LIST} variables={{ website }}>
       {({ loading, error, data }) => {
         if (loading || error) {
@@ -144,8 +164,8 @@ const InformationGatherer = adopt({
           data: found,
         });
       }}
-    </Query>
-  ),
+    </Query>);
+  },
   pageTranslationData: ({ render, pageData, language }) => {
     if (!pageData.data) {
       return render(null);
@@ -168,35 +188,42 @@ const InformationGatherer = adopt({
 
     return render(pageTranslationData.id);
   },
-  navigationsData: ({ render, website }) => (
-    <Query
-      query={gql`query($website: ID!) {
-        navigations(where: { website: { id: $website }}) {
-          id
-          name
-          nodes {
+  navigationsData: ({ render, website }) => {
+    console.log('Inside navigations data query', website);
+    if (!website) {
+      return render({
+        loading: true
+      });
+    }
+    return (
+      <Query
+        query={gql`query($website: ID!) {
+          navigations(where: { website: { id: $website }}) {
             id
-            page
-            title
-            link
-            order
-            parent
+            name
+            nodes {
+              id
+              page
+              title
+              link
+              order
+              parent
+              __typename
+            }
             __typename
           }
-          __typename
-        }
-      }`} 
-      variables={{ website }}
-    >
-      {({ loading, error, data }) => {
-        return render({
-          loading,
-          error,
-          data: data.navigations || null,
-        });
-      }}
-    </Query>
-  )
+        }`} 
+        variables={{ website }}
+      >
+        {({ loading, error, data }) => {
+          return render({
+            loading,
+            error,
+            data: data.navigations || null,
+          });
+        }}
+      </Query>);
+  }
 });
 
 interface AsyncData {
@@ -298,16 +325,15 @@ const validator = (data: InformationGathererData) => {
   if (data.pageTypeData.data === null) {
     someNull = true;
   }
+
   if (someNull !== true) {
     const {
       pageData: {
         data: pageData
       },
-      pageTypeData,
       websiteData: {
         data: websiteData
       },
-      projectData,
       languageData: {
         data: languageData
       },

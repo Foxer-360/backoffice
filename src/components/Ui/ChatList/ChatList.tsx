@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Icon, List, Checkbox, Tag, Avatar } from 'antd';
-import { userInfo } from 'os';
-import { CALL_HISTORY_METHOD } from 'react-router-redux';
+import { List, Avatar } from 'antd';
+
+import moment from 'moment';
 
 export interface ChatListProps {
   chats: Chat[];
@@ -35,7 +35,7 @@ class ChatList extends React.Component<ChatListProps, ChatListState> {
 
             <div className="chatBubble">
               {chat.user && chat.user.name &&
-                <span>{chat.user.name} , 12:15</span>
+                <span>{chat.user.name} , {moment(chat.createdAt).format('h:mm A')}</span>
               }
 
               <div className="chatBubble__content">

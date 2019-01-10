@@ -86,8 +86,6 @@ const validator = ({ path, search, info }: ValidatorInfo, history: History): voi
 
   if (info.language) {
     if (info.language !== language && info.language !== 'null') {
-
-      console.log('setting new lang', info.language);
       client.mutate({
         mutation: mutations.LOCAL_SELECT_LANGUAGE,
         variables: {
