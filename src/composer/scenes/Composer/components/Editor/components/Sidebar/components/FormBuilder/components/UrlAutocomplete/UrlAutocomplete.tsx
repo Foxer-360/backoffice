@@ -4,23 +4,44 @@ import { AutoComplete, Input, Checkbox } from 'antd';
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
 import { canNotDefineSchemaWithinExtensionMessage } from 'graphql/validation/rules/LoneSchemaDefinition';
+import { adopt } from 'react-adopt';
+
+const GET_CONTEXT = gql`{
+  languageData @client
+}`;
 
 const GET_PAGES_URLS = gql`
-  query
-    pagesUrls($language: ID!) {
-      pagesUrls(where: { language: $language }) {
-        id
-        page
-        url
-        name
-      }
+  query pagesUrls($language: ID!) {
+    pagesUrls(where: { language: $language }) {
+      id
+      page
+      url
+      name
+      description
     }
+  }
 `;
+
+const ComposedQuery = adopt({
+  context: ({ render }) => (
+    <Query query={GET_CONTEXT} >
+      {({ data }) => render(data)}
+    </Query>
+  ),
+  getPagesUrls: ({ render, context: { languageData }}) => {
+    if (!languageData) { return render({ loading: true }); }
+    return (
+    <Query query={GET_PAGES_URLS} variables={{ language: languageData.id }}>
+      {(data) => {
+        return render(data);
+      }}
+    </Query>);
+  }
+});
 
 export interface IUrlAutocomplete {
   name: string;
   label: string;
-  language: string;
   notitle?: boolean;
   value?: {
     url: string,
@@ -68,8 +89,8 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
     const { onChange, value } = this.props;
 
     return (
-      <Query query={GET_PAGES_URLS} variables={{ language: this.props.language }}>
-        {({ data: { pagesUrls }, loading, error}) => {
+      <ComposedQuery>
+        {({ getPagesUrls: { data }, loading, error}) => {
 
           if (loading) {
             return 'Loading...';
@@ -78,6 +99,7 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
           if (error) {
             return `Error: ${error}`;
           }
+          const { pagesUrls } = data;
 
           let pageUrlObj;
           if (value && value.pageId && pagesUrls) {
@@ -127,7 +149,7 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
               />}
           </div>);
         }}
-      </Query>);
+      </ComposedQuery>);
   }
 }
 
