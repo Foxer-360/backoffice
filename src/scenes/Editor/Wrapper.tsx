@@ -189,7 +189,6 @@ const InformationGatherer = adopt({
     return render(pageTranslationData.id);
   },
   navigationsData: ({ render, website }) => {
-    console.log('Inside navigations data query', website);
     if (!website) {
       return render({
         loading: true
