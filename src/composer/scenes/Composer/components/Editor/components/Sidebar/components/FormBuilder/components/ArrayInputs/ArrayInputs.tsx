@@ -184,7 +184,6 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
                             key={`${dataRow.id}_${j}`}
                             id={`${dataRow.id}_${j}`}
                             name={elementName}
-                            language={this.props.language}
                             {...element}
                             value={dataRow[elementName]}
                             onChange={this.onChange}
