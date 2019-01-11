@@ -148,7 +148,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
                     properties.title &&
                     properties.title.type === 'string' &&
                     dataRow.title
-                  ) || `(Collapse without title)`;
+                  ) || `Item ${index}`;
               }
 
               const panelTitle = (
