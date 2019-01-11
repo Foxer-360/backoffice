@@ -121,7 +121,6 @@ class InputRenderer extends React.Component<InputRendererProps & IFormSchemaElem
           <UrlAutocomplete
             label={this.props.title ? this.props.title : ''}
             name={this.props.name}
-            language={this.props.language}
             placeholder={this.props.placeholder}
             value={this.props.value}
             onChange={this.props.onChange}

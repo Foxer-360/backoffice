@@ -8,6 +8,12 @@ import { ILooseObject } from '@foxer360/delta/lib/@types/@types';
 const TreeNode = TreeSelect.TreeNode;
 const { Component } = React;
 
+const GET_CONTEXT = gql`
+{
+  page @client
+}
+`;
+
 const GET_PAGES = gql`
   query pages{
     pages {
@@ -42,11 +48,15 @@ const GET_PAGES = gql`
 `;
 
 const ComposedQuery = adopt({
-  pageData: ({ render }) => <Query query={GET_PAGES} >{page => render(page)}</Query>
+  getContext: ({ render }) => (
+    <Query query={GET_CONTEXT} >
+      {({ data }) => render(data)}
+    </Query>
+  ),
+  pagesData: ({ render }) => <Query query={GET_PAGES} >{page => render(page)}</Query>
 });
 
 export interface Properties {
-  pageId: string;
   language: ILooseObject;
   resetPageContent: (id: String, content: LooseObject) => void;
 }
@@ -72,16 +82,18 @@ class TranslationContentCloner extends Component<Properties, State> {
   }
 
   render() {
-    const { pageId } = this.props;
     const { editingMode } = this.state;
 
     return (
-      <ComposedQuery variables={{ pageId }}>
+      <ComposedQuery>
         {({
-          pageData: {
+          pagesData: {
             data,
             loading,
             error
+          },
+          getContext: {
+            page: pageId
           }
         }) => {
           if (loading) {

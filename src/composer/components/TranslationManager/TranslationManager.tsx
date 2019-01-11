@@ -69,11 +69,11 @@ class TranslationManager extends Component<Properties, State> {
 
             return (
             <span>{translation.name} 
-              <TranslationContentCloner 
-                pageId={pageId} 
+              <TranslationContentCloner
                 language={language} 
                 resetPageContent={resetPageContent}
-              /><TranslationTextManager 
+              />
+              <TranslationTextManager 
                 pageId={pageId} 
                 language={language} 
               />
