@@ -12,7 +12,6 @@ import debounce from 'lodash/debounce';
 interface IArrayInputsProps {
   title: string;
   name: string;
-  language: string;
   data: ILooseObject[];
   items: IFormSchema;
   // tslint:disable-next-line:no-any

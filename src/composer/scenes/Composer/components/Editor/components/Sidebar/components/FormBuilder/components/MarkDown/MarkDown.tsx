@@ -18,10 +18,22 @@ interface IMyTextAreaProps {
   onChange: (e: React.ChangeEvent<Element> | any) => void;
 }
 
-export default class MarkDown extends React.Component<IMyTextAreaProps, {}> {
+interface IContent {
+  content: string;
+}
+
+export default class MarkDown extends React.Component<IMyTextAreaProps, IContent> {
   constructor(props: IMyTextAreaProps) {
     super(props);
-    this.onChange = debounce(this.onChange.bind(this), 200);
+    this.state = {
+      content: '',
+    };
+
+    this.onChange = debounce(this.onChange.bind(this), 500);
+  }
+
+  componentDidMount() {
+    this.setState({ content: this.props.value });
   }
 
   onChange = value =>
@@ -45,7 +57,7 @@ export default class MarkDown extends React.Component<IMyTextAreaProps, {}> {
           id={`markdown_${id}`}
           label={notitle && notitle === true ? null : label}
           onChange={this.handleChange}
-          value={value || ''}
+          value={this.state.content || ''}
           options={{
             spellChecker: false,
             placeholder: placeholder,

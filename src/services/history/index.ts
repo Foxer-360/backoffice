@@ -35,7 +35,9 @@ const parseSearch = (search: string): LooseObject => {
     language: null,
     page: null,
     project: null,
-    website: null
+    website: null,
+    languages: null,
+    navigations: null
   } as LooseObject;
 
   if (language) {

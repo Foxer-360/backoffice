@@ -228,30 +228,6 @@ class Editor extends React.Component<IProperties, IState> {
     await this.composer.setContent((this.state.content as any)); // tslint:disable-line:no-any
     await this.composer.importDelta((this.state.delta as any)); // tslint:disable-line:no-any
     await this.composer.setName(this.props.pageTranslation.name);
-    await this.composer.enablePlugins(this.props.pageType.plugins, client);
-  }
-
-  /**
-   * Helper to transform simple string array of ids of editors into object of
-   * editor info for composer
-   *
-   * @param {string[]} editors
-   * @return {IEditorInfo[]}
-   */
-  private transformEditors(editors: string[]): IEditorInfo[] {
-    const transformedEditors = editors.map((id: string) => {
-      let name = undefined as string;
-      if (id === socket.id) {
-        name = 'Me';
-      }
-
-      return {
-        id,
-        name
-      } as IEditorInfo;
-    }) as IEditorInfo[];
-
-    return transformedEditors;
   }
 
   /**
@@ -281,7 +257,7 @@ class Editor extends React.Component<IProperties, IState> {
     const { pageId, editors } = data;
 
     this.setState({
-      editors: this.transformEditors(editors),
+      editors,
     });
   }
 
@@ -411,7 +387,7 @@ class Editor extends React.Component<IProperties, IState> {
     }, this);
 
     this.setState({
-      editors: this.transformEditors(page.editors),
+      editors: page.editors,
       locks,
       loading: false,
       failed: false,

@@ -9,9 +9,9 @@ import { getMainDefinition } from 'apollo-utilities';
 import { defaults, resolvers, typeDefs } from './local';
 import { queries } from './queries';
 import { mutations } from './mutations';
-import { fragments } from './fragments';
 import { subscriptions } from './subscriptions';
 import { OperationDefinitionNode } from 'graphql';
+import { setContext } from 'apollo-link-context';
 
 const cache = new InMemoryCache();
 
@@ -41,18 +41,31 @@ const link = split(
   httpLink,
 );
 
+const authLink = setContext((_, { headers }) => {
+  // get the authentication token from local storage if it exists
+  // eslint-disable-next-line no-undef
+  const token = typeof window !== 'undefined' && localStorage.getItem('access_token');
+  // return the headers to the context so httpLink can read them
+  return {
+    headers: {
+      ...headers,
+      Authorization: token ? `Bearer ${token}` : '',
+    },
+  };
+});
+
 export const client = new ApolloClient({
   connectToDevTools: true,
   link: ApolloLink.from([
     stateLink,
     // new HttpLink({ uri: process.env.REACT_APP_GRAPHQL_SERVER }),
+    authLink,
     link,
   ]),
   cache
 });
 
 export {
-  fragments,
   queries,
   mutations,
   subscriptions

@@ -1,10 +1,24 @@
-h2.sidebar-head {
-  color: white;
-  background: #00264B;
+.sidebar-head {
+  height: 32px;
+  margin: 16px;
   border-radius: 4px;
-  padding: 4px 12px;
-  font-size: 16px;
-  margin: 14px 16px 14px 16px;
-  text-align: center;
-  font-variant: small-caps;
+  background-color: #002140;
+
+  h2 {
+    color: white;
+    font-size: 16px;
+    padding: 4px 12px;
+    text-align: center;
+    font-variant: small-caps;
+  }
+}
+
+.ant-menu-item > a {
+  color: white;
+  display: initial;
+}
+
+.ant-menu-inline-collapsed > .ant-menu-item .anticon + a {
+  opacity: 0;
+  max-width: 0;
 }

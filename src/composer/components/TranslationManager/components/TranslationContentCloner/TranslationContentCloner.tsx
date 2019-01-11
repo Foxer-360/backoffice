@@ -126,8 +126,9 @@ class TranslationContentCloner extends Component<Properties, State> {
       <Row type="flex" style={{ margin: '0 0 10px' }}>
       {currentPage && currentPage.translations
         .filter((translation) => translation.language.code !== language.code)
-        .map((translation) => (
+        .map((translation, i) => (
           <Button
+            key={i}
             style={{ marginRight: 10, width: 100 }} 
             size={'small'}
             onClick={() => 

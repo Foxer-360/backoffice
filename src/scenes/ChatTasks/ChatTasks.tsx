@@ -9,6 +9,7 @@ import Tasks from './components/Tasks';
 import { TaskItem } from './components/Tasks/Tasks';
 import './style.css';
 import { takeLatest } from 'redux-saga/effects';
+import gql from 'graphql-tag';
 
 const { Component } = React;
 
@@ -23,9 +24,155 @@ export interface State {
   hidden: boolean;
 }
 
+const PAGE_TASK_LIST = gql`
+  query getPageTaskList($pageTranslation: ID!) {
+    pageTasks(
+      where: { pageTranslation: { id: $pageTranslation } }
+      orderBy: updatedAt_DESC
+    ) {
+      id
+      name
+      description
+      done
+      updatedAt
+      user {
+        name
+        avatar
+        email
+      }
+    }
+  }
+`;
+
+export const CREATE_TASK = gql`
+  mutation createTask($pageTranslation: PageTranslationCreateOneWithoutTasksInput!, $name: String!,
+  $description: String!, $done: Boolean!) {
+    createPageTask(
+      data: {
+        pageTranslation: $pageTranslation
+        name: $name
+        description: $description
+        done: $done
+      }
+    ) {
+      id
+      name
+      description
+      done
+      updatedAt
+      user {
+        name
+        avatar
+        email
+      }
+    }
+  }
+`;
+
+export const UPDATE_TASK = gql`
+  mutation updateTask($id: ID!, $name: String!, $description: String!) {
+    updatePageTask(
+      where: { id: $id }
+      data: {
+        name: $name
+        description: $description
+      }
+    ) {
+      id
+      name
+      description
+      done
+      updatedAt
+      user {
+        name
+        avatar
+        email
+      }
+    }
+  }
+`;
+
+export const TOGGLE_TASK_DONE = gql`
+  mutation toggleTask($id: ID!, $done: Boolean!) {
+    updatePageTask(
+      where: { id: $id }
+      data: {
+        done: $done
+      }
+    ) {
+      id
+      name
+      description
+      done
+      updatedAt
+      user {
+        name
+        avatar
+        email
+      }
+    }
+  }
+`;
+
+export const REMOVE_TASK = gql`
+  mutation removeTask($id: ID!) {
+    deletePageTask(
+      where: { id: $id }
+    ) {
+      id
+      name
+      description
+      done
+      updatedAt
+      user {
+        name
+        avatar
+        email
+      }
+    }
+  }
+`;
+
+const PAGE_CHAT_LIST = gql`
+  query getPageChatList($page: ID!) {
+    pageChats(
+      where: { page: { id: $page } }
+      orderBy: createdAt_DESC
+    ) {
+      id
+      text
+      createdAt
+      user {
+        name
+        avatar
+        email
+      }
+    }
+  }
+`;
+
+export const CREATE_CHAT = gql`
+  mutation createChat($page: PageCreateOneWithoutChatsInput!, $text: String!) {
+    createPageChat(
+      data: {
+        page: $page
+        text: $text
+      }
+    ) {
+      id
+      text
+      createdAt
+      user {
+        name
+        avatar
+        email
+      }
+    }
+  }
+`;
 const QueryAndMutationsForTasks = adopt({
   tasks: ({ pageTranslation, render }) => (
-    <Query query={queries.PAGE_TASK_LIST} variables={{ pageTranslation }}>
+    <Query query={PAGE_TASK_LIST} variables={{ pageTranslation }}>
       {({ loading, data: { pageTasks }, error, subscribeToMore, refetch }) => {
         const subscribe = () => {
           subscribeToMore({
@@ -106,14 +253,14 @@ const QueryAndMutationsForTasks = adopt({
   ),
   create: ({ pageTranslation, render }) => (
     <Mutation
-      mutation={mutations.CREATE_TASK}
+      mutation={CREATE_TASK}
       update={(cache, { data: { createPageTask } }) => {
         const { pageTasks } = cache.readQuery({
-          query: queries.PAGE_TASK_LIST,
+          query: PAGE_TASK_LIST,
           variables: { pageTranslation }
         });
         cache.writeQuery({
-          query: queries.PAGE_TASK_LIST,
+          query: PAGE_TASK_LIST,
           variables: { pageTranslation },
           data: { pageTasks: pageTasks.concat([createPageTask]) }
         });
@@ -136,7 +283,7 @@ const QueryAndMutationsForTasks = adopt({
     </Mutation>
   ),
   toggle: ({ render }) => (
-    <Mutation mutation={mutations.TOGGLE_TASK_DONE}>
+    <Mutation mutation={TOGGLE_TASK_DONE}>
       {toggleTask => {
         const fce = (id: string, done: boolean) => {
           toggleTask({
@@ -152,7 +299,7 @@ const QueryAndMutationsForTasks = adopt({
     </Mutation>
   ),
   update: ({ render }) => (
-    <Mutation mutation={mutations.UPDATE_TASK}>
+    <Mutation mutation={UPDATE_TASK}>
       {updateTask => {
         const fce = (id: string, task: LooseObject) => {
           updateTask({
@@ -169,10 +316,10 @@ const QueryAndMutationsForTasks = adopt({
   ),
   remove: ({ pageTranslation, render }) => (
     <Mutation
-      mutation={mutations.REMOVE_TASK}
+      mutation={REMOVE_TASK}
       update={(cache, { data: { deletePageTask } }) => {
         const { pageTasks } = cache.readQuery({
-          query: queries.PAGE_TASK_LIST,
+          query: PAGE_TASK_LIST,
           variables: { pageTranslation }
         });
         const removed = pageTasks.filter((task: LooseObject) => {
@@ -183,7 +330,7 @@ const QueryAndMutationsForTasks = adopt({
           return true;
         });
         cache.writeQuery({
-          query: queries.PAGE_TASK_LIST,
+          query: PAGE_TASK_LIST,
           variables: { pageTranslation },
           data: { pageTasks: removed }
         });
@@ -216,7 +363,7 @@ interface QaMForTasksVars {
 
 const QueryAndMutationsForChats = adopt({
   chats: ({ page, render }) => (
-    <Query query={queries.PAGE_CHAT_LIST} variables={{ page }}>
+    <Query query={PAGE_CHAT_LIST} variables={{ page }}>
       {({ loading, data: { pageChats }, error, subscribeToMore, refetch }) => {
         const subscribe = () => {
           subscribeToMore({
@@ -265,15 +412,15 @@ const QueryAndMutationsForChats = adopt({
   ),
   create: ({ page, render }) => (
     <Mutation
-      mutation={mutations.CREATE_CHAT}
+      mutation={CREATE_CHAT}
       update={(cache, { data: { createPageChat } }) => {
         const { pageChats } = cache.readQuery({
-          query: queries.PAGE_CHAT_LIST,
+          query: PAGE_CHAT_LIST,
           variables: { page }
         });
 
         cache.writeQuery({
-          query: queries.PAGE_CHAT_LIST,
+          query: PAGE_CHAT_LIST,
           variables: { page },
           data: { pageChats: pageChats.concat([createPageChat]) }
         });
