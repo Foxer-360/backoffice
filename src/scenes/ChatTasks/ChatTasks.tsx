@@ -173,7 +173,7 @@ export const CREATE_CHAT = gql`
 const QueryAndMutationsForTasks = adopt({
   tasks: ({ pageTranslation, render }) => (
     <Query query={PAGE_TASK_LIST} variables={{ pageTranslation }}>
-      {({ loading, data: { pageTasks }, error, subscribeToMore, refetch }) => {
+      {({ loading, data, error, subscribeToMore, refetch }) => {
         const subscribe = () => {
           subscribeToMore({
             document: subscriptions.PAGE_TASK_SUBSCRIPTION,
@@ -246,7 +246,7 @@ const QueryAndMutationsForTasks = adopt({
         if (loading || error) {
           return render({ subscribe, loading, error, data: [], refetch });
         }
-
+        const { pageTasks } = data;
         return render({ subscribe, loading, error, data: pageTasks, refetch });
       }}
     </Query>
@@ -364,7 +364,7 @@ interface QaMForTasksVars {
 const QueryAndMutationsForChats = adopt({
   chats: ({ page, render }) => (
     <Query query={PAGE_CHAT_LIST} variables={{ page }}>
-      {({ loading, data: { pageChats }, error, subscribeToMore, refetch }) => {
+      {({ loading, data, error, subscribeToMore, refetch }) => {
         const subscribe = () => {
           subscribeToMore({
             document: subscriptions.PAGE_CHAT_SUBSCRIPTION,
@@ -405,7 +405,7 @@ const QueryAndMutationsForChats = adopt({
         if (error || loading) {
           return render({ subscribe, loading, error, data: [], refetch });
         }
-
+        const { pageChats } = data;
         return render({ subscribe, loading, error, data: pageChats, refetch });
       }}
     </Query>
