@@ -88,10 +88,8 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
     const { onChange, value } = this.props;
 
     return (
-
       <ComposedQuery>
         {({ getPagesUrls: { data }, loading, error}) => {
-
 
           if (loading) {
             return 'Loading...';
