@@ -7,8 +7,8 @@ import { IAddComponentObject, IComponentsServiceLikeClass, IEditorInfo, ILockInf
 import DelayComponent from './components/DelayComponent';
 import Sidebar from './components/Sidebar';
 import View from './components/View';
-import Tags from '@source/components/Tags';
-import TranslationManager from '@source/components/TranslationManager';
+import Tags from '@source/composer/components/Tags';
+import TranslationManager from '@source/composer/components/TranslationManager';
 
 // tslint:disable:jsx-no-multiline-js
 // tslint:disable:jsx-no-lambda

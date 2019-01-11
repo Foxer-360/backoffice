@@ -1,5 +1,4 @@
 import gql from 'graphql-tag';
-import { fragments } from '../fragments';
 
 export const LANGUAGES = gql`
   query languages {
@@ -170,30 +169,6 @@ export const PAGE_TYPE_LIST = gql`
       content
     }
   }
-`;
-
-export const PAGE_TASK_LIST = gql`
-  query getPageTaskList($pageTranslation: ID!) {
-    pageTasks(
-      where: { pageTranslation: { id: $pageTranslation } }
-      orderBy: updatedAt_DESC
-    ) {
-      ...TaskDetail
-    }
-  }
-  ${fragments.TASK_FRAGMENT}
-`;
-
-export const PAGE_CHAT_LIST = gql`
-  query getPageChatList($page: ID!) {
-    pageChats(
-      where: { page: { id: $page } }
-      orderBy: createdAt_DESC
-    ) {
-      ...ChatDetail
-    }
-  }
-  ${fragments.CHAT_FRAGMENT}
 `;
 
 // subscription onPageChatIsAdded($page: ID!) {

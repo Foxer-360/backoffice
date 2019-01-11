@@ -105,7 +105,7 @@ class Chat extends Component<Properties, State> {
     const sortByDate = (a: ChatItem, b: ChatItem) => (a.createdAt > b.createdAt ? 1 : -1);
 
     // Default data format
-    let data = this.props.chats.map(transform).sort(sortByDate);
+    let data = this.props.chats ? this.props.chats.map(transform).sort(sortByDate) : [];
 
     return data;
   }

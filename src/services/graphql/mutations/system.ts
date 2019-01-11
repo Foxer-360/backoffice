@@ -1,5 +1,4 @@
 import gql from 'graphql-tag';
-import { fragments } from '../fragments';
 
 export const CREATE_PROJECT = gql`
   mutation createProject($name: String!, $defaultName: String!,
@@ -199,77 +198,6 @@ export const REMOVE_PAGE = gql`
   }
 `;
 
-export const CREATE_TASK = gql`
-  mutation createTask($pageTranslation: PageTranslationCreateOneWithoutTasksInput!, $name: String!,
-  $description: String!, $done: Boolean!) {
-    createPageTask(
-      data: {
-        pageTranslation: $pageTranslation
-        name: $name
-        description: $description
-        done: $done
-      }
-    ) {
-      ...TaskDetail
-    }
-  }
-  ${fragments.TASK_FRAGMENT}
-`;
-
-export const UPDATE_TASK = gql`
-  mutation updateTask($id: ID!, $name: String!, $description: String!) {
-    updatePageTask(
-      where: { id: $id }
-      data: {
-        name: $name
-        description: $description
-      }
-    ) {
-      ...TaskDetail
-    }
-  }
-  ${fragments.TASK_FRAGMENT}
-`;
-
-export const TOGGLE_TASK_DONE = gql`
-  mutation toggleTask($id: ID!, $done: Boolean!) {
-    updatePageTask(
-      where: { id: $id }
-      data: {
-        done: $done
-      }
-    ) {
-      ...TaskDetail
-    }
-  }
-  ${fragments.TASK_FRAGMENT}
-`;
-
-export const REMOVE_TASK = gql`
-  mutation removeTask($id: ID!) {
-    deletePageTask(
-      where: { id: $id }
-    ) {
-      ...TaskDetail
-    }
-  }
-  ${fragments.TASK_FRAGMENT}
-`;
-
-export const CREATE_CHAT = gql`
-  mutation createChat($page: PageCreateOneWithoutChatsInput!, $text: String!) {
-    createPageChat(
-      data: {
-        page: $page
-        text: $text
-      }
-    ) {
-      ...ChatDetail
-    }
-  }
-  ${fragments.CHAT_FRAGMENT}
-`;
-
 export const CREATE_PAGE_TYPE = gql`
   mutation createPageType($name: String!, $website: ID!, $content: Json, $plugins: [String!]!) {
     createPageType(
@@ -372,34 +300,66 @@ export const CREATE_NAVIGATION_STRUCTURE = gql`
   }
 `;
 
-export const SAVE_PAGE_PLUGIN = gql`
-    mutation savePagePlugin(
-        $page: ID,
-        $language: ID,
-        $plugin: String!,
-        $content: Json,
+export const CREATE_PAGE_PLUGIN = gql`
+  mutation createPagePlugin(
+    $page: ID!,
+    $language: ID!,
+    $plugin: String!,
+    $content: Json!
+  ) {
+    createPagePlugin(
+      data: {
+        page: {
+          connect: {
+            id: $page
+          }
+        },
+        language: {
+          connect: {
+            id: $language
+          }
+        },
+        plugin: $plugin,
+        content: $content
+      }
     ) {
-        savePagePlugin(
-            data: {
-                page: {
-                    connect: {
-                        id: $page
-                    }
-                },
-                language: {
-                    connect: {
-                        id: $language
-                    }
-                },
-                plugin: $plugin,
-                content: $content
-            }
-        ) {
-            id
-            plugin
-            content
-        }
+      id
+      page {
+        id
+      }
+      language {
+        id
+      }
+      plugin
+      content
     }
+  }
+`;
+
+export const UPDATE_PAGE_PLUGIN = gql`
+  mutation updatePagePlugin(
+    $id: ID!
+    $content: Json!
+  ) {
+    updatePagePlugin(
+      data: {
+        content: $content
+      },
+      where: {
+        id: $id
+      }
+    ) {
+      id
+      page {
+        id
+      }
+      language {
+        id
+      }
+      plugin
+      content
+    }
+  }
 `;
 
 export const CREATE_TAG = gql`

@@ -6,7 +6,7 @@ import { Query } from 'react-apollo';
 import { canNotDefineSchemaWithinExtensionMessage } from 'graphql/validation/rules/LoneSchemaDefinition';
 
 const GET_PAGES_URLS = gql`
-  query pagesUrls($language: ID) {
+  query pagesUrls($language: ID!) {
     pagesUrls(where: { language: $language }) {
       id
       page

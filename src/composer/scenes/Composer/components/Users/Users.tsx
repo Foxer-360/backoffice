@@ -26,13 +26,13 @@ class Users extends React.Component<IProperties, {}> {
     return (
       <ul style={style}>
         {this.props.editors.map((e: IEditorInfo, i: number) => {
-          let name = e.id;
-          if (e.name && e.name.length > 0) {
-            name = e.name;
+          let name = 'Undefined';
+          if (e.userInfo && e.userInfo.name && e.userInfo.name.length > 0) {
+            name = e.userInfo.name;
           }
 
           let hasOwnIcon = false;
-          if (e.icon && e.icon.length > 0) {
+          if (e.userInfo.picture && e.userInfo.picture.length > 0) {
             hasOwnIcon = true;
           }
 
@@ -40,7 +40,7 @@ class Users extends React.Component<IProperties, {}> {
               <li key={i} style={{ display: 'inline-block' }}>
                 <Tooltip key={i} title={name}>
                   <div style={{ display: 'inline', marginRight: '6px' }}>
-                    {hasOwnIcon ? <Avatar src={e.icon} /> : <Avatar icon="user" />}
+                    {hasOwnIcon ? <Avatar src={e.userInfo.picture} /> : <Avatar icon="user" />}
                   </div>
                 </Tooltip>
               </li>
