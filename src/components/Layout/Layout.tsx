@@ -34,15 +34,30 @@ const Wrapped = (Comp: any, withoutBackground?: boolean): any => {
   );
 };
 
-class Layout extends Component<Properties, {}> {
+export interface State {
+  collapsed: boolean;
+}
+
+class Layout extends Component<Properties, State> {
+  
+  constructor(props: Properties) {
+    super(props);
+
+    this.state = {
+      collapsed: false,
+    };
+  }
+
+  onCollapse = (collapsed) => this.setState({ collapsed });
+
   render() {
     return (
       <AntdLayout style={{ minHeight: '100vh' }}>
     
-        <Sider>
-          <Sidebar />
+        <Sider collapsible={true} collapsed={this.state.collapsed} onCollapse={this.onCollapse}>
+          <Sidebar collapsed={this.state.collapsed} />
         </Sider>
-        <AntdLayout>
+        <AntdLayout>  
           <Header path={this.props.path} />
           <Switch>
             <Route path="/pages" render={Wrapped(Pages)} />
