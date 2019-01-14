@@ -142,7 +142,13 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
             this.props.data.map((dataRow: ILooseObject, index: number) => {
               let title = null;
               if (this.props.items.properties) {
-                title = dataRow[Object.keys(this.props.items.properties)[0]];
+                const properties: LooseObject = this.props.items.properties;
+                title = 
+                  (
+                    properties.title &&
+                    properties.title.type === 'string' &&
+                    dataRow.title
+                  ) || `Item ${index}`;
               }
 
               const panelTitle = (
