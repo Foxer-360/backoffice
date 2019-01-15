@@ -2,7 +2,7 @@ import * as React from 'react';
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
 import { adopt } from 'react-adopt';
-import { Row, Tree, Button, Modal } from 'antd';
+import { Row, Button, Modal } from 'antd';
 import { ILooseObject } from '@foxer360/delta/lib/@types/@types';
 
 const { Component } = React;
@@ -106,9 +106,9 @@ class TranslationContentCloner extends Component<Properties, State> {
           return (
             <span style={{ float: 'right' }}>
               <Button 
-                type={'default'} 
-                icon={'copy'} 
-                size={'small'} 
+                type={'default'}
+                icon={'copy'}
+                size={'small'}
                 onClick={this.showModal}
               />
               <Modal
@@ -133,7 +133,9 @@ class TranslationContentCloner extends Component<Properties, State> {
     return (
       <div>
         <Row type="flex" style={{ margin: '10px 0' }}>
-          <strong>Copy content from current page:</strong>
+          {currentPage.translations && currentPage.translations.length > 1 && 
+            <strong>Copy content from current page:</strong> || ''
+          }
         </Row>
         <Row type="flex" style={{ margin: '0 0 10px' }}>
           {currentPage && currentPage.translations
@@ -158,7 +160,7 @@ class TranslationContentCloner extends Component<Properties, State> {
           }
         </Row>
         <Row type="flex" style={{ margin: '0 0 10px' }}>
-          <strong>Copy from another page:</strong>
+          <strong>Copy content from another page:</strong>
         </Row>
         <Row type="flex">
 
@@ -178,7 +180,7 @@ class TranslationContentCloner extends Component<Properties, State> {
                         .find((tr) => tr.language.code === language.code).id
                     )}
                   >
-                    Copy content from {t.language.englishName} ({t.name})
+                    {t.name} - <span style={{ color: '#1890ff' }}>{t.language.code}</span>
                   </Button>
                 ))
               )}
