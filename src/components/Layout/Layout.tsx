@@ -6,6 +6,7 @@ import Header from './components/Header';
 import Content from './components/Content';
 import Footer from './components/Footer';
 import Sidebar from './components/Sidebar';
+import Subscribers from '@source/scenes/Subscribers';
 import Pages from '@source/scenes/Pages';
 import Settings from '@source/scenes/Settings';
 import Home from '@source/scenes/Home';
@@ -63,6 +64,7 @@ class Layout extends Component<Properties, State> {
             <Route path="/pages" render={Wrapped(Pages)} />
             <Route path="/page" render={Wrapped(Pages, true)} />
             <Route path="/settings" render={Wrapped(Settings)} />
+            <Route path="/subscribers" render={Wrapped(Subscribers)} />
             <Route path="/" exact={true} render={Wrapped(Home, true)} />
           </Switch>
           <Footer />
