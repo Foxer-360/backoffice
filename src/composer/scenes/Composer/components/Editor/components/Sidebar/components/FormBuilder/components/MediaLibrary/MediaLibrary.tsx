@@ -88,7 +88,7 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
             <label>Image alt text </label>
             <Input
               onChange={e => this.onChangeAlt(e.target.value)}
-              value={mediaData && mediaData.alt ? mediaData.alt : ''}
+              defaultValue={mediaData && mediaData.alt ? mediaData.alt : ''}
               placeholder={'Alt Text'}
             />
           </Col>

@@ -20,7 +20,6 @@ export default class MyInput extends React.Component<IMyInputProps> {
       <div style={{ paddingBottom: '5px' }}>
         {this.props.notitle && this.props.notitle === true ? null
           : <label>{this.props.label}</label>}
-        
         <Input
           type={this.props.type}
           name={this.props.name}

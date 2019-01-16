@@ -113,7 +113,7 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
                   <AutoComplete
                     dataSource={pagesUrls.map(source => source.url).filter(u => u !== '')}
                     filterOption={(inputValue, { props: { children } }: LooseObject) =>
-                      children.toUpperCase().includes(inputValue.toUpperCase()) !== -1}
+                      children.toUpperCase().includes(inputValue.toUpperCase())}
                     defaultValue={pageUrlObj && pageUrlObj ? pageUrlObj.url : value && value.url}
                     onSearch={newUrl => this.onChange({ url: newUrl }, pagesUrls)}
                     onSelect={newUrl => this.onChange({ url: newUrl }, pagesUrls)}

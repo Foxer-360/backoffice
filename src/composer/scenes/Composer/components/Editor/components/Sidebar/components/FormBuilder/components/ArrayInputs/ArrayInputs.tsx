@@ -1,5 +1,5 @@
 import { ILooseObject } from '@source/composer/types';
-import { Icon, Popconfirm, Collapse } from 'antd';
+import { Icon, Popconfirm, Collapse, Card } from 'antd';
 import * as React from 'react';
 import { IFormSchema } from '../../FormBuilder';
 import InputRenderer from '../InputRenderer';
@@ -19,13 +19,58 @@ interface IArrayInputsProps {
   activeTab: number;
 }
 
-class ArrayInputs extends React.Component<IArrayInputsProps> {
+interface IArrayInputsState {
+  loading: boolean;
+}
+
+class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> {
   constructor(props: IArrayInputsProps) {
     super(props);
     this.onChange = this.onChange.bind(this);
     this.onEditTab = this.onEditTab.bind(this);
     this.mediaLibraryChange = this.mediaLibraryChange.bind(this);
-    this.onChangeTab = debounce(this.onChangeTab.bind(this), 25);
+    this.getNextIdValue = this.getNextIdValue.bind(this);
+    this.onChangeTab = this.onChangeTab.bind(this);
+    this.state = {
+      loading: true
+    };
+  }
+
+  getNextIdValue() {
+    let highestIdValue = '0';
+
+    this.props.data.forEach(item => {
+      if (item.id && parseInt(item.id, 10) > parseInt(highestIdValue, 10) ) {
+        highestIdValue = item.id;
+      }
+    });
+
+    return (parseInt(highestIdValue, 10) + 1).toString();
+  }
+
+  async componentDidMount() {
+    // check if ids in all rows
+    // if so, then state.loading = false;
+
+    // if no, then recalculate and send onChange
+    if (this.props.data && this.props.data.length > 0) {
+      const newData = this.props.data.map((item, key) => {
+        if (item && !item.id) { 
+          item.id = this.getNextIdValue(); 
+        }
+        return item;
+      });
+      await this.props.onChange({
+        target: {
+          name: this.props.name,
+          value: newData,
+        },
+      });
+      this.setState({ loading: false });
+    } else {
+      this.setState({ loading: false });
+    }
+
   }
 
   public onChangeTab(key: string) {
@@ -33,11 +78,9 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
   }
 
   public onNewTab() {
-    const id = `#${Date.now()}`;
+    const id = this.getNextIdValue();
     const newData = [...this.props.data];
     newData.push({ id });
-
-    const newTab = id;
 
     this.props.onChange({
       target: {
@@ -45,25 +88,12 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
         value: newData,
       },
     });
-
-    this.onChangeTab(newTab);
   }
 
   public onEditTab(targetKey: string, action?: string) {
     let iKey = parseInt(targetKey, 10);
     let newData = [...this.props.data];
     let newTab = this.props.activeTab;
-
-    if (action === 'remove') {
-      newData.splice(iKey, 1);
-
-      if (newTab > iKey || iKey === newTab) {
-        newTab = newTab - 1;
-      }
-      if (newTab < 0) {
-        newTab = 0;
-      }
-    }
 
     if (action === 'up') {
       if (iKey > 0 && newData.length > 1) {
@@ -85,6 +115,16 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
     });
   }
 
+  removeItem(id: string) {
+    const newData = this.props.data.filter(item => item.id !== id);
+    this.props.onChange({
+      target: {
+        name: this.props.name,
+        value: newData,
+      },
+    });
+  }
+
   // tslint:disable-next-line:no-any
   public onChange(key: any) {
     let rowIndex = this.props.data.findIndex((row: ILooseObject) => row.id === this.props.activeTab);
@@ -95,10 +135,6 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
 
     const newData = [...this.props.data];
     newData[rowIndex][key.target.name] = key.target.value;
-   
-    if (!newData[rowIndex].id) {
-      newData[rowIndex].id = `#${Date.now()}`;
-    }
 
     this.props.onChange({
       target: {
@@ -118,10 +154,6 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
     const newData = [...this.props.data];
     newData[rowIndex][media.name] = media.value;
 
-    if (!newData[rowIndex].id) {
-      newData[rowIndex].id = `#${Date.now()}`;
-    }
-
     this.props.onChange({
       target: {
         name: this.props.name,
@@ -131,6 +163,9 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
   }
 
   public render() {
+    if (this.state.loading) {
+      return (<Card loading={true} />);
+    }
     return (
       <Section title={this.props.title}>
         {/* 
@@ -163,7 +198,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
 
                     <Popconfirm
                       title="Are you sure delete this tab?"
-                      onConfirm={() => this.onEditTab(index.toString(), 'remove')}
+                      onConfirm={() => this.removeItem(dataRow.id)}
                       okText="Yes"
                       cancelText="No"
                     >
@@ -185,7 +220,6 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
                     Object.keys(this.props.items.properties).map((elementName: string, j: number) => {
                       const element = this.props.items.properties[elementName];
                       return (
-                        <>
                           <InputRenderer
                             key={`${dataRow.id}_${j}`}
                             id={`${dataRow.id}_${j}`}
@@ -195,13 +229,12 @@ class ArrayInputs extends React.Component<IArrayInputsProps> {
                             onChange={this.onChange}
                             mediaLibraryChange={this.mediaLibraryChange}
                           />
-                        </>
                       );
                     })}
                 </Collapse.Panel>
               );
             })}
-            <div className={'ant-collapse-item'} style={{ backgroundColor: 'white' }}>
+            <div key={'new-collapse'} className={'ant-collapse-item'} style={{ backgroundColor: 'white' }}>
               <a 
                 className={'ant-collapse-header'} 
                 onClick={() => this.onNewTab()} 
