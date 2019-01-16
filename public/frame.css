@@ -127,7 +127,7 @@ body {
   box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.2);
   font-weight: bold;
   background: none;
-  font-size: 2.2em;
+  font-size: 22px;
   font-weight: 200;
 }
 
@@ -229,7 +229,7 @@ canvas {
   border: 1px solid transparent;
   white-space: nowrap;
   padding: 0 15px;
-  font-size: 2.2em;
+  font-size: 22px;
   border-radius: 4px;
   height: auto;
   -webkit-user-select: none;
@@ -277,7 +277,7 @@ canvas {
   z-index: 3000;
   transition: 0.45s ease;
   opacity: 0;
-  font-size: 2.4em;
+  font-size: 24px;
   font-weight: 200;
   transform: translateZ(0);
   backface-visibility: hidden;
