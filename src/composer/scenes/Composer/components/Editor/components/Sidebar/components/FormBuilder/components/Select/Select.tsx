@@ -42,7 +42,10 @@ export default class MySelect extends React.Component<IMySelectProps> {
         <Select defaultValue={this.props.value} placeholder={this.props.placeholder} onSelect={this.handleChange}>
           {Object.keys(options).map((key: string, index: number) => {
             return (
-              <Select.Option key={index.toString()} value={key}>
+              <Select.Option
+                key={`${index}`}
+                value={key}
+              >
                 {options[key]}
               </Select.Option>
             );

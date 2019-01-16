@@ -258,3 +258,12 @@ body {
     // padding-top: 10%;
   }
 }
+
+.ant-table .ant-table-row-indent + .ant-table-row-expand-icon {
+  position: relative;
+  top: -24px;
+}
+
+.ant-table-thead > tr > th, .ant-table-tbody > tr > td { min-width: 200px; }
+
+.ant-tag { margin-bottom: 4px; }

@@ -122,11 +122,19 @@ class StructureList extends Component<Properties, State> {
       parentId: null,
     },
   };
-
   private readonly COLUMNS = [
-    { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Url', dataIndex: 'url', key: 'url' },
-    { title: 'Type', dataIndex: 'type', key: 'type' },
+    { title: 'Name', dataIndex: 'name', key: 'name', width: 400,
+      render: (name, row) => {
+        return (
+          <div style={{ display: 'inline-block' }}>
+            <p style={{ marginBottom: '5px' }}>{name}</p>
+            <p style={{ fontSize: '0.9em' }}>
+              url: {row.url && row.url || '/'}
+            </p>
+          </div>
+        );
+      }
+    },
     {
       title: 'Tags',
       dataIndex: 'tags',
@@ -134,7 +142,7 @@ class StructureList extends Component<Properties, State> {
         return <Tags popOver={true} pageId={id} />;
       }
     },
-    { title: 'Actions', key: 'actions',
+    { title: 'Actions', key: 'actions', width: 200,
       render: Actions(this.handleAddPage.bind(this), this.handleEditPage.bind(this)) }
   ];
 
@@ -278,6 +286,7 @@ class StructureList extends Component<Properties, State> {
                 return res;
               })
             );
+
             return <Table columns={this.COLUMNS} dataSource={data} defaultExpandAllRows={true} />;
           }}
         </PageList>

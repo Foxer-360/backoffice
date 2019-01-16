@@ -1,6 +1,8 @@
 import * as React from 'react';
-import { Popover, Tag, Icon } from 'antd';
+
 import gql from 'graphql-tag';
+
+import { Popover, Tag, Icon } from 'antd';
 import { Query, Mutation } from 'react-apollo';
 import { adopt } from 'react-adopt';
 
@@ -64,29 +66,11 @@ export interface Properties {
   popOver?: boolean;
 }
 
-export interface State {
-  itemsToShow: number;
-  expanded: boolean;
-}
+export interface State {}
 
 class Tags extends Component<Properties, State> {
   constructor(props: Properties) {
     super(props);
-
-    this.state = {
-      itemsToShow: 5,
-      expanded: false
-    };
-
-    this.showMore = this.showMore.bind(this);
-  }
-
-  showMore(tagsLength: number) {
-    this.state.itemsToShow === 5 ? (
-      this.setState({ itemsToShow: tagsLength, expanded: true })
-    ) : (
-      this.setState({ itemsToShow: 5, expanded: false })
-    );
   }
 
   isTagSelected(pages: Array<LooseObject>, pageId: string) {
@@ -146,7 +130,6 @@ class Tags extends Component<Properties, State> {
                 {data.tags &&
                   data.tags
                     .filter(({ pages }) => this.isTagSelected(pages, pageId))
-                    .slice(0, this.state.itemsToShow)
                     .map(({ color, name, pages, id: tagId }, key) => {
                       return (
                         <Tag
@@ -181,14 +164,6 @@ class Tags extends Component<Properties, State> {
                     )}
                   </Popover>
                 </Popover>
-
-                {numberOfUnselectedTags < 5 && data.tagsLength > 0 && (
-                  <Icon 
-                    type={'ellipsis'} 
-                    style={{ color: 'grey', cursor: 'pointer' }}
-                    onClick={() => this.showMore(data.tagsLength)}
-                  />
-                )}
               </div>
             );
           }}

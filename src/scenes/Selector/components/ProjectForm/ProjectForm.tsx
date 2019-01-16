@@ -267,7 +267,7 @@ class ProjectForm extends Component<Properties, State> {
                       onChange={val => this.handleSelectChange('langs', val as Array<string>)}
                       value={this.state.langs}
                     >
-                      {data.languages.map((lang: LooseObject) => {
+                      {data.languages && data.languages.map((lang: LooseObject) => {
                         return <Select.Option key={lang.id}>{lang.name}</Select.Option>;
                       })}
                     </Select>
@@ -310,7 +310,7 @@ class ProjectForm extends Component<Properties, State> {
                       value={[this.state.defLang]}
                       notFoundContent="Please select firstly some languages"  
                     >
-                      {data.languages.map((lang: LooseObject) => {
+                      {data.languages && data.languages.map((lang: LooseObject) => {
                         if (indexOf(this.state.langs, lang.id) > -1) {
                           return <Select.Option key={lang.id}>{lang.name}</Select.Option>;
                         }

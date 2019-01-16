@@ -14,6 +14,7 @@ export interface Properties {
   history: any;
   // tslint:disable-next-line:no-any
   location: any;
+  collapsed: boolean;
 }
 
 export interface State {
@@ -67,19 +68,22 @@ class Sidebar extends Component<Properties, State> {
   render() {
     return (
       <>
-        <h2 className="sidebar-head">
-          BackOffice
-        </h2>
+        <div className={'sidebar-head'}>
+          <h2>{this.props.collapsed && 'BO' || 'BackOffice'}</h2>
+        </div>
         <Menu theme="dark" mode="inline" selectedKeys={this.state.selectedKey}>
           <Item key="home">
-            <Link to="/"><Icon type="home" />Home</Link>
+            <Icon type="home" />
+            <Link to="/">Home</Link>
           </Item>
           <Item key="pages">
-            <Link to="/pages"><Icon type="database" />Pages</Link>
+            <Icon type="database" />
+            <Link to="/pages">Pages</Link>
           </Item>
           <Item key="settings">
-              <Link to="/settings"><Icon type="tool" />Settings</Link>
-            </Item>
+            <Icon type="tool" />
+            <Link to="/settings">Settings</Link>
+          </Item>
         </Menu>
       </>
     );

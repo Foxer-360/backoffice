@@ -1,8 +1,10 @@
 import decode from 'jwt-decode';
 import auth0 from 'auth0-js';
+import { request } from 'graphql-request';
 
 const ID_TOKEN_KEY = 'id_token';
 const ACCESS_TOKEN_KEY = 'access_token';
+const USER_KEY = 'user';
 
 const CLIENT_ID = process.env.REACT_APP_AUTH0_CLIENT_ID || 'C3APVkj7pSphv9x7qLZ7ib1eeyPO5lOh';
 const CLIENT_DOMAIN = process.env.REACT_APP_AUTH0_CLIENT_DOMAIN || 'nevim42.eu.auth0.com';
@@ -20,7 +22,7 @@ export function login() {
     responseType: 'token id_token',
     redirectUri: REDIRECT,
     audience: AUDIENCE,
-    // scope: SCOPE
+    scope: 'openid profile email user_metadata app_metadata picture'
   });
 }
 
@@ -80,6 +82,25 @@ export function setIdToken() {
   if (!idToken) {
     return;
   }
+
+  request(
+    process.env.REACT_APP_AUTHORIZATION_API_ADDRESS,
+    `
+    mutation authenticate($idToken: String!) {
+      authenticate(idToken: $idToken) {
+          id
+          name
+          email
+          avatar
+      }
+    }
+    `,
+    {
+      idToken
+    },
+  ).catch((e) => {
+    console.error(e);
+  });
   localStorage.setItem(ID_TOKEN_KEY, idToken);
 }
 

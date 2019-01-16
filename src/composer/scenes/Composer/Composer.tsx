@@ -52,9 +52,8 @@ export interface IData {
 }
 
 export interface IEditorInfo {
-  id: string;
-  name?: string;
-  icon?: string; // URL of icon image
+  socketId: string;
+  userInfo: LooseObject;
 }
 
 export interface ILockInfo {
