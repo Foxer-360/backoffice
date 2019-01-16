@@ -1,7 +1,6 @@
 import * as React from 'react';
 import SimpleMDE from 'react-simplemde-editor';
 import 'simplemde/dist/simplemde.min.css';
-import debounce from 'lodash/debounce';
 
 // tslint:disable:jsx-no-multiline-js
 // tslint:disable:jsx-no-lambda
@@ -28,8 +27,6 @@ export default class MarkDown extends React.Component<IMyTextAreaProps, IContent
     this.state = {
       content: '',
     };
-
-    this.onChange = debounce(this.onChange.bind(this), 500);
   }
 
   componentDidMount() {

@@ -41,7 +41,9 @@ class Tags extends React.Component<TagsProps, TagsState> {
 
     values.forEach(value => {
       let matchTag = tags.filter(tag => tag.name === value);
-      data.push({ id: matchTag[0].id, name: value });
+      if (matchTag && matchTag[0] && matchTag[0].id) {
+        data.push({ id: matchTag[0].id, name: value });
+      }
     });
 
     return data;

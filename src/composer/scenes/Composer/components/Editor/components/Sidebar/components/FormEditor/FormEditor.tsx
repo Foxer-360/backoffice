@@ -1,6 +1,7 @@
 import { ILooseObject } from '@source/composer/types';
 import { Context } from '@source/composer/utils';
 import { Button, Icon } from 'antd';
+import debounce from 'lodash/debounce';
 import * as React from 'react';
 import { IComponentsServiceLikeClass } from '../../../../../../Composer';
 import FormBuilder from '../FormBuilder';
@@ -22,6 +23,12 @@ export interface IProperties {
 }
 
 class FormEditor extends React.Component<IProperties, {}> {
+    onChange: (data: ILooseObject) => void;
+  constructor(props: IProperties) {
+
+    super(props);
+    this.onChange = debounce(this.props.onChange, 500);
+  }
 
   public render() {
     const type = this.props.type || '';
@@ -36,12 +43,12 @@ class FormEditor extends React.Component<IProperties, {}> {
           <FormBuilder
             form={formResource}
             data={this.props.data}
-            onChange={this.props.onChange}
+            onChange={this.onChange}
           />
           :
           <Form
             data={this.props.data}
-            onChange={this.props.onChange}
+            onChange={this.onChange}
           />
         }
 
