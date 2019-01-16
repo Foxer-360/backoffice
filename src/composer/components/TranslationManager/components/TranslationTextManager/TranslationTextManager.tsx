@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Input, Button, Popover, Icon, Form, Row } from 'antd';
+import { Input, Button, Popover, Icon, Form, Row, Modal } from 'antd';
 import gql from 'graphql-tag';
 import { Query, Mutation } from 'react-apollo';
 import { adopt } from 'react-adopt';
@@ -105,7 +105,6 @@ export interface Properties {
 export interface State {
   translation: ILooseObject; 
   editingMode: boolean;
-
 }
 
 class TranslationTextManager extends Component<Properties, State> {
@@ -118,9 +117,26 @@ class TranslationTextManager extends Component<Properties, State> {
     };
   }
 
+  showModal = () => {
+    this.setState({
+      editingMode: true,
+    });
+  }
+
+  handleOk = () => {
+    this.setState({
+      editingMode: false,
+    });
+  }
+
+  handleCancel = () => {
+    this.setState({
+      editingMode: false,
+    });
+  }
+
   render(): JSX.Element {
     const { pageId, language } = this.props;
-    const { editingMode } = this.state;
 
     return (
       <ComposedQuery variables={{ pageId, languageCode: language.code }}>
@@ -135,123 +151,107 @@ class TranslationTextManager extends Component<Properties, State> {
           } 
 
           const { page: { translations : { 0: translation }}} = data;
-
-        return (
-            <Popover 
-              visible={editingMode} 
-              content={this.getPopOverContent(translation, updatePageTranslation)} 
-              trigger="click" 
-              placement="bottomLeft"
-            >
-              <Icon
-                style={{ marginLeft: 5 }}
-                onClick={() => {
-                  this.setState({ editingMode: true });
-                }}
-                type="edit" 
+          return (
+            <span style={{ float: 'right', marginRight: 10 }}>
+              <Button 
+                type={'default'} 
+                icon={'edit'} 
+                size={'small'} 
+                onClick={this.showModal}
               />
-            </Popover>);
-
+              <Modal
+                title="Update Page Info"
+                visible={this.state.editingMode}
+                onCancel={this.handleCancel}
+                footer={[
+                  <Button 
+                    key="submit" 
+                    type="primary" 
+                    size="default" 
+                    onClick={() => {
+                      updatePageTranslation({ variables: { 
+                        ...translation,
+                        ...this.state.translation
+                      }}).then(this.handleCancel);
+                    }}
+                  >
+                    Update
+                  </Button>,
+                  <Button key="back" onClick={this.handleCancel}>Cancel</Button>
+                ]}
+              >
+                {this.getPopOverContent(translation)}
+              </Modal>
+            </span>
+          );
         }}
       </ComposedQuery>
     );
   }
 
-  getPopOverContent = (translation, updatePageTranslation) => {
+  getPopOverContent = (translation) => {
 
     const formItemLayout = {
       labelCol: {
         xs: { span: 24 },
         sm: { span: 8 },
-      },
+      }, 
       wrapperCol: {
         xs: { span: 24 },
         sm: { span: 16 },
       },
-      style: { marginBottom: 5 }
     };
 
     return (
-    <div>
-      <FormItem
-        label="Page name"
-        {...formItemLayout}
-      >
-        <Input
-          placeholder="Page name"
-          size={'small'}
-          defaultValue={translation.name}
-          prefix={<Icon type="bold" style={{ color: 'rgba(0,0,0,.25)' }} />}
-          onChange={({ target: { value: newName }}) => {
-            this.setState({
-              translation: {
-                ...translation,
-                name: newName
-              }
-            });
-          }}
-        />
-      </FormItem>
-      <FormItem
-        label="Url slag"
-        {...formItemLayout}
-      >
-        <Input
-          placeholder="Url slag"
-          size={'small'}
-          defaultValue={translation.url}
-          prefix={<Icon type="link" style={{ color: 'rgba(0,0,0,.25)' }} />}
-          onChange={({ target: { value: newUrl }}) => {
-            this.setState({
-              translation: {
-                ...translation,
-                url: newUrl
-              }
-            });
-          }}
-        />
-      </FormItem>
-      <FormItem
-        label="Description"
-        {...formItemLayout}
-      >
-        <TextArea
-          placeholder="Description"
-          defaultValue={translation.description}
-          onChange={({ target: { value: newDescription }}) => {
-            this.setState({
-              translation: {
-                ...translation,
-                description: newDescription
-              }
-            });
-          }}
-        />
-      </FormItem>
-      <Row type="flex" justify="end">
-        <Button
-          size={'small'}
-          onClick={() => {
-            updatePageTranslation({ variables: { 
-              ...translation,
-              ...this.state.translation
-            }}).then(() => this.setState({ editingMode: false }));
-          }} 
-          type="primary"
-          style={{ marginRight: 10 }}
-        >
-          Update
-        </Button>
-        <Button
-          size={'small'}
-          onClick={() => {
-            this.setState({ editingMode: false });
-          }}
-        >
-          Cancel
-        </Button>
-      </Row>
-    </div>);
+      <div>
+        <FormItem label="Page name" {...formItemLayout}>
+          <Input
+            placeholder="Page name"
+            size={'default'}
+            defaultValue={translation.name}
+            prefix={<Icon type="bold" style={{ color: 'rgba(0,0,0,.25)' }} />}
+            onChange={({ target: { value: newName }}) => {
+              this.setState({
+                translation: {
+                  ...translation,
+                  name: newName
+                }
+              });
+            }}
+          />
+        </FormItem>
+        <FormItem label="Url slag" {...formItemLayout}>
+          <Input
+            placeholder="Url slag"
+            size={'default'}
+            defaultValue={translation.url}
+            prefix={<Icon type="link" style={{ color: 'rgba(0,0,0,.25)' }} />}
+            onChange={({ target: { value: newUrl }}) => {
+              this.setState({
+                translation: {
+                  ...translation,
+                  url: newUrl
+                }
+              });
+            }}
+          />
+        </FormItem>
+        <FormItem label="Description" {...formItemLayout}>
+          <TextArea
+            placeholder="Description"
+            defaultValue={translation.description}
+            onChange={({ target: { value: newDescription }}) => {
+              this.setState({
+                translation: {
+                  ...translation,
+                  description: newDescription
+                }
+              });
+            }}
+          />
+        </FormItem>
+      </div>
+    );
   }
 }
 
