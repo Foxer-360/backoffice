@@ -33,8 +33,6 @@ class EmbedVideoEditor extends React.Component<IEmbedVideoEditorProps, IEmbedVid
     let youtubeVideo = value.split('v=')[1];
     let vimeoVideo = value.split('vimeo.com/')[1];
 
-    console.log('%c Emilio: ', 'background: #222; color: #bada55',  value.split('vimeo.com/')[1], youtubeVideo);
-
     if (youtubeVideo) {
       let ampersandPosition = youtubeVideo.indexOf('&');
       if (ampersandPosition !== -1) {
@@ -50,8 +48,6 @@ class EmbedVideoEditor extends React.Component<IEmbedVideoEditorProps, IEmbedVid
     if (!vimeoVideo && !youtubeVideo) {
       videoSrc = 'error';
     }
-
-    console.log('%c Emilio: dada', 'background: #222; color: #bada55', videoSrc);
 
     this.setState({
       embeddedVideoUrl: videoSrc,
