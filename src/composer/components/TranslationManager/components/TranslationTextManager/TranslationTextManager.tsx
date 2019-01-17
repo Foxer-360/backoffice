@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Input, Button, Popover, Icon, Form, Row } from 'antd';
+import { Input, Button, Popover, Icon, Form, Row, Modal } from 'antd';
 import gql from 'graphql-tag';
 import { Query, Mutation } from 'react-apollo';
 import { adopt } from 'react-adopt';
@@ -118,6 +118,24 @@ class TranslationTextManager extends Component<Properties, State> {
     };
   }
 
+  showModal = () => {
+    this.setState({
+      editingMode: true,
+    });
+  }
+
+   handleOk = () => {
+    this.setState({
+      editingMode: false,
+    });
+  }
+
+   handleCancel = () => {
+    this.setState({
+      editingMode: false,
+    });
+  }
+
   render(): JSX.Element {
     const { pageId, language } = this.props;
     const { editingMode } = this.state;
@@ -137,27 +155,44 @@ class TranslationTextManager extends Component<Properties, State> {
           const { page: { translations : { 0: translation }}} = data;
 
         return (
-            <Popover 
-              visible={editingMode} 
-              content={this.getPopOverContent(translation, updatePageTranslation)} 
-              trigger="click" 
-              placement="bottomLeft"
+          <span style={{ float: 'right', marginRight: 10 }}>
+            <Button
+              type={'default'}
+              icon={'edit'}
+              size={'small'}
+              onClick={this.showModal}
+            />
+            <Modal
+              title="Update Page Info"
+              visible={this.state.editingMode}
+              onCancel={this.handleCancel}
+              footer={[
+                <Button 
+                  key="submit" 
+                  type="primary" 
+                  size="default" 
+                  onClick={() => {
+                    updatePageTranslation({ variables: { 
+                      ...translation,
+                      ...this.state.translation
+                    }}).then(this.handleCancel);
+                  }}
+                >
+                  Update
+                </Button>,
+                <Button key="back" onClick={this.handleCancel}>Cancel</Button>
+              ]}
             >
-              <Icon
-                style={{ marginLeft: 5 }}
-                onClick={() => {
-                  this.setState({ editingMode: true });
-                }}
-                type="edit" 
-              />
-            </Popover>);
-
-        }}
+              {this.getPopOverContent(translation)}
+            </Modal>
+          </span>
+        );
+      }}
       </ComposedQuery>
     );
   }
 
-  getPopOverContent = (translation, updatePageTranslation) => {
+  getPopOverContent = (translation) => {
 
     const formItemLayout = {
       labelCol: {
@@ -173,13 +208,10 @@ class TranslationTextManager extends Component<Properties, State> {
 
     return (
     <div>
-      <FormItem
-        label="Page name"
-        {...formItemLayout}
-      >
+      <FormItem label="Page name" {...formItemLayout}>
         <Input
           placeholder="Page name"
-          size={'small'}
+          size={'default'}
           defaultValue={translation.name}
           prefix={<Icon type="bold" style={{ color: 'rgba(0,0,0,.25)' }} />}
           onChange={({ target: { value: newName }}) => {
@@ -198,7 +230,7 @@ class TranslationTextManager extends Component<Properties, State> {
       >
         <Input
           placeholder="Url slag"
-          size={'small'}
+          size={'default'}
           defaultValue={translation.url}
           prefix={<Icon type="link" style={{ color: 'rgba(0,0,0,.25)' }} />}
           onChange={({ target: { value: newUrl }}) => {
@@ -211,10 +243,7 @@ class TranslationTextManager extends Component<Properties, State> {
           }}
         />
       </FormItem>
-      <FormItem
-        label="Description"
-        {...formItemLayout}
-      >
+      <FormItem label="Description" {...formItemLayout}>
         <TextArea
           placeholder="Description"
           defaultValue={translation.description}
@@ -228,29 +257,6 @@ class TranslationTextManager extends Component<Properties, State> {
           }}
         />
       </FormItem>
-      <Row type="flex" justify="end">
-        <Button
-          size={'small'}
-          onClick={() => {
-            updatePageTranslation({ variables: { 
-              ...translation,
-              ...this.state.translation
-            }}).then(() => this.setState({ editingMode: false }));
-          }} 
-          type="primary"
-          style={{ marginRight: 10 }}
-        >
-          Update
-        </Button>
-        <Button
-          size={'small'}
-          onClick={() => {
-            this.setState({ editingMode: false });
-          }}
-        >
-          Cancel
-        </Button>
-      </Row>
     </div>);
   }
 }
