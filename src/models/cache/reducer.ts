@@ -33,31 +33,29 @@ const reducer = (state = initState, action: ReduxAction) => {
         }
       };
     case types.APPEND_DATA_WITH_ID:
-      {
-        const ids = state[payload.name].data.map((item: LooseObject) => item.id);
-        let data = state[payload.name].data;
-        payload.data.forEach((item: LooseObject) => {
-          if (indexOf(ids, item.id) > -1) {
-            data[indexOf(ids, item.id)] = item;
-          } else {
-            data.push(item);
-          }
-        }, this);
+      const ids = state[payload.name].data.map((item: LooseObject) => item.id);
+      let data = state[payload.name].data;
+      payload.data.forEach((item: LooseObject) => {
+        if (indexOf(ids, item.id) > -1) {
+          data[indexOf(ids, item.id)] = item;
+        } else {
+          data.push(item);
+        }
+      }, this);
 
-        const dataObj = {
-          ...state[payload.name],
-          update: new Date,
-          valid: true,
-          data: [
-            ...data
-          ]
-        };
+      const dataObj = {
+        ...state[payload.name],
+        update: new Date,
+        valid: true,
+        data: [
+          ...data
+        ]
+      };
 
-        return {
-          ...state,
-          [payload.name]: dataObj
-        };
-      }
+      return {
+        ...state,
+        [payload.name]: dataObj
+      };
     case types.ADD_ITEM:
       let dataObject: GeneralData;
       if (state[payload.name]) {

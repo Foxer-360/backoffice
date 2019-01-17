@@ -10,7 +10,7 @@
     "@foxer360/delta": "git+https://github.com/Foxer-360/delta.git#v0.1.0",
     "@types/react-color": "^2.13.6",
     "@types/zen-observable": "^0.8.0",
-    "antd": "^3.5.1",
+    "antd": "3.12.3",
     "apollo-boost": "^0.1.12",
     "apollo-link-context": "^1.0.12",
     "apollo-link-error": "^1.1.5",
@@ -98,8 +98,7 @@
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash": "^4.14.106",
     "@types/node": "^9.6.2",
-    "@types/prop-types": "^15.5.4",
-    "@types/react": "*",
+    "@types/react": "^16.7.20",
     "@types/react-dom": "*",
     "@types/react-infinite-scroller": "^1.0.6",
     "@types/react-redux": "^5.0.15",
@@ -109,7 +108,7 @@
     "@types/socket.io-client": "^1.4.32",
     "@types/ws": "^5.1.2",
     "git-clone": "^0.1.0",
-    "typescript": "^2.8.1",
+    "typescript": "^3.2.2",
     "webpack-bundle-analyzer": "^2.13.1"
   },
   "jest": {
