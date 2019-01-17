@@ -45,6 +45,9 @@ class Sidebar extends Component<Properties, State> {
       case '/subscribers':
         key = 'subscribers';
         break;
+      case '/inquiries':
+        key = 'inquiries';
+        break;
       default:
         key = 'home';
         break;
@@ -86,6 +89,10 @@ class Sidebar extends Component<Properties, State> {
           <Item key="subscribers">
             <Icon type="usergroup-add" />
             <Link to="/subscribers">Subscribers</Link>
+          </Item>
+          <Item key="inquiries">
+            <Icon type="usergroup-add" />
+            <Link to="/inquiries">Inquiries</Link>
           </Item>
           <Item key="settings">
             <Icon type="tool" />
