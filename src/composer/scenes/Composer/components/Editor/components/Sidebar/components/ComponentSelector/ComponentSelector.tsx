@@ -22,6 +22,15 @@ export interface IProperties {
 
 class ComponentSelector extends React.Component<IProperties, {}> {
 
+  getCurrentProjectName() {
+    for (var key in this.props.componentsService) {
+      if (key === 'instances') {
+        return Object.keys(this.props.componentsService[key])[0];
+      }
+    }
+    return null;
+  }
+
   public render() {
     const data = this.props.componentsService.getAllowedTypes().sort();
     let desc = 'To add new component into content you can drag';
@@ -40,7 +49,12 @@ class ComponentSelector extends React.Component<IProperties, {}> {
           renderItem={(item: string) => (
             <List.Item className="selector-list-item">
               <div onClick={() => this.props.onAdd(item)} style={{ width: '100%' }}>
-                <Card dragStart={this.props.dragStart} dragEnd={this.props.dragEnd} type={item} />
+                <Card 
+                  projectName={this.getCurrentProjectName()} 
+                  dragStart={this.props.dragStart} 
+                  dragEnd={this.props.dragEnd} 
+                  type={item} 
+                />
               </div>
             </List.Item>
           )}
