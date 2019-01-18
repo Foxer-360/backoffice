@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { Popover, Tag, Card, Icon } from 'antd';
+import { Popover, Tag, Card, Icon, Button } from 'antd';
 import gql from 'graphql-tag';
 import { Query, Mutation } from 'react-apollo';
 import { adopt } from 'react-adopt';
 import { Link } from 'react-router-dom';
+import { client } from '@source/services/graphql';
 
 const { Component } = React;
 
@@ -91,7 +92,17 @@ class Tags extends Component<Properties, State> {
             {...(selectedTagId === id ? { color } : {})}
           >
             <Link 
-              to={`/pages?tag=${id}`}
+              onClick={() => {
+                if (selectedTagId === id) {
+                  client.cache.writeQuery({
+                    query: SELECT_TAG_ID,
+                    data: {
+                      tag: null
+                    }
+                  });
+                }
+              }} 
+              to={`/pages?tag=${selectedTagId === id ? null : id}`}
             >
               {name}
             </Link>
@@ -106,26 +117,48 @@ class Tags extends Component<Properties, State> {
 
     return (
     <div>
+    <Popover content={content} trigger="click" placement="top">
+      <Popover content={content} trigger="hover" placement="top">
+          <Button>
+            Select tag <Icon type="down" />
+          </Button>
+      </Popover>
+    </Popover>
     {tags
         .filter(({ id }) => id === selectedTagId)
-        .map(({ color, name, pages, id: tagId }, key) => {
+        .map(({ color, name, id }, key) => {
           return (
             <Tag
               key={key}
               color={color}
+              onClick={() => {
+                client.cache.writeQuery({
+                  query: SELECT_TAG_ID,
+                  data: {
+                    tag: null
+                  }
+                });
+              }} 
+              style={{ margin: '0 0 0 7px'}}
             >
-              {name}
+              <Link 
+                onClick={() => {
+                  if (selectedTagId === id) {
+                    client.cache.writeQuery({
+                      query: SELECT_TAG_ID,
+                      data: {
+                        tag: null
+                      }
+                    });
+                  }
+                }} 
+                to={`/pages`}
+              >
+                {name}
+              </Link>
             </Tag>
           );
         })}
-
-    <Popover content={content} trigger="click" placement="top">
-      <Popover content={content} trigger="hover" placement="top">
-          <Tag style={{ background: '#fff', borderStyle: 'dashed' }}>
-            <Icon type="plus" /> Select tag
-          </Tag>
-      </Popover>
-    </Popover>
     </div>);
   }
 

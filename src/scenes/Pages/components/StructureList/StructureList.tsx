@@ -290,9 +290,10 @@ class StructureList extends Component<Properties, State> {
       <>
         <div className="pages-filter-header">
           <Row type="flex" justify="end">
-            <Col span={4}>
+            <Col span={6}>
                 <TagsFilter />
             </Col>
+            <Col span={14} />
             <Col span={4}>
               <Search
                 placeholder="search text"
