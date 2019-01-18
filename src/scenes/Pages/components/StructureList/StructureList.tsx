@@ -1,5 +1,13 @@
 import * as React from 'react';
-import { Button, Popconfirm, Table, Card } from 'antd';
+import { 
+  Button,
+  Popconfirm,
+  Table,
+  Card,
+  Row,
+  Col,
+  Input
+} from 'antd';
 import CreatePageModal from './components/CreatePageModal';
 import Actions from './components/Actions';
 import { Query } from 'react-apollo';
@@ -8,6 +16,7 @@ import { adopt } from 'react-adopt';
 import Tags from './../../../../components/Tags';
 
 const { Component } = React;
+const Search = Input.Search;
 
 export interface Page {
   id: string;
@@ -40,7 +49,9 @@ export interface State {
   modal: {
     visible: boolean;
     parentId: string | null;
+
   };
+  searchedText: string;
 }
 
 const PageList = adopt({
@@ -85,6 +96,7 @@ const PageList = adopt({
               parent: p.parent ? p.parent.id : null,
               name: null as string,
               url: null as string,
+              translations: p.translations
             };
             const translation = p.translations.find((t: LooseObject) => {
               if (t.language.id === language) {
@@ -121,6 +133,7 @@ class StructureList extends Component<Properties, State> {
       visible: false,
       parentId: null,
     },
+    searchedText: null,
   };
   private readonly COLUMNS = [
     { title: 'Name', dataIndex: 'name', key: 'name', width: 400,
@@ -258,6 +271,17 @@ class StructureList extends Component<Properties, State> {
   render() {
     return (
       <>
+        <div className="pages-filter-header">
+          <Row type="flex" justify="end">
+            <Col span={4}>
+              <Search
+                placeholder="search text"
+                onChange={({ target: { value: searchedText } }) => this.setState({ searchedText })}
+                onSearch={searchedText => this.setState({ searchedText })}
+              />
+            </Col>
+          </Row>
+        </div>
         <PageList>
           {({ fullWebsite, language, pages }: PageListObject) => {
             if (!pages || pages.length < 1) {
@@ -276,7 +300,7 @@ class StructureList extends Component<Properties, State> {
 
             // const keysToExpand = [] as string[];
             const urlPrefix = this.getUrlPrefix(fullWebsite, language);
-            const data: Array<TablePage> = this.pagesToTree(
+            const data: Array<TablePage> = !this.state.searchedText ? this.pagesToTree(
               pages.map((page: Page) => {
                 const res: TablePage = {
                   ...page,
@@ -284,8 +308,21 @@ class StructureList extends Component<Properties, State> {
                   urlPrefix,
                 };
                 return res;
-              })
-            );
+              })) :
+              pages.map((page: Page) => {
+                const res: TablePage = {
+                  ...page,
+                  key: page.id,
+                  urlPrefix,
+                };
+                return res;
+              }).filter(page => {
+                if (this.state.searchedText) {
+                  console.log('here');
+                  return JSON.stringify(page).toLowerCase().includes(this.state.searchedText.toLowerCase());
+                }
+                return true;
+              });
 
             return <Table columns={this.COLUMNS} dataSource={data} defaultExpandAllRows={true} />;
           }}

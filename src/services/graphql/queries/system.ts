@@ -129,6 +129,8 @@ export const PAGE_LIST = gql`
         }
         url
         name
+        status
+        content
       }
     }
   }
