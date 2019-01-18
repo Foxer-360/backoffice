@@ -132,6 +132,9 @@ export const PAGE_LIST = gql`
         status
         content
       }
+      tags {
+        id
+      }
     }
   }
 `;

@@ -1,4 +1,5 @@
 import { History } from 'history';
+import gql from 'graphql-tag';
 import { client, mutations, queries } from '@source/services/graphql';
 
 import { PageValidator } from './page';
@@ -60,6 +61,14 @@ const validator = ({ path, search, info }: ValidatorInfo, history: History): voi
     language = language.language;
   }
 
+  const SELECT_TAG_ID = gql`{
+    tag @client
+  }`;
+
+  const { tag } = client.cache.readQuery({
+    query: SELECT_TAG_ID
+  });
+
   let newSearch = search.replace('?', '');
   if (info.website) {
     if (info.website !== website) {
@@ -104,6 +113,25 @@ const validator = ({ path, search, info }: ValidatorInfo, history: History): voi
     }
     newSearch += '&language=' + language;
   }
+
+    // Process selected tag
+    if (info.tag) {
+      if (info.tag !== tag && info.tag !== 'null') {
+        // Select tag from url
+        client.cache.writeQuery({
+          query: SELECT_TAG_ID,
+          data: {
+            tag: info.tag
+          }
+        });
+      }
+    } else {
+      // Add language into search
+      if (newSearch.length > 1) {
+        newSearch += '&';
+      }
+      newSearch += 'tag=' + tag;
+    }
 
   // If search is different, than replace url
   if (search !== newSearch) {

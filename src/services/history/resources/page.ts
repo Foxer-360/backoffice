@@ -1,5 +1,6 @@
 import { History } from 'history';
 import { client, mutations, queries } from '@source/services/graphql';
+
 import { ValidatorInfo } from '.';
 
 const validator = ({ path, search, info }: ValidatorInfo, history: History): void => {

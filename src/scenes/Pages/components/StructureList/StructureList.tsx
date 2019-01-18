@@ -13,7 +13,9 @@ import Actions from './components/Actions';
 import { Query } from 'react-apollo';
 import { queries } from '@source/services/graphql';
 import { adopt } from 'react-adopt';
+import gql from 'graphql-tag';
 import Tags from './../../../../components/Tags';
+import TagsFilter from '@source/components/TagsFilter';
 
 const { Component } = React;
 const Search = Input.Search;
@@ -24,6 +26,7 @@ export interface Page {
   parent: string | null;
   type: string;
   url: string;
+  tags: Array<LooseObject>;
 }
 
 export interface TablePage {
@@ -36,6 +39,7 @@ export interface TablePage {
   urlPrefix?: string;
   fullUrl?: string;
   children?: Array<TablePage>;
+  tags: Array<LooseObject>;
 }
 
 export interface Properties {
@@ -96,7 +100,8 @@ const PageList = adopt({
               parent: p.parent ? p.parent.id : null,
               name: null as string,
               url: null as string,
-              translations: p.translations
+              translations: p.translations,
+              tags: p.tags,
             };
             const translation = p.translations.find((t: LooseObject) => {
               if (t.language.id === language) {
@@ -118,6 +123,17 @@ const PageList = adopt({
       </Query>
     );
   },
+  selectedTagId: ({ render }) => (
+    <Query 
+      query={gql`{
+        tag @client
+      }`}
+    >
+      {({ data }) => {
+        return render(data && data.tag);
+      }}
+    </Query>
+  ),
 });
 
 interface PageListObject {
@@ -125,6 +141,7 @@ interface PageListObject {
   language?: string;
   fullWebsite?: LooseObject;
   pages?: Array<Page>;
+  selectedTagId?: string;
 }
 
 class StructureList extends Component<Properties, State> {
@@ -274,6 +291,9 @@ class StructureList extends Component<Properties, State> {
         <div className="pages-filter-header">
           <Row type="flex" justify="end">
             <Col span={4}>
+                <TagsFilter />
+            </Col>
+            <Col span={4}>
               <Search
                 placeholder="search text"
                 onChange={({ target: { value: searchedText } }) => this.setState({ searchedText })}
@@ -283,7 +303,7 @@ class StructureList extends Component<Properties, State> {
           </Row>
         </div>
         <PageList>
-          {({ fullWebsite, language, pages }: PageListObject) => {
+          {({ fullWebsite, language, pages, selectedTagId }: PageListObject) => {
             if (!pages || pages.length < 1) {
               return (
                 <>
@@ -298,28 +318,24 @@ class StructureList extends Component<Properties, State> {
               );
             }
 
-            // const keysToExpand = [] as string[];
             const urlPrefix = this.getUrlPrefix(fullWebsite, language);
-            const data: Array<TablePage> = !this.state.searchedText ? this.pagesToTree(
-              pages.map((page: Page) => {
-                const res: TablePage = {
-                  ...page,
-                  key: page.id,
-                  urlPrefix,
-                };
-                return res;
-              })) :
-              pages.map((page: Page) => {
-                const res: TablePage = {
-                  ...page,
-                  key: page.id,
-                  urlPrefix,
-                };
-                return res;
-              }).filter(page => {
-                if (this.state.searchedText) {
-                  console.log('here');
-                  return JSON.stringify(page).toLowerCase().includes(this.state.searchedText.toLowerCase());
+            const pagesWithUrlPrefix = pages.map((page: Page) => {
+              const res: TablePage = {
+                ...page,
+                key: page.id,
+                urlPrefix,
+                tags: page.tags
+              };
+              return res;
+            });
+            const data: Array<TablePage> = (!this.state.searchedText && !selectedTagId) ? 
+              this.pagesToTree(pagesWithUrlPrefix) :
+              pagesWithUrlPrefix.filter(page => {
+                if (this.state.searchedText && !JSON.stringify(page).toLowerCase().includes(this.state.searchedText.toLowerCase())) {
+                  return false;
+                }
+                if (selectedTagId && !page.tags.some(({ id }) => selectedTagId === id)) {
+                  return false;
                 }
                 return true;
               });
