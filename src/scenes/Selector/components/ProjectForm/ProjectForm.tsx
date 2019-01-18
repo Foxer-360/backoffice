@@ -306,7 +306,7 @@ class ProjectForm extends Component<Properties, State> {
                   return (
                     <Select
                       style={{ width: '100%' }}
-                      onChange={val => this.handleSelectChange('defLang', val)}
+                      onChange={(val) => this.handleSelectChange('defLang', val as string[])}
                       value={[this.state.defLang]}
                       notFoundContent="Please select firstly some languages"  
                     >

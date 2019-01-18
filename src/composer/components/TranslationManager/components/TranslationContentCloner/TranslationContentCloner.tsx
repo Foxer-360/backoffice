@@ -1,10 +1,12 @@
 import * as React from 'react';
 import gql from 'graphql-tag';
-import { Query } from 'react-apollo';
+import { Query, Mutation } from 'react-apollo';
 import { adopt } from 'react-adopt';
-import { Row, Button, Modal } from 'antd';
+import { Row, Popover, Icon, Button, TreeSelect, Modal } from 'antd';
 import { ILooseObject } from '@foxer360/delta/lib/@types/@types';
+import { spawn } from 'child_process';
 
+const TreeNode = TreeSelect.TreeNode;
 const { Component } = React;
 
 const GET_CONTEXT = gql`
@@ -61,7 +63,7 @@ export interface Properties {
 }
 
 export interface State {
-  displayCopy: boolean;
+  editingMode: boolean;
 }
 
 class TranslationContentCloner extends Component<Properties, State> {
@@ -69,22 +71,23 @@ class TranslationContentCloner extends Component<Properties, State> {
     super(props);
 
     this.state = {
-      displayCopy: false,
+      editingMode: false
     };
   }
 
-  showModal = () => this.setState({ displayCopy: true, });
-  handleOk = (e) => this.setState({ displayCopy: false, });
-  handleCancel = (e) => this.setState({ displayCopy: false, });
+  showModal = () => this.setState({ editingMode: true, });	
+  handleOk = (e) => this.setState({ editingMode: false, });	
+  handleCancel = (e) => this.setState({ editingMode: false, });
 
   cloneTranslation = (sourceTranslationContent, targetTranslationId) => {
     const { resetPageContent } = this.props;
     
     resetPageContent(targetTranslationId, sourceTranslationContent);
-    this.setState({ displayCopy: false });
+    this.setState({ editingMode: false });
   }
 
   render() {
+    const { editingMode } = this.state;
 
     return (
       <ComposedQuery>
@@ -98,22 +101,22 @@ class TranslationContentCloner extends Component<Properties, State> {
             page: pageId
           }
         }) => {
-          if (loading) { return 'Loading...'; }
+          if (loading) { return 'Loading...'; } 
           if (error) { return 'Error...'; }
 
           const { pages } = data;
 
           return (
             <span style={{ float: 'right' }}>
-              <Button 
+              <Button
                 type={'default'}
                 icon={'copy'}
                 size={'small'}
                 onClick={this.showModal}
               />
               <Modal
-                title="Copy content to current page"
-                visible={this.state.displayCopy}
+                title={'Copy content to current page'}
+                visible={this.state.editingMode}
                 onOk={this.handleOk}
                 onCancel={this.handleCancel}
                 footer={null}
@@ -129,62 +132,81 @@ class TranslationContentCloner extends Component<Properties, State> {
   getPopOverContent = (pages, pageId, updatePageTranslation) => {
     const { language } = this.props;
     const currentPage = pages.find(p => p.id === pageId);
-    
+
     return (
       <div>
-        <Row type="flex" style={{ margin: '10px 0' }}>
-          {currentPage.translations && currentPage.translations.length > 1 && 
-            <strong>Copy content from current page:</strong> || ''
-          }
-        </Row>
+        {currentPage.translations && currentPage.translations.length > 1 &&
+          <Row type="flex" style={{ margin: '10px 0' }}>
+            <strong>Copy content from current page:</strong> 
+          </Row>
+        }
         <Row type="flex" style={{ margin: '0 0 10px' }}>
-          {currentPage && currentPage.translations
-            .filter((translation) => translation.language.code !== language.code)
-            .map((translation) => (
-              <div style={{ width: '100%' }}>
-                <Button
-                  block={true}
-                  size={'default'}
-                  type={'dashed'}
-                  onClick={() => 
-                    updatePageTranslation(
-                      translation.content, currentPage.translations
-                      .find((t) => t.language.code === language.code).id
-                    )}
-                >
-                  From {translation.language.englishName}
-                </Button>
-              </div>
-              )
+        {currentPage && currentPage.translations
+          .filter((translation) => translation.language.code !== language.code)
+          .map((translation, i) => (
+            <Button
+              key={i}
+              style={{ marginRight: 10 }} 
+              size={'small'}
+              type={'dashed'}
+              onClick={() => 
+                updatePageTranslation(
+                  translation.content, currentPage.translations
+                  .find((t) => t.language.code === language.code).id
+                )}
+            >
+             {translation.language.code}
+            </Button>
             )
-          }
+          )
+        }
         </Row>
         <Row type="flex" style={{ margin: '0 0 10px' }}>
-          <strong>Copy content from another page:</strong>
+          {pages && pages.length > 0  && <strong>Copy content from another page:</strong> || ''}
         </Row>
         <Row type="flex">
-
-          {pages && pages.length > 0 &&
-            <div>
-              {pages.filter(p => p.id !== pageId).map((p, i) => 
-                p.translations.map((t, j) => (
-                  <Button 
-                    key={j}
-                    block={true}
-                    type={'dashed'}
-                    size={'default'}
-                    style={{ marginBottom: 10 }}
-                    onClick={() => 
-                      updatePageTranslation(
-                        t.content, currentPage.translations
-                        .find((tr) => tr.language.code === language.code).id
-                    )}
-                  >
-                    {t.name} - <span style={{ color: '#1890ff' }}>{t.language.code}</span>
-                  </Button>
-                ))
-              )}
-            </div>
+          {pages && pages.length > 0  && (
+            <TreeSelect
+              showSearch={true}
+              size={'default'}
+              style={{ width: '100%', marginRight: 10 }}
+              dropdownStyle={{ maxHeight: 400, maxWidth: 300, overflow: 'auto' }}
+              placeholder="Click"
+              allowClear={true}
+              treeDefaultExpandAll={true}
+            >
+              {pages.filter(p => p.id !== pageId).map((p, i) => (
+                <TreeNode 
+                  selectable={false} 
+                  value={JSON.stringify(p.translations.map(t => t.name))} 
+                  title={`${p.translations[0].name}`} 
+                  key={p.id}
+                >
+                  {p.translations.map(t =>
+                    <TreeNode
+                      value={`${t.name}`}
+                      selectable={false}
+                      title={
+                        <span>
+                          copy <strong>{t.name}</strong> from: 
+                          <Button 
+                            type={'dashed'}
+                            size={'small'}
+                            style={{ marginLeft: 5 }}
+                            onClick={() => 
+                              updatePageTranslation(
+                                t.content, currentPage.translations.find((tr) => tr.language.code === language.code).id)}
+                          >
+                            {t.language.code}
+                          </Button>
+                        </span>
+                        } 
+                      key={t.id} 
+                    />
+                  )}
+                </TreeNode>))
+              }
+            </TreeSelect>)
           }
         </Row>
       </div>

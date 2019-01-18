@@ -39,8 +39,10 @@ class ImageEditor extends React.Component<IImageEditorProps, IImageEditorState> 
       fileList: [],
       image64: null,
       recommendedSizes: {
-        width: (this.props.image.recommendedSizes && this.props.image.recommendedSizes.width) || null,
-        height: (this.props.image.recommendedSizes && this.props.image.recommendedSizes.height) || null,
+        width:
+          (this.props.image && this.props.image.recommendedSizes && this.props.image.recommendedSizes.width) || null,
+        height:
+          (this.props.image && this.props.image.recommendedSizes && this.props.image.recommendedSizes.height) || null,
       },
     };
   }
@@ -174,7 +176,7 @@ class ImageEditor extends React.Component<IImageEditorProps, IImageEditorState> 
                       }
                     }
                   }}
-                  style={{ marginRight: '16px' }}   
+                  style={{ marginRight: '16px' }}
                 >
                   Place
                 </Button>

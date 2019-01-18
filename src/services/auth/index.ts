@@ -5,6 +5,7 @@ import { request } from 'graphql-request';
 const ID_TOKEN_KEY = 'id_token';
 const ACCESS_TOKEN_KEY = 'access_token';
 const USER_KEY = 'user';
+const IS_APPLICATION_LOGGING_OUT = 'loginout';
 
 const CLIENT_ID = process.env.REACT_APP_AUTH0_CLIENT_ID || 'C3APVkj7pSphv9x7qLZ7ib1eeyPO5lOh';
 const CLIENT_DOMAIN = process.env.REACT_APP_AUTH0_CLIENT_DOMAIN || 'nevim42.eu.auth0.com';
@@ -28,10 +29,15 @@ export function login() {
 
 // tslint:disable-next-line:no-any
 export function logout(callback?: () => any) {
+  localStorage.setItem(IS_APPLICATION_LOGGING_OUT, 'true');
   clearIdToken();
   clearAccessToken();
 
   // Usualy dispatch router action
+  window.location.href = 
+    `https://${process.env.REACT_APP_AUTH0_CLIENT_DOMAIN}/v2/logout?`
+    + `returnTo=${encodeURIComponent(process.env.REACT_APP_AUTH0_REDIRECT_LOGOUT)}`
+    + `&client_id=${process.env.REACT_APP_AUTH0_CLIENT_ID}`;
   if (callback) {
     callback();
   }
@@ -52,12 +58,12 @@ export function getAccessToken() {
   return localStorage.getItem(ACCESS_TOKEN_KEY);
 }
 
-function clearIdToken() {
-  localStorage.removeItem(ID_TOKEN_KEY);
+export function clearIdToken() {
+  return localStorage.removeItem(ID_TOKEN_KEY);
 }
 
-function clearAccessToken() {
-  localStorage.removeItem(ACCESS_TOKEN_KEY);
+export function clearAccessToken() {
+  return localStorage.removeItem(ACCESS_TOKEN_KEY);
 }
 
 // Helper function that will allow us to extract the access_token and id_token
@@ -82,25 +88,6 @@ export function setIdToken() {
   if (!idToken) {
     return;
   }
-
-  request(
-    process.env.REACT_APP_AUTHORIZATION_API_ADDRESS,
-    `
-    mutation authenticate($idToken: String!) {
-      authenticate(idToken: $idToken) {
-          id
-          name
-          email
-          avatar
-      }
-    }
-    `,
-    {
-      idToken
-    },
-  ).catch((e) => {
-    console.error(e);
-  });
   localStorage.setItem(ID_TOKEN_KEY, idToken);
 }
 
@@ -110,6 +97,15 @@ export function getError() {
 }
 
 export function isLoggedIn() {
+  /**
+   * In case that client logging out through logout endpoint say true, 
+   * to prevent application to asynchronously redirect us and let do the redirect the logout method
+   */
+
+  if (localStorage.getItem(IS_APPLICATION_LOGGING_OUT)) {
+    localStorage.removeItem(IS_APPLICATION_LOGGING_OUT);
+    return true;
+  }
   const idToken = getIdToken();
   return !!idToken && !isTokenExpired(idToken);
 }

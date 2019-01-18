@@ -2,11 +2,14 @@ import { ILooseObject } from '@source/composer/types';
 import { Icon, List } from 'antd';
 import * as React from 'react';
 
+import './style.scss';
+
 // tslint:disable:jsx-no-multiline-js
 // tslint:disable:jsx-no-lambda
 
 export interface IProperties {
   type: string;
+  projectName: string;
 
   dragStart: (data: ILooseObject) => void;
   dragEnd: () => void;
@@ -60,6 +63,9 @@ class Card extends React.Component<IProperties, IState> {
   }
 
   public render() {
+    {/* preferable image size: 412x250, format: jpg */}
+    let img = `/assets/${this.props.projectName}/images/screenshots/${this.props.type}.jpg`;
+
     return (
       <div
         draggable={true}
@@ -71,10 +77,14 @@ class Card extends React.Component<IProperties, IState> {
           avatar={<Icon type="credit-card" style={{ fontSize: 24, width: '100%' }} />}
           title={<span style={{ fontSize: '16px' }}>{this.props.type}</span>}
         />
+        <img 
+          src={img} 
+          className={'rolled-image'} 
+          onError={(e) => (e.target as HTMLInputElement).style.display = 'none'}
+        />
       </div>
     );
   }
-
 }
 
 export default Card;

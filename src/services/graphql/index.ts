@@ -12,6 +12,8 @@ import { mutations } from './mutations';
 import { subscriptions } from './subscriptions';
 import { OperationDefinitionNode } from 'graphql';
 import { setContext } from 'apollo-link-context';
+import { onError } from 'apollo-link-error';
+import { message } from 'antd';
 
 const cache = new InMemoryCache();
 
@@ -26,6 +28,21 @@ const wsLink = new WebSocketLink({
   uri: `ws://localhost:5001/subscriptions`,
   options: {
     reconnect: true
+  }
+});
+
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    graphQLErrors.map(({ message: errorMessage, locations, path }) => {
+      console.log(
+        `[GraphQL error]: Message: ${errorMessage}, Location: ${locations}, Path: ${path}`
+      );
+      message.warning(errorMessage, 10);
+
+    });
+  }
+  if (networkError) {
+    console.log(`[Network error]: ${networkError}`);
   }
 });
 
@@ -57,6 +74,7 @@ const authLink = setContext((_, { headers }) => {
 export const client = new ApolloClient({
   connectToDevTools: true,
   link: ApolloLink.from([
+    errorLink,
     stateLink,
     // new HttpLink({ uri: process.env.REACT_APP_GRAPHQL_SERVER }),
     authLink,
