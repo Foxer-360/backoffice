@@ -3,4 +3,5 @@ export const defaults = {
   website: null as string,
   language: null as string,
   page: null as string,
+  tag: null as string,
 };
