@@ -31,13 +31,17 @@ const parseSearch = (search: string): LooseObject => {
   const websiteRe = /website=([a-z0-9]+)/;
   const website = location.search.match(websiteRe);
 
+  const tagRe = /tag=([a-z0-9]+)/;
+  const tag = location.search.match(tagRe);
+
   const result = {
     language: null,
     page: null,
     project: null,
     website: null,
     languages: null,
-    navigations: null
+    navigations: null,
+    tag: null,
   } as LooseObject;
 
   if (language) {
@@ -51,6 +55,10 @@ const parseSearch = (search: string): LooseObject => {
   }
   if (website) {
     result.website = website[1];
+  }
+
+  if (tag) {
+    result.tag = tag[1];
   }
 
   return result;

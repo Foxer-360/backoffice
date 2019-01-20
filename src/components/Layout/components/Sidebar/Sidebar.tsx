@@ -1,8 +1,11 @@
 import * as React from 'react';
 import { Icon, Menu } from 'antd';
 import { Link } from 'react-router-dom';
+import gql from 'graphql-tag';
+import { client } from '@source/services/graphql';
 
 import './sidebar.scss';
+import TagsFilter from '@source/components/TagsFilter';
 
 const { Component } = React;
 const { Item } = Menu;
@@ -19,7 +22,12 @@ export interface Properties {
 
 export interface State {
   selectedKey: Array<string>;
+  openedKey: Array<string>;
 }
+
+const SELECT_TAG_ID = gql`{
+  tag @client
+}`;
 
 class Sidebar extends Component<Properties, State> {
 
@@ -27,12 +35,15 @@ class Sidebar extends Component<Properties, State> {
     super(props);
 
     this.state = {
-      selectedKey: ['home']
+      selectedKey: ['home'],
+      openedKey: []
     };
   }
 
-  getSelectedKeysFromPath(path: string) {
+  getSelectedKeysFromPath(path: string, search: string) {
     let key = '';
+
+    if (search.includes('tag')) { return ['tagged-pages']; }
 
     switch (path) {
       case '/page':
@@ -56,9 +67,14 @@ class Sidebar extends Component<Properties, State> {
     return [key];
   }
 
+  getOpenedKeys(search: string) {
+    return search.includes('tag') ? ['tagged-pages'] : [];
+  }
+
   componentDidMount() {
     this.setState({
-      selectedKey: this.getSelectedKeysFromPath(this.props.location.pathname)
+      selectedKey: this.getSelectedKeysFromPath(this.props.location.pathname, this.props.location.search),
+      openedKey: this.getOpenedKeys(this.props.location.search)
     });
   }
 
@@ -67,7 +83,8 @@ class Sidebar extends Component<Properties, State> {
       return;
     }
     this.setState({
-      selectedKey: this.getSelectedKeysFromPath(nextProps.location.pathname)
+      selectedKey: this.getSelectedKeysFromPath(nextProps.location.pathname, this.props.location.search),
+      openedKey: this.getOpenedKeys(this.props.location.search)
     });
   }
 
@@ -77,14 +94,26 @@ class Sidebar extends Component<Properties, State> {
         <div className={'sidebar-head'}>
           <h2>{this.props.collapsed && 'BO' || 'BackOffice'}</h2>
         </div>
-        <Menu theme="dark" mode="inline" selectedKeys={this.state.selectedKey}>
+        <Menu theme="dark" mode="inline" selectedKeys={this.state.selectedKey} openKeys={this.state.openedKey}>
           <Item key="home">
             <Icon type="home" />
             <Link to="/">Home</Link>
           </Item>
-          <Item key="pages">
+          <Item key="pages/pages?tag=null`">
             <Icon type="database" />
-            <Link to="/pages">Pages</Link>
+            <Link 
+              onClick={() => {
+                client.cache.writeQuery({
+                  query: SELECT_TAG_ID,
+                  data: {
+                    tag: null
+                  }
+                });
+              }} 
+              to="/pages"
+            >
+              Pages
+            </Link>
           </Item>
           <Item key="subscribers">
             <Icon type="usergroup-add" />
@@ -99,6 +128,7 @@ class Sidebar extends Component<Properties, State> {
             <Link to="/settings">Settings</Link>
           </Item>
         </Menu>
+        <TagsFilter filteredTags={true} />
       </>
     );
   }

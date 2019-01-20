@@ -49,7 +49,7 @@ const InformationGatherer = adopt({
         return render({
           loading,
           error,
-          data: data && data.project || null,
+          data: (data && data.project) || null,
         });
       }}
     </Query>);
@@ -113,7 +113,7 @@ const InformationGatherer = adopt({
         return render({
           loading,
           error,
-          data: data.page || null,
+          data: (data && data.page) || null,
         });
       }}
     </Query>);
@@ -218,7 +218,7 @@ const InformationGatherer = adopt({
           return render({
             loading,
             error,
-            data: data.navigations || null,
+            data: (data && data.navigations) || null,
           });
         }}
       </Query>);
