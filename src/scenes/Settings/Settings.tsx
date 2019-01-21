@@ -24,6 +24,9 @@ class Settings extends Component<{}, {}> {
           <Tabs.TabPane tab="Tags" key="4">
             <Tags />
           </Tabs.TabPane>
+          <Tabs.TabPane tab="Datasources" key="5">
+            <Tags />
+          </Tabs.TabPane>
         </Tabs>
       </div>
     );
