@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { Icon, List, Checkbox, Tag, Spin } from 'antd';
+import { Icon, List, Tag, Spin, Checkbox } from 'antd';
 import { dateFormatter } from '../../../utils';
 import history from '@source/services/history';
+import { client } from '@source/services/graphql';
+import gql from 'graphql-tag';
 
 interface Task {
   name: string;
@@ -48,13 +50,15 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
             dataSource={this.props.tasks}
             renderItem={(task: Task) => (
               <List.Item>
-                <div className={'dashBoard__card__task'}>
+                <div
+                  className={'dashBoard__card__task'}
+                  onClick={() => this.goToPage(task.pageTranslation.page)}
+                  style={{ cursor: 'pointer' }}
+                >
                   <div className={'dashBoard__card__task__main'}>
-                    {/* <Checkbox> */}
+                    <Checkbox>
                       <span style={{ fontSize: '17px' }}>{task.name}</span>
-                    {/* </Checkbox> */}
-
-                    {console.log('%c Emilio: ', 'background: #222; color: #bada55', task)}
+                    </Checkbox>
 
                     {task.updatedAt && (
                       <span className={'dueDate'}>
@@ -73,9 +77,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
                       <Icon type={'tag'} />
                       <span>
                         {task.pageTranslation && (
-                          <Tag color="geekblue" onClick={() => this.goToPage(task.pageTranslation.page)}>
-                            {task.pageTranslation && task.pageTranslation.name}
-                          </Tag>  
+                          <Tag color="geekblue">{task.pageTranslation && task.pageTranslation.name}</Tag>
                         )}
                         {/* <Tag color="blue">JS</Tag> */}
                         {/* <Tag color="cyan">CSS</Tag> */}

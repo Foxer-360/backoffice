@@ -20,7 +20,6 @@ const PAGE_TASK_LIST = gql`
         id
         name
         page {
-          id
           website {
             id
             defaultLanguage {
@@ -43,6 +42,21 @@ const PAGE_CHAT_LIST = gql`
         username
         avatar
         email
+      }
+      page {
+        id
+        translations {
+          language {
+            id
+          }
+          name
+        }
+        website {
+          id
+          defaultLanguage {
+            id
+          }
+        }
       }
     }
   }

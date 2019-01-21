@@ -9,7 +9,7 @@ import Tasks from './components/Tasks';
 import { TaskItem } from './components/Tasks/Tasks';
 import './style.css';
 import { takeLatest } from 'redux-saga/effects';
-import gql from 'graphql-tag';  
+import gql from 'graphql-tag';
 
 const { Component } = React;
 
@@ -64,21 +64,21 @@ export const CREATE_TASK = gql`
 `;
 
 export const UPDATE_TASK = gql`
-         mutation updateTask($id: ID!, $name: String!, $description: String!) {
-           updatePageTask(where: { id: $id }, data: { name: $name, description: $description }) {
-             id
-             name
-             description
-             done
-             updatedAt
-             user {
-               username
-               avatar
-               email
-             }
-           }
-         }
-       `;
+  mutation updateTask($id: ID!, $name: String!, $description: String!) {
+    updatePageTask(where: { id: $id }, data: { name: $name, description: $description }) {
+      id
+      name
+      description
+      done
+      updatedAt
+      user {
+        username
+        avatar
+        email
+      }
+    }
+  }
+`;
 
 export const TOGGLE_TASK_DONE = gql`
   mutation toggleTask($id: ID!, $done: Boolean!) {

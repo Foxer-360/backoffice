@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { List, Avatar, Spin } from 'antd';
-
+import { List, Avatar, Spin, Icon, Tag } from 'antd';
+import history from '@source/services/history';
 import moment from 'moment';
 
 export interface ChatListProps {
@@ -13,6 +13,7 @@ interface Chat {
   text: string;
   createdAt: string | Date;
   user?: LooseObject;
+  page?: LooseObject;
 }
 
 export interface ChatListState {}
@@ -22,6 +23,13 @@ class ChatList extends React.Component<ChatListProps, ChatListState> {
     super(props);
     this.state = {};
   }
+
+  goToPage = chat => {
+    history.push(
+      `/page?page=${chat.page.id}&website=${chat.page.website.id}&language=${chat.page.website.defaultLanguage.id}`
+    );
+  };
+
   render() {
     const { loading } = this.props;
     return (
@@ -43,7 +51,7 @@ class ChatList extends React.Component<ChatListProps, ChatListState> {
                   </div>
                 )}
 
-                <div className="chatBubble">
+                <div className="chatBubble" onClick={() => this.goToPage(chat)} style={{ cursor: 'pointer' }}>
                   {chat.user && chat.user.username && (
                     <span>
                       {chat.user.username} , {moment(chat.createdAt).format('h:mm A')}
@@ -52,6 +60,20 @@ class ChatList extends React.Component<ChatListProps, ChatListState> {
 
                   <div className="chatBubble__content">
                     <p>{chat.text}</p>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6px', width: '100%' }}>
+                    <Icon type={'tag'} style={{ color: '#c6c6c6', fontSize: '19px', marginRight: '6px' }} />
+                    <span>
+                      {chat.page && (
+                        <Tag color="geekblue">
+                          {
+                            chat.page.translations.find(t => t.language.id === chat.page.website.defaultLanguage.id)
+                              .name
+                          }
+                        </Tag>
+                      )}
+                    </span>
                   </div>
                 </div>
               </div>
