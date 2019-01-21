@@ -19,21 +19,35 @@ interface Chat {
 export interface ChatListState {}
 
 class ChatList extends React.Component<ChatListProps, ChatListState> {
+  // tslint:disable-next-line:no-any
+  private ChatList: any;
+
   constructor(props: ChatListProps) {
     super(props);
     this.state = {};
+    this.ChatList = React.createRef();
+  }
+
+  componentDidUpdate(prevProps: ChatListProps) {
+    if (prevProps.chats.length !== this.props.chats.length) {
+      this.ChatList.current.scrollTop = this.ChatList.current.scrollHeight + 100;
+    }
+  }
+
+  componentDidMount() {
+    this.ChatList.current.scrollTop = this.ChatList.current.scrollHeight + 100;
   }
 
   goToPage = chat => {
     history.push(
       `/page?page=${chat.page.id}&website=${chat.page.website.id}&language=${chat.page.website.defaultLanguage.id}`
     );
-  };
+  }
 
   render() {
     const { loading } = this.props;
     return (
-      <>
+      <div ref={this.ChatList}>
         {loading && (
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
             <Spin />
@@ -80,7 +94,7 @@ class ChatList extends React.Component<ChatListProps, ChatListState> {
             )}
           />
         )}
-      </>
+      </div>
     );
   }
 }

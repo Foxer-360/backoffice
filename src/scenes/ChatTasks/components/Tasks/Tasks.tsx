@@ -33,6 +33,7 @@ export interface TaskItem {
   done: boolean;
   updatedAt: Date;
   user?: LooseObject;
+  pageTranslation?: LooseObject;
 }
 
 const Title = (name: string, date: Date) => (
@@ -49,7 +50,7 @@ const ListRenderItem = (
 ) => (item: TaskItem) => (
   <List.Item style={{ borderBottom: '1px solid e8e8e8', borderTop: ' 1px solid e8e8e8' }}>
     {/* <List.Item.Meta title={Title(item.name, item.updatedAt)} description={item.description} />
-  */}
+     */}
 
     <List.Item>
       <div className={'dashBoard__card__task'}>
@@ -64,17 +65,12 @@ const ListRenderItem = (
         </div>
 
         <div className={'dashBoard__card__task__detail'}>
-          {item.user &&
-            item.user.name &&
-            <span style={{ color: '#c6c6c6' }}>By {item.user.name}</span>
-          }
+          {item.user && item.user.name && <span style={{ color: '#c6c6c6' }}>By {item.user.name}</span>}
 
           <div>
             <Icon type={'tag'} />
             <span>
-              <Tag color="geekblue">BUG</Tag>
-              <Tag color="blue">JS</Tag>
-              <Tag color="cyan">CSS</Tag>
+              {item.pageTranslation && <Tag color="geekblue">{item.pageTranslation && item.pageTranslation.name}</Tag>}
             </span>
           </div>
         </div>
@@ -89,7 +85,7 @@ const ListRenderItem = (
             style={{ marginRight: '8px' }}
             onClick={() => edit(item.id, { name: item.name, description: item.description })}
           />
-          
+
           <Popconfirm title="Are you sure to delete this task?" onConfirm={() => remove(item.id)}>
             <Button type="danger" size="small" icon="delete" />
           </Popconfirm>

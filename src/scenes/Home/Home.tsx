@@ -20,6 +20,7 @@ const PAGE_TASK_LIST = gql`
         id
         name
         page {
+          id
           website {
             id
             defaultLanguage {

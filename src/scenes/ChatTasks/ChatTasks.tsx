@@ -37,6 +37,19 @@ const PAGE_TASK_LIST = gql`
         avatar
         email
       }
+      pageTranslation {
+        id
+        name
+        page {
+          id
+          website {
+            id
+            defaultLanguage {
+              id
+            }
+          }
+        }
+      }
     }
   }
 `;
@@ -125,6 +138,7 @@ const PAGE_CHAT_LIST = gql`
         avatar
         email
       }
+  
     }
   }
 `;
