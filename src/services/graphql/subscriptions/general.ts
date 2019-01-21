@@ -15,7 +15,7 @@ export const PAGE_CHAT_SUBSCRIPTION = gql`
         text
         createdAt
         user {
-          name
+          username
           avatar
           email
         }
@@ -41,8 +41,8 @@ export const PAGE_TASK_SUBSCRIPTION = gql`
         done
         updatedAt
         user {
-          name
-          avatar
+          username
+          avatar  
           email
         }
       }
