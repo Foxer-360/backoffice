@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { RouterAction } from 'react-router-redux';
 
-import { setAccessToken, setIdToken, getError } from '../../services/auth';
+import { setSession, getError } from '../../services/auth';
 
 const { Component } = React;
 
@@ -23,7 +23,7 @@ class Callback extends Component<Properties, State> {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const err = getError();
     if (err) {
       // tslint:disable-next-line:no-console
@@ -34,8 +34,7 @@ class Callback extends Component<Properties, State> {
       });
       return;
     }
-    setAccessToken();
-    setIdToken();
+    await setSession();
 
     this.props.goHome();
   }
