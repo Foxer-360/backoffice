@@ -81,8 +81,6 @@ class ImageGallery extends React.Component<IImageGalleryProps, IImageGalleryStat
           visible={this.state.isDrawerVisible}
           destroyOnClose={true}
           width={500}
-          zIndex={1300}
-          style={{ position: 'relative' }}
         >
           <UploadImage closeEditor={() => this.closeDrawer()} onChange={this.props.placeImg}>
             <ImageEditor
