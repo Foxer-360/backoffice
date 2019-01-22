@@ -1,14 +1,14 @@
 import { ILooseObject } from '@source/composer/types';
 import { Col, Drawer, Input, Pagination, Row } from 'antd';
 import * as React from 'react';
-import Editor from '../Editor/Editor';
+import ImageEditor from '../ImageEditor/ImageEditor';
 import UploadImage from '../MutationComponents/UploadImage';
 import GalleryCard from './components/GalleryCard';
 
 // tslint:disable:jsx-no-multiline-js
 // tslint:disable:jsx-no-lambda
 
-export interface IGalleryProps {
+export interface IImageGalleryProps {
   images?: ILooseObject[];
   // tslint:disable:no-any
   placeImg?: any;
@@ -16,13 +16,13 @@ export interface IGalleryProps {
   name: string;
 }
 
-export interface IGalleryState {
+export interface IImageGalleryState {
   isDrawerVisible: boolean;
   selectedImage: object | null;
 }
 
-class Gallery extends React.Component<IGalleryProps, IGalleryState> {
-  constructor(props: IGalleryProps) {
+class ImageGallery extends React.Component<IImageGalleryProps, IImageGalleryState> {
+  constructor(props: IImageGalleryProps) {
     super(props);
     this.state = { isDrawerVisible: false, selectedImage: null };
   }
@@ -81,9 +81,11 @@ class Gallery extends React.Component<IGalleryProps, IGalleryState> {
           visible={this.state.isDrawerVisible}
           destroyOnClose={true}
           width={500}
+          zIndex={1300}
+          style={{ position: 'relative' }}
         >
           <UploadImage closeEditor={() => this.closeDrawer()} onChange={this.props.placeImg}>
-            <Editor
+            <ImageEditor
               name={this.props.name}
               image={this.state.selectedImage}
               onChange={media => {
@@ -99,4 +101,4 @@ class Gallery extends React.Component<IGalleryProps, IGalleryState> {
   }
 }
 
-export default Gallery;
+export default ImageGallery;
