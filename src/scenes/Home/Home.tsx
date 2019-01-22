@@ -1,68 +1,67 @@
 import * as React from 'react';
-import { Row, Col, Form, Input, Card, Icon, Button, List, Checkbox, Avatar, Tag } from 'antd';
+import { Row, Col, Card, Icon } from 'antd';
 import TaskList from '@source/components/Ui/TaskList';
 import ChatList from '@source/components/Ui/ChatList';
+import gql from 'graphql-tag';
+import { Query } from 'react-apollo';
 
-interface Chat {
-  contact: string;
-  lastMessage: string;
-}
-
-const tasks = [
-  'Prototype',
-  'Test Framework',
-  'Call Client',
-  'Build CSS',
-  'Replace Text',
-  'Add Componets',
-  'Fix Mailing',
-  'Prototype',
-  'Test Framework',
-  'Call Client',
-  'Build CSS',
-  'Replace Text',
-  'Add Componets',
-  'Fix Mailing'
-];
-
-const chats = [
-  {
-    contact: 'John Doe',
-    lastMessage: 'Hey, How are you!?'
-  },
-  {
-    contact: 'Zachariah Tadeo',
-    lastMessage: 'Did you send the new PDF for the design?'
-  },
-  {
-    contact: 'Denny Lafleur',
-    lastMessage: 'Want to grab coffee after work?'
-  },
-  {
-    contact: 'John Doe',
-    lastMessage: 'Hey, How are you!?'
-  },
-  {
-    contact: 'Zachariah Tadeo',
-    lastMessage: 'Did you send the new PDF for the design?'
-  },
-  {
-    contact: 'Denny Lafleur',
-    lastMessage: 'Want to grab coffee after work?'
-  },
-  {
-    contact: 'John Doe',
-    lastMessage: 'Hey, How are you!?'
-  },
-  {
-    contact: 'Zachariah Tadeo',
-    lastMessage: 'Did you send the new PDF for the design?'
-  },
-  {
-    contact: 'Denny Lafleur',
-    lastMessage: 'Want to grab coffee after work?'
+const PAGE_TASK_LIST = gql`
+  query getPageTaskList {
+    pageTasks(orderBy: updatedAt_DESC) {
+      id
+      name
+      description
+      done
+      updatedAt
+      user {
+        username
+      }
+      pageTranslation {
+        id
+        name
+        page {
+          id
+          website {
+            id
+            defaultLanguage {
+              id
+            }
+          }
+        }
+      }
+    }
   }
-];
+`;
+
+const PAGE_CHAT_LIST = gql`
+  query getPageChatList {
+    pageChats(orderBy: createdAt_DESC) {
+      id
+      text
+      createdAt
+      user {
+        username
+        avatar
+        email
+      }
+      page {
+        id
+        translations {
+          language {
+            id
+          }
+          name
+        }
+        website {
+          id
+          defaultLanguage {
+            id
+          }
+        }
+      }
+    }
+  }
+`;
 
 const Home = () => (
   <div className={'dashBoard'}>
@@ -75,7 +74,7 @@ const Home = () => (
           <span
             style={{
               color: '#000000a6',
-              fontSize: '16px'
+              fontSize: '16px',
             }}
           >
             Here is all the info from when you let last time.
@@ -93,20 +92,23 @@ const Home = () => (
               style={{
                 color: '#1890FF',
                 fontSize: '25px',
-                marginRight: '12px'
+                marginRight: '12px',
               }}
             />
             Recent Tasks
           </h3>
 
           <div className={'dashBoard__card__cont'}>
-            <TaskList tasks={tasks} />
-          </div>
-
-          <div className={'dashBoard__card__btn'}>
-            <Button type="primary" icon="plus">
-              Add New Task
-            </Button>
+            <Query query={PAGE_TASK_LIST}>
+              {({ loading, data, error, subscribeToMore, refetch }) => {
+                return (
+                  <TaskList
+                    tasks={data && data.pageTasks && data.pageTasks.filter(task => !task.done)}
+                    loading={loading}
+                  />
+                );
+              }}
+            </Query>
           </div>
         </Card>
       </Col>
@@ -119,20 +121,18 @@ const Home = () => (
               style={{
                 color: '#1890FF',
                 fontSize: '25px',
-                marginRight: '12px'
+                marginRight: '12px',
               }}
             />
             Recent Chats
           </h3>
 
           <div className={'dashBoard__card__cont'}>
-            {/* <ChatList chats={chats}/> */}
-          </div>
-
-          <div className={'dashBoard__card__btn'}>
-            <Button type="primary" icon="message">
-              New Chat
-            </Button>
+            <Query query={PAGE_CHAT_LIST}>
+              {({ loading, data, error, subscribeToMore, refetch }) => {
+                return <ChatList chats={data && data.pageChats && data.pageChats.slice(0, 15)} loading={loading} />;
+              }}
+            </Query>
           </div>
         </Card>
       </Col>

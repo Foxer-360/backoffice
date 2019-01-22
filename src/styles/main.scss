@@ -164,7 +164,7 @@ body {
   &Item {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 12px;
+    // margin-bottom: 12px;
     padding: 10px;
     align-items: center;
 
@@ -242,7 +242,7 @@ body {
     }
 
     &:hover {
-      transform: translateY(-5px);
+      // transform: translateY(-5px);
     }
 
     span {

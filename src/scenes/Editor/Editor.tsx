@@ -1,24 +1,22 @@
-import {
-  Composer,
-  Context,
-  IEditorInfo,
-  ILockInfo,
-} from '@source/composer';
+import { Composer, Context, IEditorInfo, ILockInfo } from '@source/composer';
 import { connect, StandardResponse } from '@source/services/socket';
 import ChatTasks from '@source/scenes/ChatTasks';
 import { ComponentsModule, PluginsModule } from '@source/services/modules';
 import history from '@source/services/history';
-import { client } from '@source/services/graphql';
+import { Query } from 'react-apollo';
 import { Alert, Card, Spin } from 'antd';
 import * as React from 'react';
-
+import gql from 'graphql-tag';
+import { client } from '@source/services/graphql';
 const socket = connect();
 
-export interface ILooseObject { // tslint:disable-line:interface-name
+export interface ILooseObject {
+  // tslint:disable-line:interface-name
   [key: string]: any; // tslint:disable-line:no-any
 }
 
-export interface IProperties { // tslint:disable-line:interface-name
+export interface IProperties {
+  // tslint:disable-line:interface-name
   projectId: string;
   project: ILooseObject;
   websiteId: string;
@@ -32,7 +30,8 @@ export interface IProperties { // tslint:disable-line:interface-name
   pageTranslation: ILooseObject;
 }
 
-export interface IState { // tslint:disable-line:interface-name
+export interface IState {
+  // tslint:disable-line:interface-name
   editors: IEditorInfo[];
   locks: ILockInfo[];
   loading: boolean; // Flag if all necessary async data are loaded
@@ -46,7 +45,6 @@ export interface IState { // tslint:disable-line:interface-name
 }
 
 class Editor extends React.Component<IProperties, IState> {
-
   private composer: Composer;
 
   constructor(props: IProperties) {
@@ -120,15 +118,15 @@ class Editor extends React.Component<IProperties, IState> {
   public handlePageContentReseted(payload: ILooseObject): void {
     const { delta, content } = payload;
     this.setState({ delta, content }, async () => {
-      await this.composer.setContent((this.state.content as any)); // tslint:disable-line:no-any
-      await this.composer.importDelta((this.state.delta as any)); // tslint:disable-line:no-any
+      await this.composer.setContent(this.state.content as any); // tslint:disable-line:no-any
+      await this.composer.importDelta(this.state.delta as any); // tslint:disable-line:no-any
     });
   }
 
   public resetPageContent(id: String, content: LooseObject): void {
     socket.emit('composer/reset-page-content', {
       pageId: id,
-      content
+      content,
     });
   }
 
@@ -186,8 +184,8 @@ class Editor extends React.Component<IProperties, IState> {
         <ChatTasks
           page={this.props.pageId}
           pageTranslation={this.props.pageTranslationId}
-          taskAndChatHidden={this.state.taskAndChatHidden}
           handleToggleDisplayTaskAndChat={this.handleToggleDisplayTaskAndChat}
+          taskAndChatHidden={this.state.taskAndChatHidden}
         />
       </>
     );
@@ -225,8 +223,8 @@ class Editor extends React.Component<IProperties, IState> {
 
     await this.composer.resetContent();
     await this.composer.resetPlugins();
-    await this.composer.setContent((this.state.content as any)); // tslint:disable-line:no-any
-    await this.composer.importDelta((this.state.delta as any)); // tslint:disable-line:no-any
+    await this.composer.setContent(this.state.content as any); // tslint:disable-line:no-any
+    await this.composer.importDelta(this.state.delta as any); // tslint:disable-line:no-any
     await this.composer.setName(this.props.pageTranslation.name);
   }
 
@@ -280,7 +278,7 @@ class Editor extends React.Component<IProperties, IState> {
       .map((o: ILooseObject) => {
         return {
           id: o.component,
-          editorId: o.client
+          editorId: o.client,
         };
       })
       .filter((o: ILooseObject) => {
@@ -314,9 +312,11 @@ class Editor extends React.Component<IProperties, IState> {
    */
   private startEditPage(): void {
     // Stop edit page (just for sure) and then start edit
-    socket.emit('composer/stop-edit-page', {
-      pageId: this.props.pageTranslationId,
-    }).once('composer/stop-edit-page', this.handleStopEditPageBeforeStart);
+    socket
+      .emit('composer/stop-edit-page', {
+        pageId: this.props.pageTranslationId,
+      })
+      .once('composer/stop-edit-page', this.handleStopEditPageBeforeStart);
   }
 
   /**
@@ -335,9 +335,11 @@ class Editor extends React.Component<IProperties, IState> {
     }
 
     // Ask server for permission to edit page
-    socket.emit('composer/start-edit-page', {
-      pageId: this.props.pageTranslationId,
-    }).once('composer/start-edit-page', this.handleStartEditPage);
+    socket
+      .emit('composer/start-edit-page', {
+        pageId: this.props.pageTranslationId,
+      })
+      .once('composer/start-edit-page', this.handleStartEditPage);
   }
 
   /**
@@ -355,9 +357,11 @@ class Editor extends React.Component<IProperties, IState> {
     }
 
     // Ask server for page informations
-    socket.emit('composer/get-page', {
-      pageId: this.props.pageTranslationId,
-    }).once('composer/get-page', this.handleGetPage);
+    socket
+      .emit('composer/get-page', {
+        pageId: this.props.pageTranslationId,
+      })
+      .once('composer/get-page', this.handleGetPage);
   }
 
   /**
@@ -386,17 +390,20 @@ class Editor extends React.Component<IProperties, IState> {
       }
     }, this);
 
-    this.setState({
-      editors: page.editors,
-      locks,
-      loading: false,
-      failed: false,
+    this.setState(
+      {
+        editors: page.editors,
+        locks,
+        loading: false,
+        failed: false,
 
-      content: page.content,
-      delta: page.delta,
-    }, () => {
-      this.initComposer();
-    });
+        content: page.content,
+        delta: page.delta,
+      },
+      () => {
+        this.initComposer();
+      }
+    );
   }
 
   /**
@@ -419,11 +426,25 @@ class Editor extends React.Component<IProperties, IState> {
    * @return {void}
    */
   private handleToggleDisplayTaskAndChat(): void {
-    this.setState((state: IState) => {
-      return {
-        taskAndChatHidden: !state.taskAndChatHidden,
-      };
-    });
+    this.setState(
+      (state: IState) => {
+        return {
+          taskAndChatHidden: !state.taskAndChatHidden,
+        };
+      },
+      () => {
+        client.cache.writeQuery({
+          query: gql`
+            query {
+              openChatAndTasks
+            }
+          `,
+          data: {
+            openChatAndTasks: this.state.taskAndChatHidden,
+          },
+        });
+      }
+    );
   }
 
   /**
@@ -446,16 +467,18 @@ class Editor extends React.Component<IProperties, IState> {
    */
   private activatorStartEditComponent(id: number): Promise<boolean> {
     return new Promise(resolve => {
-      socket.emit('composer/start-edit-component', {
-        pageId: this.props.pageTranslationId,
-        componentId: id
-      }).once('composer/start-edit-component', (response: StandardResponse) => {
-        if (response.status !== 'success') {
-          return resolve(false);
-        }
+      socket
+        .emit('composer/start-edit-component', {
+          pageId: this.props.pageTranslationId,
+          componentId: id,
+        })
+        .once('composer/start-edit-component', (response: StandardResponse) => {
+          if (response.status !== 'success') {
+            return resolve(false);
+          }
 
-        resolve(true);
-      });
+          resolve(true);
+        });
     });
   }
 
@@ -469,16 +492,18 @@ class Editor extends React.Component<IProperties, IState> {
    */
   private activatorStopEditComponent(id: number): Promise<boolean> {
     return new Promise(resolve => {
-      socket.emit('composer/stop-edit-component', {
-        pageId: this.props.pageTranslationId,
-        componentId: id
-      }).once('composer/stop-edit-component', (response: StandardResponse) => {
-        if (response.status !== 'success') {
-          return resolve(false);
-        }
+      socket
+        .emit('composer/stop-edit-component', {
+          pageId: this.props.pageTranslationId,
+          componentId: id,
+        })
+        .once('composer/stop-edit-component', (response: StandardResponse) => {
+          if (response.status !== 'success') {
+            return resolve(false);
+          }
 
-        resolve(true);
-      });
+          resolve(true);
+        });
     });
   }
 
@@ -492,24 +517,25 @@ class Editor extends React.Component<IProperties, IState> {
    */
   private activatorCommit(data: ILooseObject): Promise<boolean> {
     return new Promise(resolve => {
-      socket.emit('composer/commit', {
-        pageId: this.props.pageTranslationId,
-        data,
-      }).once('composer/commit', (response: StandardResponse) => {
-        if (response.status !== 'success') {
-          return resolve(false);
-        }
+      socket
+        .emit('composer/commit', {
+          pageId: this.props.pageTranslationId,
+          data,
+        })
+        .once('composer/commit', (response: StandardResponse) => {
+          if (response.status !== 'success') {
+            return resolve(false);
+          }
 
-        // Check for updates from server
-        if (response.payload.updates && response.payload.updates.length > 0) {
-          this.composer.update(response.payload.updates);
-        }
+          // Check for updates from server
+          if (response.payload.updates && response.payload.updates.length > 0) {
+            this.composer.update(response.payload.updates);
+          }
 
-        resolve(true);
-      });
+          resolve(true);
+        });
     });
   }
-
 }
 
 export default Editor;
