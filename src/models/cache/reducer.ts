@@ -26,11 +26,11 @@ const reducer = (state = initState, action: ReduxAction) => {
         ...state,
         [payload.name]: {
           name: payload.name,
-          update: new Date(),
+          update: new Date,
           valid: true,
 
-          data: payload.data,
-        },
+          data: payload.data
+        }
       };
     case types.APPEND_DATA_WITH_ID:
       const ids = state[payload.name].data.map((item: LooseObject) => item.id);
@@ -61,22 +61,25 @@ const reducer = (state = initState, action: ReduxAction) => {
       if (state[payload.name]) {
         dataObject = {
           ...state[payload.name],
-          update: new Date(),
-          data: [...state[payload.name].data, payload.item],
+          update: new Date,
+          data: [
+            ...state[payload.name].data,
+            payload.item
+          ]
         };
       } else {
         // If data object doesnt exist, create new
         dataObject = {
           name: payload.name,
-          update: new Date(),
+          update: new Date,
           valid: true,
-          data: [payload.item],
+          data: [payload.item]
         };
       }
 
       return {
         ...state,
-        [payload.name]: dataObject,
+        [payload.name]: dataObject
       };
     case types.EDIT_ITEM:
       // No data, create empty data object and mark as invalid
@@ -85,12 +88,12 @@ const reducer = (state = initState, action: ReduxAction) => {
           name: payload.name,
           update: new Date(),
           valid: false,
-          data: [],
+          data: []
         };
 
         return {
           ...state,
-          [payload.name]: dataObject,
+          [payload.name]: dataObject
         };
       }
 
@@ -100,7 +103,7 @@ const reducer = (state = initState, action: ReduxAction) => {
           if (item.id === payload.id) {
             return {
               ...item,
-              ...payload.item,
+              ...payload.item
             };
           }
 
@@ -109,13 +112,13 @@ const reducer = (state = initState, action: ReduxAction) => {
 
         dataObject = {
           ...state[payload.name],
-          data: state[payload.name].data.map(mapFce),
+          data: state[payload.name].data.map(mapFce)
         };
       }
 
       return {
         ...state,
-        [payload.name]: dataObject,
+        [payload.name]: dataObject
       };
     case types.REMOVE_ITEM:
       // Nothing to remove
@@ -135,13 +138,13 @@ const reducer = (state = initState, action: ReduxAction) => {
 
         dataObject = {
           ...state[payload.name],
-          data: state[payload.name].data.filter(filterFce),
+          data: state[payload.name].data.filter(filterFce)
         };
       }
 
       return {
         ...state,
-        [payload.name]: dataObject,
+        [payload.name]: dataObject
       };
     default:
       return state;

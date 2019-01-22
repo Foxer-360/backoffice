@@ -1,12 +1,12 @@
 import { ILooseObject } from '@source/composer/types';
 import { getImgUrl } from '@source/composer/utils';
-import { Button, Col, Icon, Row, Spin, Upload, Input } from 'antd';
+import { Button, Col, Icon, Row, Spin, Upload } from 'antd';
 import * as React from 'react';
 
 // tslint:disable:jsx-no-multiline-js
 // tslint:disable:jsx-no-lambda
 
-export interface IImageEditorProps {
+export interface IEditorProps {
   // tslint:disable:no-any
   image?: any;
   uploadImage?: (fileList: ILooseObject, mediaData?: ILooseObject) => void;
@@ -16,7 +16,7 @@ export interface IImageEditorProps {
   name: string;
 }
 
-export interface IImageEditorState {
+export interface IEditorState {
   // tslint:disable:no-any
   fileList: any;
   image64: any;
@@ -28,8 +28,8 @@ function getBase64(img: any, callback: any) {
   reader.readAsDataURL(img);
 }
 
-class ImageEditor extends React.Component<IImageEditorProps, IImageEditorState> {
-  constructor(props: IImageEditorProps) {
+class Editor extends React.Component<IEditorProps, IEditorState> {
+  constructor(props: IEditorProps) {
     super(props);
     this.state = {
       fileList: [],
@@ -47,7 +47,7 @@ class ImageEditor extends React.Component<IImageEditorProps, IImageEditorState> 
   // tslint:disable:no-any
   public getImageInfo = (image: any) => {
     const mb = parseInt(image.size, 0) / 1048576;
-    return `${400} x ${400}` + ' - ' + mb.toFixed(4) + 'Mb ';
+    return '400 x 400' + ' - ' + mb.toFixed(4) + 'Mb ';
   }
 
   public render() {
@@ -87,7 +87,6 @@ class ImageEditor extends React.Component<IImageEditorProps, IImageEditorState> 
             <Spin />
           </div>
         )}
-
         {!this.props.loading && (
           <>
             <Row>
@@ -108,7 +107,6 @@ class ImageEditor extends React.Component<IImageEditorProps, IImageEditorState> 
                 </p>
               </Col>
             </Row>
-
             <hr className={'hSep'} />
 
             <Row>
@@ -118,16 +116,11 @@ class ImageEditor extends React.Component<IImageEditorProps, IImageEditorState> 
                   onClick={() => {
                     if (imageBase64) {
                       if (this.props.uploadImage) {
-                        this.props.uploadImage(this.state.fileList, {
-                          type: 'image',
-                        });
+                        this.props.uploadImage(this.state.fileList, image);
                       }
                     } else {
                       if (this.props.onChange) {
-                        this.props.onChange({
-                          name: this.props.name,
-                          value: { ...image, type: 'image' },
-                        });
+                        this.props.onChange({ value: image, name: this.props.name });
                       }
                     }
                   }}
@@ -155,4 +148,4 @@ class ImageEditor extends React.Component<IImageEditorProps, IImageEditorState> 
   }
 }
 
-export default ImageEditor;
+export default Editor;

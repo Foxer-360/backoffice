@@ -52,7 +52,7 @@ class UploadImage extends React.Component<IUploadImageProps, IUploadImageState> 
 
         if (response.data.createFile) {
           notification.success({
-            description: 'Image uploaded successfully',
+            description: 'Image uploaded succesfuly',
             message: 'Success',
           });
         } else {

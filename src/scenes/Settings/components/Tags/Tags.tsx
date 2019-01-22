@@ -207,6 +207,7 @@ class Tags extends Component<Properties, State> {
 
             const COLUMNS = [{
               title: 'Name',
+              dataIndex: 'name',
               key: 'name',
               width: '30%',
             }, {

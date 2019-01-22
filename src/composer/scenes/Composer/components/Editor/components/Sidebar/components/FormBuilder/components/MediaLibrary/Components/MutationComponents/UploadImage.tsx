@@ -49,16 +49,16 @@ class UploadImage extends React.Component<IUploadImageProps, IUploadImageState> 
       .then(response => {
         this.setState({ loading: false });
         const file = response.data.createFile ? response.data.createFile : response.data.file;
-        const image = { value: { ...file, ...mediaData }, name: 'image' };
+        const image = { ...mediaData, value: file, name: 'image' };
 
         if (response.data.createFile) {
           notification.success({
-            description: 'Image Uploaded Successfully',
+            description: 'Image uploaded succesfuly',
             message: 'Success',
           });
         } else {
           notification.success({
-            description: 'Image Updated',
+            description: 'Image updated',
             message: 'Success',
           });
         }
