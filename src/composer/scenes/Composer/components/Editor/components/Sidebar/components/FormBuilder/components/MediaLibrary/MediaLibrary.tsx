@@ -103,7 +103,7 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
 
         <Row gutter={6} style={{ display: 'flex', justifyContent: 'left', padding: '0 3px' }}>
           <Button onClick={() => this.showDrawer('editor')} style={{ marginRight: '16px', minWidth: '105px' }}>
-            <Icon type={'upload'} /> Upload
+            <Icon type={'upload'} /> Add
           </Button>
           <Button
             type="primary"

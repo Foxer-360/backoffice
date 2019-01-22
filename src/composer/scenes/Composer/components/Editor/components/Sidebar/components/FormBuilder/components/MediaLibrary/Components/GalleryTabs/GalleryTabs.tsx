@@ -27,7 +27,7 @@ export default class GalleryTabs extends React.Component<GalleryTabsProps, Galle
     this.setState({
       activeTab: tabIndex,
     });
-  }   
+  }
 
   public render() {
     return (
@@ -41,11 +41,6 @@ export default class GalleryTabs extends React.Component<GalleryTabsProps, Galle
           <AllImagesQuery>
             <ImageGallery placeImg={this.props.placeMedia} image={this.props.media} name={this.props.name} />
           </AllImagesQuery>
-        </Tabs.TabPane>
-
-        <Tabs.TabPane tab="Videos" key="1">
-          {/* <VideoGallery placeVideo={} video={} name={}/> */}
-          Videos
         </Tabs.TabPane>
       </Tabs>
     );
