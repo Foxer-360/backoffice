@@ -92,8 +92,9 @@ const PageList = adopt({
             return render([]);
           }
 
+          if (error) { return 'Error...'; }
           // Transform data into language depend
-          const pages = data.pages.map((p: LooseObject) => {
+          const pages = data && data.pages && data.pages.map((p: LooseObject) => {
             const model = {
               id: p.id,
               type: p.type.name,
@@ -247,7 +248,7 @@ class StructureList extends Component<Properties, State> {
   }
 
   resolveFullUrls(node: TablePage, parentUrl: string | null) {
-    node.fullUrl = parentUrl ? `${parentUrl}/${node.url}` : `${node.url.length > 0 ? `/${node.url}` : ``}`;
+    node.fullUrl = parentUrl ? `${parentUrl}/${node.url}` : `${node.url && node.url.length > 0 ? `/${node.url}` : ``}`;
 
     if (node.children === null || node.children === undefined) {
       return;

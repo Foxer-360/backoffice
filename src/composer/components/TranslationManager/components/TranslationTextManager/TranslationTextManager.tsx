@@ -14,9 +14,9 @@ const UPDATE_PAGE_TRANSLATION = gql`
     updatePageTranslation(data: { name: $name, url: $url, description: $description }, where: { id: $id }) {
       id
       name
+      content
       url
       description
-      content
       language {
         id
         code
@@ -67,7 +67,12 @@ const ComposedQuery = adopt({
     <Mutation
       mutation={UPDATE_PAGE_TRANSLATION}
       update={(cache, { data: { updatePageTranslationName } }) => {
-        const { page } = cache.readQuery({ query: GET_PAGE });
+        const { page } = cache.readQuery({ 
+          query: GET_PAGE,
+          variables: {
+            pageId
+          } 
+        });
 
         const updatedPage = { 
           ...page, 
