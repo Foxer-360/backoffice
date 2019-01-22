@@ -32,7 +32,7 @@ class Users extends React.Component<IProperties, {}> {
           }
 
           let hasOwnIcon = false;
-          if (e.userInfo.picture && e.userInfo.picture.length > 0) {
+          if (e.userInfo && e.userInfo.picture && e.userInfo.picture.length > 0) {
             hasOwnIcon = true;
           }
 

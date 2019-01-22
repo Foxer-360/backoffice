@@ -40,7 +40,6 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
 
   // tslint:disable-next-line:no-any
   public handleChange(e: React.ChangeEvent | any) {
-
     const newData = {
       ...this.props.data,
       [(e.target as HTMLInputElement).name]: (e.target as HTMLInputElement).value,
@@ -49,7 +48,9 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
   }
 
   public mediaLibraryChange(media: { value: object; name: string }) {
-    const newData = { ...this.props.data, [media.name]: media.value };
+    const value = { ...this.props.data[media.name], ...media.value };
+    const newData = { ...this.props.data, [media.name]: value };
+
     this.props.onChange(newData);
   }
 
