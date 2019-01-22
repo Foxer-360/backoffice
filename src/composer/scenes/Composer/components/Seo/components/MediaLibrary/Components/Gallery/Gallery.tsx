@@ -40,7 +40,7 @@ class Gallery extends React.Component<IGalleryProps, IGalleryState> {
 
   public onClose = () => {
     this.setState({ isDrawerVisible: false });
-  }
+  }  
 
   public render() {
     return (
@@ -58,7 +58,7 @@ class Gallery extends React.Component<IGalleryProps, IGalleryState> {
             <div className={'mediaLibrary__gallery__row'}>
               {this.props.images &&
                 this.props.images.map((item, index) => (
-                  <GalleryCard key={index} toggleEdit={this.showDrawer} placeImg={this.props.placeImg} image={item} />
+                  <GalleryCard key={index} toggleEdit={this.showDrawer}image={item} />
                 ))}
             </div>
           </Col>
