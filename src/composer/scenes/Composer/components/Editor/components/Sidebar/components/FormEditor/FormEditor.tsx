@@ -46,10 +46,10 @@ class FormEditor extends React.Component<IProperties, {}> {
             onChange={this.onChange}
           />
           :
-          <Form
-            data={this.props.data}
-            onChange={this.onChange}
-          />
+          <div>
+            <Icon style={{ marginRight: 10 }} type="stop" />
+            This form is not editable!
+          </div>
         }
 
         <hr
