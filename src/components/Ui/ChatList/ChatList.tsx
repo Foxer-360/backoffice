@@ -44,7 +44,7 @@ class ChatList extends React.Component<ChatListProps, ChatListState> {
     history.push(
       `/page?page=${chat.page.id}&website=${chat.page.website.id}&language=${chat.page.website.defaultLanguage.id}`
     );
-  };
+  }
 
   render() {
     const { loading } = this.props;
