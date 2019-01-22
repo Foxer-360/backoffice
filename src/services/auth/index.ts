@@ -162,7 +162,6 @@ async function renew() {
                     logout();
                 } else {
                     setSession(authResult, false);
-                    // redirect to dashboard
                 }
             }
         );
