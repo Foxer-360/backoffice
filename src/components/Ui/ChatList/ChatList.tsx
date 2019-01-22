@@ -29,8 +29,10 @@ class ChatList extends React.Component<ChatListProps, ChatListState> {
   }
 
   componentDidUpdate(prevProps: ChatListProps) {
-    if (prevProps.chats.length !== this.props.chats.length) {
-      this.ChatList.current.scrollTop = this.ChatList.current.scrollHeight + 100;
+    if (prevProps.chats) {
+      if (prevProps.chats.length !== this.props.chats.length) {
+        this.ChatList.current.scrollTop = this.ChatList.current.scrollHeight + 100;
+      }
     }
   }
 
@@ -42,7 +44,7 @@ class ChatList extends React.Component<ChatListProps, ChatListState> {
     history.push(
       `/page?page=${chat.page.id}&website=${chat.page.website.id}&language=${chat.page.website.defaultLanguage.id}`
     );
-  }
+  };
 
   render() {
     const { loading } = this.props;
