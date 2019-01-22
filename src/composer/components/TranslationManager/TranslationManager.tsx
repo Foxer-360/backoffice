@@ -24,10 +24,12 @@ const GET_PAGE = gql`
   query page($pageId: ID!, $languageCode: String ){
     page(where: { id: $pageId }) {
       id
+      parent {
+        id
+      }   
       type {
         id
         name
-        __typename
       }
       tags {
         id
@@ -36,9 +38,10 @@ const GET_PAGE = gql`
       }
       translations(where: {language: {code: $languageCode}}) {
         id
-        name
-        content
         url
+        name
+        status
+        content
         description
         language {
           id
@@ -46,7 +49,6 @@ const GET_PAGE = gql`
           name
           englishName
         }
-        __typename
       }
       __typename
     }
@@ -61,12 +63,9 @@ class TranslationManager extends Component<Properties, State> {
     return (
         <Query query={GET_PAGE} variables={{ pageId, languageCode: language.code }} >
           {({ data, loading, error }) => {
-
             if (loading) { return 'Loading...'; }
             if (error) { return 'Error...'; }
-
             const { page: { translations : { 0: translation }}} = data;
-
             return (
             <span>{translation.name} 
               <TranslationContentCloner

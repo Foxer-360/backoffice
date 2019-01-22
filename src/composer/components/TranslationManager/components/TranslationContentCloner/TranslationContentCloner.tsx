@@ -5,6 +5,7 @@ import { adopt } from 'react-adopt';
 import { Row, Popover, Icon, Button, TreeSelect, Modal } from 'antd';
 import { ILooseObject } from '@foxer360/delta/lib/@types/@types';
 import { spawn } from 'child_process';
+import { queries } from '@source/services/graphql';
 
 const TreeNode = TreeSelect.TreeNode;
 const { Component } = React;
@@ -12,40 +13,8 @@ const { Component } = React;
 const GET_CONTEXT = gql`
 {
   page @client
+  website @client
 }
-`;
-
-const GET_PAGES = gql`
-  query pages{
-    pages {
-      id
-      type {
-        id
-        name
-        __typename
-      }
-      tags {
-        id
-        name
-        __typename
-      }
-      translations {
-        id
-        name
-        content
-        url
-        description
-        language {
-          id
-          code
-          name
-          englishName
-        }
-        __typename
-      }
-      __typename
-    }
-  }
 `;
 
 const ComposedQuery = adopt({
@@ -54,7 +23,14 @@ const ComposedQuery = adopt({
       {({ data }) => render(data)}
     </Query>
   ),
-  pagesData: ({ render }) => <Query query={GET_PAGES}>{page => render(page)}</Query>
+  pagesData: ({ render, getContext: { website } }) => { 
+
+    if (!website) {
+      return render({ loading: true });
+    }
+    
+    return <Query query={queries.PAGE_LIST} variables={{ website }}>{page => render(page)}</Query>;
+  }
 });
 
 export interface Properties {
@@ -87,7 +63,6 @@ class TranslationContentCloner extends Component<Properties, State> {
   }
 
   render() {
-    const { editingMode } = this.state;
 
     return (
       <ComposedQuery>

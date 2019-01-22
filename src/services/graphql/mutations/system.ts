@@ -179,12 +179,22 @@ export const CREATE_PAGE = gql`
       }
       translations {
         id
+        url
+        name
+        status
+        content
+        description
         language {
           id
           code
+          name
+          englishName
         }
-        url
+      }
+      tags {
+        id
         name
+        __typename
       }
     }
   }
