@@ -72,11 +72,17 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
           <div
             className={'ant-upload ant-upload-select ant-upload-select-picture-card'}
             onClick={() => this.showDrawer('editor')}
-            style={{ margin: '32px auto', width: '100%', maxWidth: '250px' }}
+            style={{ margin: '0px auto 6px', width: '100%', maxWidth: '250px' }}
           >
             <span className={'ant-upload'}>
               <img style={{ width: '100%' }} src={getImgUrl(mediaData)} alt="file" />
             </span>
+          </div>
+        )}
+
+        {mediaData && mediaData.recommendedSizes && (
+          <div style={{ color: '#bfbfbf', fontStyle: 'italic', textAlign: 'center', width: '100%' }}>
+            {`Recommended Sizes: ${mediaData.recommendedSizes.width}px X ${mediaData.recommendedSizes.height}px`}
           </div>
         )}
 

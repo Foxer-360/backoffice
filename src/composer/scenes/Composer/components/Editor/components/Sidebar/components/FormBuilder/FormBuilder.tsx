@@ -48,12 +48,13 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
   }
 
   public mediaLibraryChange(media: { value: object; name: string }) {
-    const newData = { ...this.props.data, [media.name]: media.value };
+    const value = { ...this.props.data[media.name], ...media.value };
+    const newData = { ...this.props.data, [media.name]: value };
+
     this.props.onChange(newData);
   }
 
   public renderElements(schema: IFormSchema, pass?: number): JSX.Element[] | null {
-
     if (schema && schema.properties) {
       return Object.keys(schema.properties).map((elementName: string, index: number) => {
         const element = schema.properties[elementName];
@@ -81,7 +82,7 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
 
           default:
             return (
-              <InputRenderer   
+              <InputRenderer
                 id={pass ? index + pass : index}
                 key={index}
                 name={elementName}

@@ -32,7 +32,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     this.getNextIdValue = this.getNextIdValue.bind(this);
     this.onChangeTab = this.onChangeTab.bind(this);
     this.state = {
-      loading: true
+      loading: true,
     };
   }
 
@@ -40,7 +40,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     let highestIdValue = '0';
 
     this.props.data.forEach(item => {
-      if (item.id && parseInt(item.id, 10) > parseInt(highestIdValue, 10) ) {
+      if (item.id && parseInt(item.id, 10) > parseInt(highestIdValue, 10)) {
         highestIdValue = item.id;
       }
     });
@@ -55,8 +55,8 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     // if no, then recalculate and send onChange
     if (this.props.data && this.props.data.length > 0) {
       const newData = this.props.data.map((item, key) => {
-        if (item && !item.id) { 
-          item.id = this.getNextIdValue(); 
+        if (item && !item.id) {
+          item.id = this.getNextIdValue();
         }
         return item;
       });
@@ -70,7 +70,6 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     } else {
       this.setState({ loading: false });
     }
-
   }
 
   public onChangeTab(key: string) {
@@ -128,7 +127,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
   // tslint:disable-next-line:no-any
   public onChange(key: any) {
     let rowIndex = this.props.data.findIndex((row: ILooseObject) => row.id === this.props.activeTab);
-    
+
     if (rowIndex < 0) {
       rowIndex = 0;
     }
@@ -152,7 +151,9 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     }
 
     const newData = [...this.props.data];
-    newData[rowIndex][media.name] = media.value;
+    const value = { ...this.props.data[rowIndex][media.name], ...media.value };
+
+    newData[rowIndex][media.name] = value;
 
     this.props.onChange({
       target: {
@@ -164,7 +165,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
 
   public render() {
     if (this.state.loading) {
-      return (<Card loading={true} />);
+      return <Card loading={true} />;
     }
     return (
       <Section title={this.props.title}>
@@ -178,21 +179,24 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
               let title = null;
               if (this.props.items.properties) {
                 const properties: LooseObject = this.props.items.properties;
-                title = 
-                  (
-                    properties.title &&
-                    properties.title.type === 'string' &&
-                    dataRow.title
-                  ) || `Item ${index}`;
+                title = (properties.title && properties.title.type === 'string' && dataRow.title) || `Item ${index}`;
               }
 
               const panelTitle = (
                 <>
-                  <div onClick={e => { e.stopPropagation(); }}>
+                  <div
+                    onClick={e => {
+                      e.stopPropagation();
+                    }}
+                  >
                     {title || 'new item'}
 
-                    <div style={{position: 'absolute', top: '30%', right: '35px' }}>
-                      <Icon onClick={() => this.onEditTab(index.toString(), 'up')} type="arrow-up" style={{ marginRight: '5px' }} />
+                    <div style={{ position: 'absolute', top: '30%', right: '35px' }}>
+                      <Icon
+                        onClick={() => this.onEditTab(index.toString(), 'up')}
+                        type="arrow-up"
+                        style={{ marginRight: '5px' }}
+                      />
                       <Icon onClick={() => this.onEditTab(index.toString(), 'down')} type="arrow-down" />
                     </div>
 
@@ -221,29 +225,29 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                       const element = this.props.items.properties[elementName];
 
                       return (
-                          <InputRenderer
-                            key={`${dataRow.id}_${j}`}
-                            id={`${dataRow.id}_${j}`}
-                            name={elementName}
-                            {...element}
-                            value={dataRow[elementName]}
-                            onChange={this.onChange}
-                            mediaLibraryChange={this.mediaLibraryChange}
-                          />
+                        <InputRenderer
+                          key={`${dataRow.id}_${j}`}
+                          id={`${dataRow.id}_${j}`}
+                          name={elementName}
+                          {...element}
+                          value={dataRow[elementName]}
+                          onChange={this.onChange}
+                          mediaLibraryChange={this.mediaLibraryChange}
+                        />
                       );
                     })}
                 </Collapse.Panel>
               );
             })}
-            <div key={'new-collapse'} className={'ant-collapse-item'} style={{ backgroundColor: 'white' }}>
-              <a 
-                className={'ant-collapse-header'} 
-                onClick={() => this.onNewTab()} 
-                style={{ display: 'block', padding: '10px 0', textAlign: 'center', color: '#1890ff' }}
-              >
-                Add new item
-              </a>
-            </div>
+          <div key={'new-collapse'} className={'ant-collapse-item'} style={{ backgroundColor: 'white' }}>
+            <a
+              className={'ant-collapse-header'}
+              onClick={() => this.onNewTab()}
+              style={{ display: 'block', padding: '10px 0', textAlign: 'center', color: '#1890ff' }}
+            >
+              Add new item
+            </a>
+          </div>
         </Collapse>
       </Section>
     );

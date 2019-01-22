@@ -20,10 +20,6 @@ export interface IImageEditorState {
   // tslint:disable:no-any
   fileList: any;
   image64: any;
-  recommendedSizes: {
-    width: string;
-    height: string;
-  };
 }
 
 function getBase64(img: any, callback: any) {
@@ -38,12 +34,6 @@ class ImageEditor extends React.Component<IImageEditorProps, IImageEditorState> 
     this.state = {
       fileList: [],
       image64: null,
-      recommendedSizes: {
-        width:
-          (this.props.image && this.props.image.recommendedSizes && this.props.image.recommendedSizes.width) || null,
-        height:
-          (this.props.image && this.props.image.recommendedSizes && this.props.image.recommendedSizes.height) || null,
-      },
     };
   }
 
@@ -51,25 +41,13 @@ class ImageEditor extends React.Component<IImageEditorProps, IImageEditorState> 
     this.setState({
       fileList: null,
       image64: null,
-      recommendedSizes: {
-        width: null,
-        height: null,
-      },
     });
   }
 
   // tslint:disable:no-any
   public getImageInfo = (image: any) => {
     const mb = parseInt(image.size, 0) / 1048576;
-    return (
-      `${this.state.recommendedSizes.width} x ${this.state.recommendedSizes.height}` + ' - ' + mb.toFixed(4) + 'Mb '
-    );
-  }
-
-  public handleSizeChange = (value: string, type: string) => {
-    this.setState({
-      recommendedSizes: { ...this.state.recommendedSizes, [type]: value },
-    });
+    return `${400} x ${400}` + ' - ' + mb.toFixed(4) + 'Mb ';
   }
 
   public render() {
@@ -133,28 +111,6 @@ class ImageEditor extends React.Component<IImageEditorProps, IImageEditorState> 
 
             <hr className={'hSep'} />
 
-            <Row justify={'space-between'} type={'flex'} style={{ marginBottom: ' 24px' }}>
-              <Col span={11}>
-                <div>
-                  <label>Recommended Max Width:</label>
-                  <Input
-                    defaultValue={this.state.recommendedSizes.width}
-                    onChange={e => this.handleSizeChange(e.target.value, 'width')}
-                  />
-                </div>
-              </Col>
-
-              <Col span={11}>
-                <div>
-                  <label>Recommend Max Height:</label>
-                  <Input
-                    defaultValue={this.state.recommendedSizes.height}
-                    onChange={e => this.handleSizeChange(e.target.value, 'height')}
-                  />
-                </div>
-              </Col>
-            </Row>
-
             <Row>
               <Col span={24}>
                 <Button
@@ -163,15 +119,14 @@ class ImageEditor extends React.Component<IImageEditorProps, IImageEditorState> 
                     if (imageBase64) {
                       if (this.props.uploadImage) {
                         this.props.uploadImage(this.state.fileList, {
-                          recommendedSizes: { ...this.state.recommendedSizes },
                           type: 'image',
                         });
                       }
                     } else {
                       if (this.props.onChange) {
                         this.props.onChange({
-                          value: { ...image, recommendedSizes: { ...this.state.recommendedSizes }, type: 'image' },
                           name: this.props.name,
+                          value: { ...image, type: 'image' },
                         });
                       }
                     }
