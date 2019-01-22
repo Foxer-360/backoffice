@@ -5,10 +5,73 @@ import { adopt } from 'react-adopt';
 import { message, Button, Table } from 'antd';
 import DatasourceModal from './components/DatasourceModal';
 import Actions from './components/Actions';
+import gql from 'graphql-tag';
 
 const { Component } = React;
 
-import { Datasource, QueryVariables, DatasourceWithJoin } from './interfaces';
+import { Datasource } from './interfaces';
+
+const DATASOURCE_LIST = gql`
+  query {
+    datasources {
+      id
+      type
+      schema
+      displayInNavigation
+    }
+  }
+`;
+
+const CREATE_DATASOURCE = gql`
+  mutation createDatasource(
+    $type: String
+    $schema: Json
+    $displayInNavigation: Boolean
+  ) {
+    createDatasource(data: { 
+      type: $type,
+      schema: $schema,
+      displayInNavigation: $displayInNavigation
+    }) {
+      id
+      type
+      schema
+      displayInNavigation
+    }
+  }
+`;
+
+const UPDATE_DATASOURCE = gql`
+  mutation updateDatasource(
+    $type: string
+    $schema: Json
+    $displayInNavigation: Boolean
+    $id: ID!
+  ) {
+    updateDatasource(data: {
+      type: $type
+      schema: $schema
+      displayInNavigation: $displayInNavigation
+      
+    },
+    where: {
+      id: $id
+    }) {
+      id
+      type
+      schema
+      displayInNavigation
+    }
+  }
+`;
+
+const DELETE_DATASOURCE = gql`
+  mutation deleteDatsource($id: ID!) {
+    deleteDatasource(where: {  id: $id }) {
+      id
+    }
+  }
+`;
 
 const DatasourceQM = adopt({
   website: ({ render }) => (
@@ -31,7 +94,7 @@ const DatasourceQM = adopt({
     }
 
     return (
-      <Query query={queries.DATASOURCE_LIST} variables={{ website }}>
+      <Query query={DATASOURCE_LIST} variables={{ website }}>
         {({ loading, data, error }) => {
           if (loading || error) {
             return render([]);
@@ -40,10 +103,9 @@ const DatasourceQM = adopt({
           const datasources: Datasource[] = data.datasources.map((datasource: Datasource) => {
             const model = {
               id: datasource.id,
-              name: datasource.name,
-              displayInNavigation: datasource.displayInNavigation,
-              plugins: datasource.plugins,
-              color: datasource.color
+              type: datasource.type,
+              schema: datasource.schema,
+              displayInNavigation: datasource.displayInNavigation
             };
             return model;
           });
@@ -55,14 +117,14 @@ const DatasourceQM = adopt({
   },
   createDatasource: ({ website, render}) => (
     <Mutation
-      mutation={mutations.CREATE_DATASOURCE}
+      mutation={CREATE_DATASOURCE}
       update={(cache, { data: { createDatasource } }) => {
         const { datasources } = cache.readQuery({
-          query: queries.DATASOURCE_LIST,
+          query: DATASOURCE_LIST,
           variables: { website }
         });
         cache.writeQuery({
-          query: queries.DATASOURCE_LIST,
+          query: DATASOURCE_LIST,
           variables: { website },
           data: { datasources: datasources.concat([createDatasource]) }
         });
@@ -79,14 +141,14 @@ const DatasourceQM = adopt({
   ),
   deleteDatasource: ({ render, website }) => (
     <Mutation
-      mutation={mutations.DELETE_DATASOURCE}
+      mutation={DELETE_DATASOURCE}
       update={(cache, { data: { deleteDatasource } }) => {
         const { datasources } = cache.readQuery({
-          query: queries.DATASOURCE_LIST,
+          query: DATASOURCE_LIST,
           variables: { website }
         });
         cache.writeQuery({
-          query: queries.DATASOURCE_LIST,
+          query: DATASOURCE_LIST,
           variables: { website },
           data: { datasources: datasources.filter((datasource: Datasource) => datasource.id !== deleteDatasource.id) }
         });
@@ -97,14 +159,14 @@ const DatasourceQM = adopt({
   ),
   updateDatasource: ({ website, render }) => (
     <Mutation
-      mutation={mutations.UPDATE_DATASOURCE}
+      mutation={UPDATE_DATASOURCE}
       update={(cache, { data: { updateDatasource } }) => {
         const { datasources } = cache.readQuery({
-          query: queries.DATASOURCE_LIST,
+          query: DATASOURCE_LIST,
           variables: { website }
         });
         cache.writeQuery({
-          query: queries.DATASOURCE_LIST,
+          query: DATASOURCE_LIST,
           variables: { website },
           data: {
             datasources: datasources.map((datasource: Datasource) => {
@@ -132,10 +194,9 @@ interface Properties {
 }
 
 interface State {
-  name: string;
+  type: string;
   displayInNavigation: boolean;
-  color: string;
-  plugins: string[];
+  schema: string;
   id: string;
   edit: boolean;
   showModal: boolean;
@@ -160,11 +221,10 @@ interface QaMForModalVars {
 class Datasources extends Component<Properties, State> {
 
   private readonly DEFAULT: State = {
-    name: null,
-    displayInNavigation: false,
-    color: '#FFFF',
-    plugins: [],
     id: null,
+    type: '',
+    displayInNavigation: false,
+    schema: '',
     edit: false,
     showModal: false,
   };
@@ -181,10 +241,9 @@ class Datasources extends Component<Properties, State> {
   showEditModal(id: string, datasource: Datasource): void {
     this.setState({
       id,
-      name: datasource.name,
+      type: datasource.type,
       displayInNavigation: datasource.displayInNavigation,
-      color: datasource.color,
-      plugins: datasource.plugins,
+      schema: datasource.schema,
       edit: true,
       showModal: true
     });
@@ -251,13 +310,12 @@ class Datasources extends Component<Properties, State> {
                     plugins: this.state.plugins,
                     color: this.state.color,
                   }}
-                  onSave={async (name: string, displayInNavigation: boolean, color: string, plugins: string[]) => {
+                  onSave={async (type: string, displayInNavigation: boolean, schema: string) => {
                     this.setState({ showModal: false });
                     const data = {
-                      name,
+                      type,
                       displayInNavigation,
-                      color,
-                      plugins
+                      schema
                     };
 
                     if (this.state.edit) {

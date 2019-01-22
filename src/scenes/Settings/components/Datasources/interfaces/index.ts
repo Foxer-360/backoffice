@@ -10,6 +10,13 @@ export interface Tag {
   plugins: string[];
 }
 
+export interface Datasource {
+  id: string;
+  type: string;
+  schema: LooseObject;
+  displayInNavigation: boolean;
+}
+
 export interface TagName {
   name: string;
   displayInNavigation: boolean;
