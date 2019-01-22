@@ -151,7 +151,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     }
 
     const newData = [...this.props.data];
-    const value = { ...this.props.data[rowIndex][media.name], ...media.value };
+    const value = { recommendedSizes: this.props.data[rowIndex][media.name].recommendedSizes, ...media.value };
 
     newData[rowIndex][media.name] = value;
 
