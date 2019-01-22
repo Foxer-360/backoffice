@@ -27,7 +27,7 @@ export default class GalleryTabs extends React.Component<GalleryTabsProps, Galle
     this.setState({
       activeTab: tabIndex,
     });
-  };
+  }
 
   public render() {
     return (
