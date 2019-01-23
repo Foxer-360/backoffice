@@ -11,6 +11,7 @@ import Inquiries from '@source/scenes/Inquiries';
 import Pages from '@source/scenes/Pages';
 import Settings from '@source/scenes/Settings';
 import Home from '@source/scenes/Home';
+import DatasourceDetail from '@source/scenes/Settings/components/Datasources/components/DatasourceDetail';
 
 const { Component } = React;
 const { Sider } = AntdLayout;
@@ -67,6 +68,7 @@ class Layout extends Component<Properties, State> {
             <Route path="/settings" render={Wrapped(Settings)} />
             <Route path="/subscribers" render={Wrapped(Subscribers)} />
             <Route path="/inquiries" render={Wrapped(Inquiries)} />
+            <Route path="/datasource/:id" render={Wrapped(DatasourceDetail)} />
             <Route path="/" exact={true} render={Wrapped(Home, true)} />
           </Switch>
           <Footer />

@@ -13,8 +13,9 @@ export interface Tag {
 export interface Datasource {
   id: string;
   type: string;
-  schema: LooseObject;
+  schema: string;
   displayInNavigation: boolean;
+  slug: string;
 }
 
 export interface TagName {

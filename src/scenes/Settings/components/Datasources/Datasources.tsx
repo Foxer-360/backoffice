@@ -3,7 +3,7 @@ import { Query, Mutation } from 'react-apollo';
 import { queries, mutations } from '@source/services/graphql';
 import { adopt } from 'react-adopt';
 import { message, Button, Table } from 'antd';
-import DatasourceModal from './components/DatasourceModal';
+import DatasourceDetail from './components/DatasourceDetail';
 import Actions from './components/Actions';
 import gql from 'graphql-tag';
 
@@ -276,14 +276,8 @@ class Datasources extends Component<Properties, State> {
               render: (record: Datasource) => (
                 <span>{record.displayInNavigation ? 'Yes' : 'No'}</span>
               )
-            }, {
-              title: 'Color',
-              key: 'color',
-              width: '12%',
-              render: (record: Datasource) => (
-                <span style={{ color: record.color}}>{record.color}</span>
-              )
-            }, {
+            },
+            {
               title: 'Actions',
               key: 'actions',
               render: (record: Datasource) => (
@@ -301,21 +295,20 @@ class Datasources extends Component<Properties, State> {
             return (
               <>
                 <Table columns={COLUMNS} dataSource={tableData} />
-                <DatasourceModal
+                <DatasourceDetail
                   visible={this.state.showModal}
                   edit={this.state.edit}
                   data={{
-                    name: this.state.name,
+                    type: this.state.type,
                     displayInNavigation: this.state.displayInNavigation,
-                    plugins: this.state.plugins,
-                    color: this.state.color,
+                    schema: this.state.schema,
                   }}
                   onSave={async (type: string, displayInNavigation: boolean, schema: string) => {
                     this.setState({ showModal: false });
                     const data = {
                       type,
                       displayInNavigation,
-                      schema
+                      schema,
                     };
 
                     if (this.state.edit) {

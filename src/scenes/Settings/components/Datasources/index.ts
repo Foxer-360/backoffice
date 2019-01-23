@@ -1,3 +1,3 @@
-import Tags from './Tags';
+import Datasources from './Datasources';
 
-export default Tags;
+export default Datasources;

@@ -3,6 +3,7 @@ import { Tabs } from 'antd';
 import PageTypes from './components/PageTypes';
 import Navigations from './components/Navigations';
 import Tags from './components/Tags';
+import Datasources from './components/Datasources';
 
 const { Component } = React;
 
@@ -25,7 +26,7 @@ class Settings extends Component<{}, {}> {
             <Tags />
           </Tabs.TabPane>
           <Tabs.TabPane tab="Datasources" key="5">
-            <Tags />
+            <Datasources />
           </Tabs.TabPane>
         </Tabs>
       </div>
