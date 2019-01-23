@@ -72,6 +72,19 @@ export const CREATE_TASK = gql`
         avatar
         email
       }
+      pageTranslation {
+        id
+        name
+        page {
+          id
+          website {
+            id
+            defaultLanguage {
+              id
+            }
+          }
+        }
+      }
     }
   }
 `;
@@ -89,6 +102,19 @@ export const UPDATE_TASK = gql`
         avatar
         email
       }
+      pageTranslation {
+        id
+        name
+        page {
+          id
+          website {
+            id
+            defaultLanguage {
+              id
+            }
+          }
+        }
+      }
     }
   }
 `;
@@ -105,6 +131,19 @@ export const TOGGLE_TASK_DONE = gql`
         username
         avatar
         email
+      }
+      pageTranslation {
+        id
+        name
+        page {
+          id
+          website {
+            id
+            defaultLanguage {
+              id
+            }
+          }
+        }
       }
     }
   }
