@@ -8,6 +8,7 @@ import metaSchema from './meta-schema.json';
 import gql from 'graphql-tag';
 import { client } from '@source/services/graphql';
 import { throwServerError } from 'apollo-link-http-common';
+import { push } from 'react-router-redux';
 
 const ajv = new Ajv();
 const validate = ajv.compile(metaSchema);
@@ -24,7 +25,7 @@ interface Properties {
 
 interface State {
   type: string;
-  schema?: string;
+  schema: LooseObject;
   displayInNavigation: boolean;
   slug: string;
   errors: LooseObject;
@@ -47,11 +48,23 @@ mutation createDatasource($type: String!, $schema: Json!, $displayInNavigation: 
 }
 `;
 
+const DATASOURCE_LIST = gql`
+  query {
+    datasources {
+      id
+      type
+      schema
+      displayInNavigation
+      slug
+    }
+  }
+`;
+
 class DatasourceModal extends Component<Properties, State> {
 
   private DEFAULT: State = {
     type: '',
-    schema: '',
+    schema: {},
     displayInNavigation: false,
     slug: '',
     errors:  null
@@ -139,13 +152,6 @@ class DatasourceModal extends Component<Properties, State> {
               <span>Schema:</span><br/>
               <JSONInput
                 id={'schema'}
-                placeholder={{
-                  'type': 'object',
-                  'properties': {
-                    'example_field': { 'type': 'string' }
-                  },
-                  'required': [ 'example_field' ]
-                }}
                 modifyErrorText={(e) => {
                   console.log(e);
 
@@ -234,6 +240,22 @@ class DatasourceModal extends Component<Properties, State> {
         schema: this.state.schema,
         displayInNavigation: this.state.displayInNavigation,
         slug: this.state.slug
+      },
+      update: (cache, { data: { createDatasource } }: LooseObject) => {
+        console.log('query');
+        const { datasources } = cache.readQuery({ query: DATASOURCE_LIST }); 
+        console.log(datasources);
+        cache.writeQuery({
+          query: DATASOURCE_LIST,
+          data: {
+            datasources: [
+              ...datasources,
+              createDatasource
+            ]
+          }
+        });
+        push('/settings');
+
       }
     })
     .then(() => {

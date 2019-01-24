@@ -11,7 +11,6 @@ const style = { marginLeft: 6 };
 
 const Actions = ({id, edit, remove}: Properties) => (
   <>
-    <Button size="small" style={style} onClick={() => edit(id)}>Edit</Button>
     <Popconfirm
       title="Are you sure, you want to remove this tag ?"
       onConfirm={() => remove(id)}

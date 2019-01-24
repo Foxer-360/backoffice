@@ -12,6 +12,7 @@ import Pages from '@source/scenes/Pages';
 import Settings from '@source/scenes/Settings';
 import Home from '@source/scenes/Home';
 import DatasourceDetail from '@source/scenes/Settings/components/Datasources/components/DatasourceDetail';
+import DatasourceItem from '@source/scenes/Settings/components/Datasources/components/DatasourceItem';
 
 const { Component } = React;
 const { Sider } = AntdLayout;
@@ -21,7 +22,8 @@ export interface Properties {
 }
 
 // tslint:disable-next-line:no-any
-const Wrapped = (Comp: any, withoutBackground?: boolean): any => {
+const Wrapped = (Comp: any, withoutBackground?: boolean, ...rest): any => {
+  console.log(rest);
   if (!withoutBackground) {
     return () => (
       <Content color="white">
@@ -69,6 +71,7 @@ class Layout extends Component<Properties, State> {
             <Route path="/subscribers" render={Wrapped(Subscribers)} />
             <Route path="/inquiries" render={Wrapped(Inquiries)} />
             <Route path="/datasource/:id" render={Wrapped(DatasourceDetail)} />
+            <Route path="/datasource-item/:id" render={Wrapped(DatasourceItem)} />
             <Route path="/" exact={true} render={Wrapped(Home, true)} />
           </Switch>
           <Footer />
