@@ -279,3 +279,7 @@ body {
   margin: 0px 0px 7px 0px;
   padding: 7px;
 }
+
+#bootstrap {
+  @import "./bootstrap/css/bootstrap.css";
+}

@@ -6,6 +6,8 @@ import { Button, Table } from 'antd';
 import Actions from './components/Actions';
 import gql from 'graphql-tag';
 import { Link } from 'react-router-dom';
+import { withRouter } from 'react-router';
+import { RouteComponentProps } from 'react-router';
 
 const { Component } = React;
 
@@ -92,7 +94,7 @@ const DatasourceQM = adopt({
   ),
 });
 
-interface Properties {
+interface Properties extends RouteComponentProps<LooseObject> {
 }
 
 interface State {
@@ -128,7 +130,7 @@ class Datasources extends Component<Properties, State> {
   }
 
   render(): React.ReactNode {
-
+    const { history: { push } } = this.props;
     return (
       <>
         <Button
@@ -143,9 +145,9 @@ class Datasources extends Component<Properties, State> {
 
             const COLUMNS = [{
               title: 'Name',
-              dataIndex: 'type',
               key: 'type',
-              width: '30%',
+              dataIndex: 'type',
+              width: '30%'
             }, {
               title: 'Display in Navigation',
               key: 'displayInNavigation',
@@ -160,7 +162,7 @@ class Datasources extends Component<Properties, State> {
               render: (record: Datasource) => (
                 <Actions
                   id={record.id}
-                  edit={(id: string) => this.showEditModal(id, datasources.find(a => a.id === id))}
+                  edit={(id: string) => push(`/datasource/${record.id}`)}
                   remove={async (id: string) => {
                     await deleteDatasource({ variables: { id } });
                   }}
@@ -180,4 +182,4 @@ class Datasources extends Component<Properties, State> {
   }
 }
 
-export default Datasources;
+export default withRouter(Datasources);

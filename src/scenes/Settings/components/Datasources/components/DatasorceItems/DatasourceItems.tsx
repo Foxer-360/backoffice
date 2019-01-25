@@ -1,11 +1,14 @@
 import * as React from 'react';
-import { Row, Col, Table, Button, Popconfirm } from 'antd';
-import Form from 'react-jsonschema-form';
+import { Row, Table, Button, Popconfirm } from 'antd';
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
 import { withRouter } from 'react-router';
 import { RouteComponentProps } from 'react-router';
 import { client } from '@source/services/graphql';
+import Pluralize from 'pluralize';
+import { Link } from 'react-router-dom';
+
+import Actions from '../Actions';
 
 const DATASOURCE = gql`
   query datasource($id: ID!) {
@@ -39,15 +42,10 @@ const CREATE_DATASOURCE_ITEM = gql`
   }
 `;
 
-const UPDATE_DATASOURCE_ITEM = gql`
-  mutation updateDatasourceItem($id: ID!, $content: Json!) {
-    updateDatasourceItem(
-      data: {
-        content: $content,
-      },
-      where: {
-        id: $id
-      }
+const DELETE_DATASOURCE_ITEM = gql`
+  mutation deleteDatasourceItem($id: ID!) {
+    deleteDatasourceItem(
+      where: { id: $id }
     ) {
       id
       content
@@ -60,16 +58,16 @@ const { Component } = React;
 interface Properties extends RouteComponentProps<LooseObject> { }  
 
 interface State {
-  formData?: {};
+  formData: {};
 }
 
-class DatasourceItem extends Component<Properties, State> {
+class DatasourceItems extends Component<Properties, State> {
 
   constructor(props: Properties) {
     super(props);
 
     this.state = {
-      formData: null
+      formData: {}
     };
 
     this.onChange = this.onChange.bind(this);
@@ -80,16 +78,17 @@ class DatasourceItem extends Component<Properties, State> {
     const {
       match: {
         params: {
-          datasourceId,
-          datasourceItemId,
-          ...rest
+          id
         }
+      },
+      history: {
+        push
       }
     } = this.props;
 
     return (
       <div>
-        <Query query={DATASOURCE} variables={{ id: datasourceId }}>
+        <Query query={DATASOURCE} variables={{ id }}>
           {({ data, loading, error }) => {
 
             if (loading) { 
@@ -101,21 +100,47 @@ class DatasourceItem extends Component<Properties, State> {
             }
 
             const { datasource } = data;
+            
+            const datasourceItemColumns = [
+              ...Object.keys(datasource.schema.properties).map((propertyKey, key) => {
+                return {
+                  key,
+                  title: datasource.schema.properties[propertyKey].title,
+                  dataIndex: propertyKey
+                };
+              }),
+              {
+                title: 'Actions',
+                key: 'actions',
+                render: (record) => {
+                  console.log(record);
+                  return (<Actions
+                    id={record.id}
+                    edit={() => push(`/datasource-item/${datasource.id}/${record.id}`)}
+                    remove={async (datasourceItemId: string) => {
+                      this.onDelete(datasource)(datasourceItemId);
+                    }}
+                  />);
+                }
+              }
+            ];
+            
             return  <div>
+              <Row style={{ marginBottom: '20px' }}>
+                <h2>{Pluralize(datasource.type, 42)}:</h2>
+              </Row>
               <Row>
-                <Form 
-                  schema={datasource.schema}
-                  uiSchema={datasource.uiSchema || {}}
-                  onChange={this.onChange}
-                  onSubmit={this.onSubmit(datasource)}
-                  onError={this.onError}
-                  formData={
-                    this.state.formData ||
-                    (datasourceItemId && 
-                      datasourceItemId !== 'new' &&
-                      datasource.datasourceItems
-                        .find(item => item.id === datasourceItemId).content
-                    ) || {}}
+                <Button
+                  type="primary"
+                  style={{ marginBottom: 16 }}
+                >
+                  <Link to={`/datasource-item/${datasource.id}/new`}>Add new datasource item.</Link>
+                </Button>
+              </Row>
+              <Row>
+                <Table
+                  columns={datasourceItemColumns} 
+                  dataSource={datasource.datasourceItems.map(({ content, id: itemId }) => ({ ...content, id: itemId }) )} 
                 />
               </Row>
             </div>;
@@ -131,25 +156,6 @@ class DatasourceItem extends Component<Properties, State> {
   }
 
   onSubmit = (datasource) => () => {
-    const {
-      match: {
-        params: {
-          datasourceItemId,
-
-        }
-      }
-    } = this.props;
-
-    if (datasourceItemId === 'new') { 
-      this.createNewItem(datasource); 
-      return;
-    }
-
-    this.updateItem(datasource, datasourceItemId);
-
-  }
-
-  createNewItem(datasource: LooseObject) {
     const { 
       history: {
         push
@@ -177,34 +183,31 @@ class DatasourceItem extends Component<Properties, State> {
             id: datasource.id
           }
         });
-        push(`/datasource-items/${datasource.id}`);
+        push('/settings#datasources');
       }
     });
   }
 
-  updateItem(datasource: LooseObject, id: String) {
+  onDelete = (datasource) => (id) => {
     const { 
       history: {
         push
       }
     } = this.props;
     client.mutate({
-      mutation: UPDATE_DATASOURCE_ITEM,
+      mutation: DELETE_DATASOURCE_ITEM,
       variables: {
         content: this.state.formData,
         id,
       },
-      update: (cache, { data: { updateDatasourceItem } }: LooseObject) => {
+      update: (cache, { data: { deleteDatasourceItem } }: LooseObject) => {
         cache.writeQuery({
           query: DATASOURCE,
           data: {
             datasource: { 
               ...datasource,
               datasourceItems: [
-                ...datasource.datasourceItems.map((datasourceItem) => {
-                  if (datasourceItem.id === updateDatasourceItem.id) { return updateDatasourceItem; }
-                  return datasourceItem;
-                }),
+                ...datasource.datasourceItems.filter((datasourceItem) => datasourceItem.id !== deleteDatasourceItem.id)
               ]
             }
           },
@@ -212,8 +215,9 @@ class DatasourceItem extends Component<Properties, State> {
             id: datasource.id
           }
         });
-        push(`/datasource-items/${datasource.id}`);
       }
+    }).catch((e) => {
+      console.log('error', e);
     });
   }
 
@@ -223,4 +227,4 @@ class DatasourceItem extends Component<Properties, State> {
 
 }
 
-export default withRouter(DatasourceItem);
+export default withRouter(DatasourceItems);

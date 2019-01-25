@@ -142,9 +142,9 @@ class Sidebar extends Component<Properties, State> {
               <Icon type="tool" />
               <Link to="/settings">Settings</Link>
             </Item>
-            {datasources.filter(({ displayInNavigation }) => (!displayInNavigation)).map((datasource) => (<Item key={datasource.type}>
+            {datasources.filter(({ displayInNavigation }) => displayInNavigation).map((datasource) => (<Item key={datasource.type}>
                 <Icon type="tool" />
-                <Link to={`/datasource-item/${datasource.id}`}>{datasource.type}</Link>
+                <Link to={`/datasource-items/${datasource.id}`}>{datasource.type}</Link>
               </Item>))}
           </Menu>
           <TagsFilter filteredTags={true} />

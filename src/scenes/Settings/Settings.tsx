@@ -4,28 +4,48 @@ import PageTypes from './components/PageTypes';
 import Navigations from './components/Navigations';
 import Tags from './components/Tags';
 import Datasources from './components/Datasources';
+import { withRouter } from 'react-router';
+import { RouteComponentProps } from 'react-router';
 
 const { Component } = React;
 
-class Settings extends Component<{}, {}> {
+interface Properties extends RouteComponentProps<LooseObject> {
+}
+
+class Settings extends Component<Properties, {}> {
 
   render() {
+
+    const { 
+      match: { 
+        params: { 
+          section 
+        } 
+      },
+      history: {
+        push
+      }
+    } = this.props;
     return (
       <div>
-        <Tabs defaultActiveKey="1">
-          <Tabs.TabPane tab="Page Types" key="1">
+        <Tabs 
+          defaultActiveKey="page-types" 
+          {...(section ? { activeKey: section } : {})}
+          onChange={(activeKey) => push(`/settings/${activeKey}`)}
+        >
+          <Tabs.TabPane tab="Page Types" key="page-types">
             <PageTypes />
           </Tabs.TabPane>
-          <Tabs.TabPane tab="Plugins" key="2">
+          <Tabs.TabPane tab="Plugins" key="plugins">
             <span>Nothing is here</span>
           </Tabs.TabPane>
-          <Tabs.TabPane tab="Navigations" key="3">
+          <Tabs.TabPane tab="Navigations" key="navigations">
             <Navigations />
           </Tabs.TabPane>
-          <Tabs.TabPane tab="Tags" key="4">
+          <Tabs.TabPane tab="Tags" key="tags">
             <Tags />
           </Tabs.TabPane>
-          <Tabs.TabPane tab="Datasources" key="5">
+          <Tabs.TabPane tab="Datasources" key="datasources">
             <Datasources />
           </Tabs.TabPane>
         </Tabs>
@@ -35,4 +55,4 @@ class Settings extends Component<{}, {}> {
 
 }
 
-export default Settings;
+export default withRouter(Settings);

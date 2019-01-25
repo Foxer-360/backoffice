@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Col, Input, Checkbox, Button, Row, Alert, Form } from 'antd';
+import { Col, Input, Checkbox, Button, Row, Alert, Form, Card } from 'antd';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import JSONInput from 'react-json-editor-ajrm';
 import locale    from 'react-json-editor-ajrm/locale/en';
@@ -7,15 +7,16 @@ import * as Ajv from 'ajv';
 import metaSchema from './meta-schema.json';
 import gql from 'graphql-tag';
 import { client } from '@source/services/graphql';
-import { throwServerError } from 'apollo-link-http-common';
-import { push } from 'react-router-redux';
+import { withRouter } from 'react-router';
+import { RouteComponentProps } from 'react-router';
+import JsonForm from 'react-jsonschema-form';
 
 const ajv = new Ajv();
 const validate = ajv.compile(metaSchema);
 
 const { Component } = React;
 
-interface Properties {
+interface Properties extends RouteComponentProps<LooseObject> {
   data?: LooseObject;
   visible: boolean;
   edit: boolean;
@@ -29,19 +30,60 @@ interface State {
   displayInNavigation: boolean;
   slug: string;
   errors: LooseObject;
+  originalDatasource?: LooseObject; 
+  uiSchema?: LooseObject;
 }
 
 const CREATE_DATASOURCE = gql`
-mutation createDatasource($type: String!, $schema: Json!, $displayInNavigation: Boolean!, $slug: String!) {
+mutation createDatasource(
+  $type: String!,
+  $schema: Json!,
+  $uiSchema: Json,
+  $displayInNavigation: Boolean!,
+  $slug: String!
+) {
   createDatasource(data: { 
     type: $type
     schema: $schema
+    uiSchema: $uiSchema
     displayInNavigation: $displayInNavigation
     slug: $slug
   }) {
     id
     type
     schema
+    uiSchema
+    displayInNavigation
+    slug
+  }
+}
+`;
+
+const UPDATE_DATASOURCE = gql`
+mutation updateDatasource(
+  $type: String!,
+  $schema: Json!,
+  $uiSchema: Json,
+  $displayInNavigation: Boolean!,
+  $slug: String!,
+  $id: ID!
+) {
+  updateDatasource(
+    data: { 
+      type: $type
+      schema: $schema
+      uiSchema: $uiSchema
+      displayInNavigation: $displayInNavigation
+      slug: $slug
+    },
+    where: {
+      id: $id
+    }
+  ) {
+    id
+    type
+    schema
+    uiSchema
     displayInNavigation
     slug
   }
@@ -54,6 +96,20 @@ const DATASOURCE_LIST = gql`
       id
       type
       schema
+      uiSchema
+      displayInNavigation
+      slug
+    }
+  }
+`;
+
+const DATASOURCE = gql`
+  query datasource($id: ID!) {
+    datasource(where: { id: $id }) {
+      id
+      type
+      schema
+      uiSchema
       displayInNavigation
       slug
     }
@@ -65,6 +121,7 @@ class DatasourceModal extends Component<Properties, State> {
   private DEFAULT: State = {
     type: '',
     schema: {},
+    uiSchema: {},
     displayInNavigation: false,
     slug: '',
     errors:  null
@@ -85,6 +142,8 @@ class DatasourceModal extends Component<Properties, State> {
       this.state = { ...this.DEFAULT };
     }
 
+    this.handleUpdate = this.handleUpdate.bind(this);
+    this.handleSave = this.handleSave.bind(this);
   }
 
   public componentWillReceiveProps(props: Properties) {
@@ -96,109 +155,277 @@ class DatasourceModal extends Component<Properties, State> {
     }
   }
 
+  public componentDidMount() {
+    const {
+      match: {
+        params: {
+          id
+        }
+      }
+    } = this.props;
+
+    if (id) {
+      client.query({
+        query: DATASOURCE,
+        variables: { id }
+      }).then(({ data: { datasource } }: LooseObject) => {
+        this.setState({ ...datasource, originalDatasource: datasource });
+      });
+    }
+  }
+
   public render() {
 
     const { errors } = this.state;
+    const {
+      match: {
+        params: {
+          id
+        }
+      }
+    } = this.props;
+    const { 
+      history: {
+        push
+      }
+    } = this.props;
 
     return (
       <>
-        <Row style={{ marginBottom: '20px' }}>
-          <h2>New datasource:</h2>
-        </Row>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Row>
-              <Form.Item
-                label="Type name"
-                {...((errors && errors.type) ? { 
-                  validateStatus: 'error', 
-                  help: errors.type
-                } : {})}
-              >
-                <Input
-                  value={this.state.type}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ type: e.target.value })}
-                />
-              </Form.Item>
-            </Row>
-            <Row style={{ marginBottom: '20px' }}>
-              <Form.Item
-                label="Slug"
-                {...((errors && errors.slug) ? { 
-                  validateStatus: 'error', 
-                  help: errors.slug
-                } : {})}
-              >
-                <Input
-                  value={this.state.slug}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ slug: e.target.value })}
-                />
-              </Form.Item>
-            </Row>
-            <Row>
-              <Form.Item
-                label="Display in navigation"
-              >
-                <Checkbox
-                  checked={this.state.displayInNavigation}
-                  onChange={(e: CheckboxChangeEvent) =>
-                    this.setState({ displayInNavigation: e.target.checked })}
-                />
-              </Form.Item>
-            </Row>
-          </Col>
-          <Col span={12}>
-            <Row style={{ marginBottom: '20px' }}>
-              <span>Schema:</span><br/>
-              <JSONInput
-                id={'schema'}
-                modifyErrorText={(e) => {
-                  console.log(e);
-
-                  return e;
-                }}
-                colors={['dark_vscode_tribute']}
-                locale={locale}
-                width={'100%'}
-                onChange={(data) => this.setState({ schema: data.jsObject })}
-              />
-              {errors && errors.schema &&
-              <Alert
-                style={{ marginTop: 10 }}
-                message="Error Text"
-                description={<>
-                  {errors.schema}
-                </>}
-                type="error"
-              />}
-            </Row>
-          </Col>
-        </Row>
-        <Row type="flex" justify="end">
-          <Button>Go back</Button>
-          <Button 
-            type="primary" 
-            style={{ 
-              marginLeft: 10,
-              marginRight: 20
-            }}
-            onClick={() => this.handleSave()}
+      <Row gutter={16}>
+          <Row             
+            style={{ padding: '30px 30px 10px 30px' }}
+            gutter={15}
           >
-            Save
-          </Button>
-        </Row>
-       
-      </>
-    );
-  }
-
-  private handleCancel(): void {
-    this.props.onCancel();
-    this.setState({ ...this.DEFAULT });
+            <Card title={(id && this.state.originalDatasource) ? `${this.state.originalDatasource.type} editation:` : 'New datasource:'} id="bootstrap">
+              <Row>
+                <Col 
+                  span={10}
+                  style={{ padding: '10px' }}
+                >
+                <Form.Item
+                  label="Type name"
+                  {...((errors && errors.type) ? { 
+                    validateStatus: 'error', 
+                    help: errors.type
+                  } : {})}
+                >
+                  <Input
+                    value={this.state.type}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ type: e.target.value })}
+                  />
+                </Form.Item>
+                </Col>
+                <Col 
+                  span={10}
+                  style={{ padding: '10px' }}
+                >
+                <Form.Item
+                  label="Slug"
+                  {...((errors && errors.slug) ? { 
+                    validateStatus: 'error', 
+                    help: errors.slug
+                  } : {})}
+                >
+                  <Input
+                    value={this.state.slug}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ slug: e.target.value })}
+                  />
+                </Form.Item>
+                </Col>
+                <Col
+                  span={4}
+                >
+                  <Form.Item
+                    label="Display in navigation"
+                  >
+                    <Checkbox
+                      checked={this.state.displayInNavigation}
+                      onChange={(e: CheckboxChangeEvent) =>
+                        this.setState({ displayInNavigation: e.target.checked })}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Card>
+          </Row>
+          <Row 
+            style={{ padding: 20 }}
+            gutter={15}
+          >
+            <Col
+              span={12}
+              style={{ padding: '10px' }}
+            >
+              <Card title="Form Schema">
+                <JSONInput
+                    id={'schema'}
+                    modifyErrorText={(e) => {
+                      return e;
+                    }}
+                    {...this.state.originalDatasource ? 
+                      { placeholder: this.state.originalDatasource.schema } : {}
+                    }
+                    colors={['dark_vscode_tribute']}
+                    locale={locale}
+                    width={'100%'}
+                    onChange={({ jsObject: schema }) => this.setState({ schema })}
+                />
+                {errors && errors.schema &&
+                <Alert
+                  style={{ marginTop: 10 }}
+                  message="Error Text"
+                  description={<>
+                    {errors.schema}
+                  </>}
+                  type="error"
+                />}
+              </Card>
+            </Col>
+            <Col
+              span={12}
+              style={{ padding: '10px' }}
+            >
+              <Card title="UI schema">
+                <JSONInput
+                  id={'uiSchema'}
+                  modifyErrorText={(e) => {
+                    return e;
+                  }}
+                  {...this.state.originalDatasource ? 
+                    { placeholder: this.state.originalDatasource.uiSchema } : {}
+                  }
+                  colors={['dark_vscode_tribute']}
+                  locale={locale}
+                  width={'100%'}
+                  onChange={({ jsObject: uiSchema }) => this.setState({ uiSchema })}
+                />
+              </Card>
+            </Col>
+          </Row>
+          <Row style={{ padding: 20 }}>
+            <Col
+              span={24}
+            >
+              <Card title="Form preview" id="bootstrap">
+                <JsonForm 
+                  schema={this.state.schema || {}}
+                  uiSchema={this.state.uiSchema || {}}
+                  onChange={console.log('changed')}
+                  onSubmit={console.log('changed')}
+                  onError={console.log('changed')} 
+                />
+              </Card>
+            </Col>
+          </Row>
+      </Row>
+      <Row type="flex" justify="end">
+        <Button
+          onClick={() => push('/settings/datasources')}
+        >
+          Go back
+        </Button>
+        <Button 
+          type="primary" 
+          style={{ 
+            marginLeft: 10,
+            marginRight: 20
+          }}
+          onClick={() => id !== 'new' ? this.handleUpdate(id) : this.handleSave()}
+        >
+          {id !== 'new' ? 'Update' : 'Save'}
+        </Button>
+      </Row>
+      </>);
   }
 
   private async handleSave(): Promise<void> {
-    console.log(this.state.schema);
+    const { 
+      history: {
+        push
+      }
+    } = this.props;
+    
+    const isValid = await this.validate();
+
+    if (!isValid) { return; }
+
+    await client.mutate({
+      mutation: CREATE_DATASOURCE,
+      variables: {
+        type: this.state.type,
+        schema: this.state.schema,
+        uiSchema: this.state.uiSchema,
+        displayInNavigation: this.state.displayInNavigation,
+        slug: this.state.slug
+      },
+      update: async (cache, { data: { createDatasource } }: LooseObject) => {
+        const { data: { datasources } } = await client.query({ query: DATASOURCE_LIST }); 
+
+        cache.writeQuery({
+          query: DATASOURCE_LIST,
+          data: {
+            datasources: [
+              ...datasources,
+              createDatasource
+            ]
+          }
+        });
+        push('/settings/datasources');
+
+      }
+    })
+    .catch((e) => {
+      this.setState({ errors: [e] });
+    });
+
+  }
+
+  private async handleUpdate(id: string): Promise<void> {
+    const { 
+      history: {
+        push
+      }
+    } = this.props;
+    
+    const isValid = await this.validate();
+
+    if (!isValid) { return; }
+
+    await client.mutate({
+      mutation: UPDATE_DATASOURCE,
+      variables: {
+        type: this.state.type,
+        schema: this.state.schema,
+        uiSchema: this.state.uiSchema,
+        displayInNavigation: this.state.displayInNavigation,
+        slug: this.state.slug,
+        id
+      },
+      update: async (cache, { data: { updateDatasource } }: LooseObject) => {
+        const { data: { datasources } } = await client.query({ query: DATASOURCE_LIST }); 
+        cache.writeQuery({
+          query: DATASOURCE_LIST,
+          data: {
+            datasources: [
+              ...datasources.map((datasource) => {
+                if (datasource.id === updateDatasource.id) { return updateDatasource; }
+                return datasource;
+              }),
+            ]
+          }
+        });
+        push('/settings/datasources');
+
+      }
+    })
+    .catch((e) => {
+      this.setState({ errors: [e] });
+    });
+
+  }
+
+  private async validate(): Promise<boolean>  {
     try {
       var valid = validate(this.state.schema);
 
@@ -230,42 +457,10 @@ class DatasourceModal extends Component<Properties, State> {
     }
 
     if (this.state.errors && Object.keys(this.state.errors).length > 0) {
-      return;
+      return false;
     }
-
-    await client.mutate({
-      mutation: CREATE_DATASOURCE,
-      variables: {
-        type: this.state.type,
-        schema: this.state.schema,
-        displayInNavigation: this.state.displayInNavigation,
-        slug: this.state.slug
-      },
-      update: (cache, { data: { createDatasource } }: LooseObject) => {
-        console.log('query');
-        const { datasources } = cache.readQuery({ query: DATASOURCE_LIST }); 
-        console.log(datasources);
-        cache.writeQuery({
-          query: DATASOURCE_LIST,
-          data: {
-            datasources: [
-              ...datasources,
-              createDatasource
-            ]
-          }
-        });
-        push('/settings');
-
-      }
-    })
-    .then(() => {
-      console.log('success');
-    })
-    .catch((e) => {
-      this.setState({ errors: [e] });
-    });
-
+    return true;
   }
 }
 
-export default DatasourceModal;
+export default withRouter(DatasourceModal);

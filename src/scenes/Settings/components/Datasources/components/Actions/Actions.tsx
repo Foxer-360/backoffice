@@ -9,10 +9,11 @@ export interface Properties {
 
 const style = { marginLeft: 6 };
 
-const Actions = ({id, edit, remove}: Properties) => (
+const Actions = ({ id, remove, edit }: Properties) => (
   <>
+    <Button size="small" style={style} onClick={() => edit(id)}>Edit</Button>
     <Popconfirm
-      title="Are you sure, you want to remove this tag ?"
+      title="Are you sure, you want to remove this page type ?"
       onConfirm={() => remove(id)}
     >
       <Button size="small" style={style} type="danger">Remove</Button>
