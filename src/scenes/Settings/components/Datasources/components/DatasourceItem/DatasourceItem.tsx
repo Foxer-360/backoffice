@@ -13,8 +13,10 @@ const DATASOURCE = gql`
       id
       type
       schema
+      slug
       datasourceItems {
         id
+        slug
         content
       }
     }
@@ -22,10 +24,11 @@ const DATASOURCE = gql`
 `;
 
 const CREATE_DATASOURCE_ITEM = gql`
-  mutation createDatasourceItem($id: ID!, $content: Json!) {
+  mutation createDatasourceItem($id: ID!, $content: Json!, $slug: String!) {
     createDatasourceItem(
       data: {
         content: $content,
+        slug: $slug,
         datasource: {
           connect: {
             id: $id
@@ -34,22 +37,25 @@ const CREATE_DATASOURCE_ITEM = gql`
       }
     ) {
       id
+      slug
       content
     }
   }
 `;
 
 const UPDATE_DATASOURCE_ITEM = gql`
-  mutation updateDatasourceItem($id: ID!, $content: Json!) {
+  mutation updateDatasourceItem($id: ID!, $content: Json!, $slug: String!) {
     updateDatasourceItem(
       data: {
         content: $content,
+        slug: $slug
       },
       where: {
         id: $id
       }
     ) {
       id
+      slug
       content
     }
   }
@@ -61,6 +67,7 @@ interface Properties extends RouteComponentProps<LooseObject> { }
 
 interface State {
   formData?: {};
+  slug: String;
 }
 
 class DatasourceItem extends Component<Properties, State> {
@@ -69,11 +76,9 @@ class DatasourceItem extends Component<Properties, State> {
     super(props);
 
     this.state = {
-      formData: null
+      formData: null,
+      slug: ''
     };
-
-    this.onChange = this.onChange.bind(this);
-
   }
 
   public render() {
@@ -103,10 +108,13 @@ class DatasourceItem extends Component<Properties, State> {
             const { datasource } = data;
             return  <div>
               <Row>
+                <h3>Url slug: {this.state.slug}</h3>
+              </Row>
+              <Row>
                 <Form 
                   schema={datasource.schema}
                   uiSchema={datasource.uiSchema || {}}
-                  onChange={this.onChange}
+                  onChange={this.onChange(datasource)}
                   onSubmit={this.onSubmit(datasource)}
                   onError={this.onError}
                   formData={
@@ -126,8 +134,33 @@ class DatasourceItem extends Component<Properties, State> {
     );
   }
 
-  onChange({ formData }: LooseObject) {
-    this.setState({ formData });
+  onChange = (datasource) => async ({ formData }: LooseObject) => {
+
+    await this.setState({ formData });
+
+    const slug = datasource.slug.map(key => formData[key] || '').join('-').toLowerCase();
+    const uniqueSlug = this.getUniqueSlug(datasource, slug, 0);
+
+    await this.setState({ 
+      slug: uniqueSlug
+    });
+  }
+
+  getUniqueSlug = (datasource: LooseObject, slug: string, index: number) => {
+    const {
+      match: {
+        params: {
+          datasourceItemId
+        }
+      }
+    } = this.props;
+
+    if (datasource.datasourceItems.some(item => item.slug === `${slug}-${index}` && datasourceItemId !== item.id)) {
+      index++;
+      return this.getUniqueSlug(datasource, slug, index);
+    } else {
+      return `${slug}-${index}`;
+    }
   }
 
   onSubmit = (datasource) => () => {
@@ -159,6 +192,7 @@ class DatasourceItem extends Component<Properties, State> {
       mutation: CREATE_DATASOURCE_ITEM,
       variables: {
         content: this.state.formData,
+        slug: this.state.slug,
         id: datasource.id,
       },
       update: (cache, { data: { createDatasourceItem } }: LooseObject) => {
@@ -192,6 +226,7 @@ class DatasourceItem extends Component<Properties, State> {
       mutation: UPDATE_DATASOURCE_ITEM,
       variables: {
         content: this.state.formData,
+        slug: this.state.slug,
         id,
       },
       update: (cache, { data: { updateDatasourceItem } }: LooseObject) => {

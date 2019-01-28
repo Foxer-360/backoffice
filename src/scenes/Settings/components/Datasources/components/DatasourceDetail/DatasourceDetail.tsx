@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Col, Input, Checkbox, Button, Row, Alert, Form, Card } from 'antd';
+import { Col, Input, Checkbox, Button, Row, Alert, Form, Card, Tag, Tooltip, Icon } from 'antd';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import JSONInput from 'react-json-editor-ajrm';
 import locale    from 'react-json-editor-ajrm/locale/en';
@@ -28,10 +28,12 @@ interface State {
   type: string;
   schema: LooseObject;
   displayInNavigation: boolean;
-  slug: string;
+  slug: Array<string>;
   errors: LooseObject;
   originalDatasource?: LooseObject; 
   uiSchema?: LooseObject;
+  inputVisible: boolean;
+  slugInputValue: string;
 }
 
 const CREATE_DATASOURCE = gql`
@@ -40,14 +42,14 @@ mutation createDatasource(
   $schema: Json!,
   $uiSchema: Json,
   $displayInNavigation: Boolean!,
-  $slug: String!
+  $slug: [String!]!
 ) {
   createDatasource(data: { 
     type: $type
     schema: $schema
     uiSchema: $uiSchema
     displayInNavigation: $displayInNavigation
-    slug: $slug
+    slug: { set: $slug }
   }) {
     id
     type
@@ -65,7 +67,7 @@ mutation updateDatasource(
   $schema: Json!,
   $uiSchema: Json,
   $displayInNavigation: Boolean!,
-  $slug: String!,
+  $slug: [String!]!,
   $id: ID!
 ) {
   updateDatasource(
@@ -74,7 +76,7 @@ mutation updateDatasource(
       schema: $schema
       uiSchema: $uiSchema
       displayInNavigation: $displayInNavigation
-      slug: $slug
+      slug: { set: $slug }
     },
     where: {
       id: $id
@@ -123,24 +125,18 @@ class DatasourceModal extends Component<Properties, State> {
     schema: {},
     uiSchema: {},
     displayInNavigation: false,
-    slug: '',
-    errors:  null
+    slug: [],
+    errors:  null,
+    inputVisible: false,
+    slugInputValue: ''
   };
+
+  private input: LooseObject = null;
 
   constructor(props: Properties) {
     super(props);
 
-    if (props.edit && props.data) {
-      this.state = {
-        type: props.data.type,
-        schema: props.data.schema,
-        displayInNavigation: props.data.displayInNavigation,
-        slug: props.data.slug,
-        errors: {}
-      };
-    } else {
-      this.state = { ...this.DEFAULT };
-    }
+    this.state = { ...this.DEFAULT };
 
     this.handleUpdate = this.handleUpdate.bind(this);
     this.handleSave = this.handleSave.bind(this);
@@ -176,7 +172,7 @@ class DatasourceModal extends Component<Properties, State> {
 
   public render() {
 
-    const { errors } = this.state;
+    const { errors, inputVisible, slugInputValue } = this.state;
     const {
       match: {
         params: {
@@ -227,10 +223,42 @@ class DatasourceModal extends Component<Properties, State> {
                     help: errors.slug
                   } : {})}
                 >
-                  <Input
-                    value={this.state.slug}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ slug: e.target.value })}
-                  />
+                <div>
+                  {this.state.slug && this.state.slug.map((tag, index) => {
+                    const isLongTag = tag.length > 20;
+                    const tagElem = (
+                      <Tag key={tag} closable={index !== 0} afterClose={() => this.handleClose(tag)}>
+                        {isLongTag ? `${tag.slice(0, 20)}...` : tag}
+                      </Tag>
+                    );
+                    return isLongTag ? <Tooltip title={tag} key={tag}>{tagElem}</Tooltip> : tagElem;
+                  })}
+                  {inputVisible && (
+                    <Input
+                      ref={this.saveInputRef}
+                      type="text"
+                      size="small"
+                      style={{ width: 78 }}
+                      value={slugInputValue}
+                      onChange={(e: LooseObject) => 
+                        this.setState({ slugInputValue: e.target.value })
+                      }
+                      onBlur={this.handleInputConfirm}
+                      onPressEnter={this.handleInputConfirm}
+                    />
+                  )}
+                  {!inputVisible && (
+                    <Tag
+                      onClick={this.showInput}
+                      style={{ background: '#fff', borderStyle: 'dashed' }}
+                    >
+                      <Icon type="plus" /> New slug fragment
+                    </Tag>
+                  )}
+                </div>
+                {this.state.slug && this.state.slug.length > 0 && 
+                `Url slug: ${this.state.slug.map(key => `[${key}]`).join('-')}` + 
+                ` (Where [key] will be content of key in data.)`}
                 </Form.Item>
                 </Col>
                 <Col
@@ -269,7 +297,7 @@ class DatasourceModal extends Component<Properties, State> {
                     colors={['dark_vscode_tribute']}
                     locale={locale}
                     width={'100%'}
-                    onChange={({ jsObject: schema }) => this.setState({ schema })}
+                    onChange={this.onJsonSchemaInputChanged}
                 />
                 {errors && errors.schema &&
                 <Alert
@@ -311,9 +339,6 @@ class DatasourceModal extends Component<Properties, State> {
                 <JsonForm 
                   schema={this.state.schema || {}}
                   uiSchema={this.state.uiSchema || {}}
-                  onChange={console.log('changed')}
-                  onSubmit={console.log('changed')}
-                  onError={console.log('changed')} 
                 />
               </Card>
             </Col>
@@ -339,6 +364,37 @@ class DatasourceModal extends Component<Properties, State> {
       </>);
   }
 
+  handleClose = (removedTag) => {
+    const slug = this.state.slug.filter(tag => tag !== removedTag);
+    this.setState({ slug });
+  }
+
+  showInput = () => {
+    this.setState({ inputVisible: true }, () => this.input.focus());
+  }
+
+  saveInputRef = input => this.input = input;
+
+  private onJsonSchemaInputChanged = async ({ jsObject: schema }) => {
+
+    await this.setState({ schema });
+  }
+
+  private handleInputConfirm = () => {
+    const state = this.state;
+    const inputValue = state.slugInputValue;
+    let slug = state.slug;
+    if (inputValue && slug.indexOf(inputValue) === -1) {
+      slug = [...slug, inputValue];
+    }
+
+    this.setState({
+      slug,
+      inputVisible: false,
+      slugInputValue: '',
+    });
+  }
+
   private async handleSave(): Promise<void> {
     const { 
       history: {
@@ -360,17 +416,7 @@ class DatasourceModal extends Component<Properties, State> {
         slug: this.state.slug
       },
       update: async (cache, { data: { createDatasource } }: LooseObject) => {
-        const { data: { datasources } } = await client.query({ query: DATASOURCE_LIST }); 
-
-        cache.writeQuery({
-          query: DATASOURCE_LIST,
-          data: {
-            datasources: [
-              ...datasources,
-              createDatasource
-            ]
-          }
-        });
+        await client.query({ query: DATASOURCE_LIST }); 
         push('/settings/datasources');
 
       }
@@ -451,8 +497,8 @@ class DatasourceModal extends Component<Properties, State> {
     if (!this.state.slug) {
       await this.setState({ errors: { ...this.state.errors, slug: 'Slug is required.'} });
     } else {
-      if (!/^[a-z]+$/.test(this.state.slug)) {
-        await this.setState({ errors: { ...this.state.errors, slug: 'Slug is consisted only from alphabetic characters in lowercase.'} });
+      if (!this.state.slug || !(this.state.slug.length > 0)) {
+        await this.setState({ errors: { ...this.state.errors, slug: 'Slug must have at least one key defined.'} });
       }
     }
 

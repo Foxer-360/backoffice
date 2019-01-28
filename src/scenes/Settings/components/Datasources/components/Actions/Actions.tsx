@@ -13,7 +13,7 @@ const Actions = ({ id, remove, edit }: Properties) => (
   <>
     <Button size="small" style={style} onClick={() => edit(id)}>Edit</Button>
     <Popconfirm
-      title="Are you sure, you want to remove this page type ?"
+      title="Are you sure, you want to remove this item?"
       onConfirm={() => remove(id)}
     >
       <Button size="small" style={style} type="danger">Remove</Button>

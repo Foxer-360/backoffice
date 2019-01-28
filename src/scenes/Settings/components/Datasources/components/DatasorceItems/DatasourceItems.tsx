@@ -18,26 +18,11 @@ const DATASOURCE = gql`
       schema
       datasourceItems {
         id
+        slug
         content
+        createdAt
+        updatedAt
       }
-    }
-  }
-`;
-
-const CREATE_DATASOURCE_ITEM = gql`
-  mutation createDatasourceItem($id: ID!, $content: Json!) {
-    createDatasourceItem(
-      data: {
-        content: $content,
-        datasource: {
-          connect: {
-            id: $id
-          }
-        },
-      }
-    ) {
-      id
-      content
     }
   }
 `;
@@ -102,18 +87,25 @@ class DatasourceItems extends Component<Properties, State> {
             const { datasource } = data;
             
             const datasourceItemColumns = [
-              ...Object.keys(datasource.schema.properties).map((propertyKey, key) => {
-                return {
-                  key,
-                  title: datasource.schema.properties[propertyKey].title,
-                  dataIndex: propertyKey
-                };
-              }),
+              {
+                title: 'Slug',
+                key: 'slug',
+                dataIndex: 'slug'
+              },
+              {
+                title: 'Created at',
+                key: 'createdAt',
+                dataIndex: 'createdAt'
+              },
+              {
+                title: 'Updated at',
+                key: 'updatedAt',
+                dataIndex: 'updatedAt'
+              },
               {
                 title: 'Actions',
                 key: 'actions',
                 render: (record) => {
-                  console.log(record);
                   return (<Actions
                     id={record.id}
                     edit={() => push(`/datasource-item/${datasource.id}/${record.id}`)}
@@ -124,7 +116,6 @@ class DatasourceItems extends Component<Properties, State> {
                 }
               }
             ];
-            
             return  <div>
               <Row style={{ marginBottom: '20px' }}>
                 <h2>{Pluralize(datasource.type, 42)}:</h2>
@@ -140,7 +131,7 @@ class DatasourceItems extends Component<Properties, State> {
               <Row>
                 <Table
                   columns={datasourceItemColumns} 
-                  dataSource={datasource.datasourceItems.map(({ content, id: itemId }) => ({ ...content, id: itemId }) )} 
+                  dataSource={datasource.datasourceItems} 
                 />
               </Row>
             </div>;
@@ -153,39 +144,6 @@ class DatasourceItems extends Component<Properties, State> {
 
   onChange({ formData }: LooseObject) {
     this.setState({ formData });
-  }
-
-  onSubmit = (datasource) => () => {
-    const { 
-      history: {
-        push
-      }
-    } = this.props;
-    client.mutate({
-      mutation: CREATE_DATASOURCE_ITEM,
-      variables: {
-        content: this.state.formData,
-        id: datasource.id,
-      },
-      update: (cache, { data: { createDatasourceItem } }: LooseObject) => {
-        cache.writeQuery({
-          query: DATASOURCE,
-          data: {
-            datasource: { 
-              ...datasource,
-              datasourceItems: [
-                ...datasource.datasourceItems,
-                createDatasourceItem
-              ]
-            }
-          },
-          variables: {
-            id: datasource.id
-          }
-        });
-        push('/settings#datasources');
-      }
-    });
   }
 
   onDelete = (datasource) => (id) => {
