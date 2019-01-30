@@ -41,7 +41,7 @@ const NavigationQM = adopt({
           const navigations: Navigation[] = data.navigations.map((nav: Navigation) => {
             const model = {
               id: nav.id,
-              name: nav.name
+              name: nav.name,
             };
             return model;
           });
@@ -57,12 +57,12 @@ const NavigationQM = adopt({
       update={(cache, { data: { createNavigation } }) => {
         const { navigations } = cache.readQuery({
           query: queries.NAVIGATION_LIST,
-          variables: { website }
+          variables: { website },
         });
         cache.writeQuery({
           query: queries.NAVIGATION_LIST,
           variables: { website },
-          data: { navigations: navigations.concat([createNavigation]) }
+          data: { navigations: navigations.concat([createNavigation]) },
         });
       }}
     >
@@ -75,12 +75,12 @@ const NavigationQM = adopt({
       update={(cache, { data: { deleteNavigation } }) => {
         const { navigations } = cache.readQuery({
           query: queries.NAVIGATION_LIST,
-          variables: { website }
+          variables: { website },
         });
         cache.writeQuery({
           query: queries.NAVIGATION_LIST,
           variables: { website },
-          data: { navigations: navigations.filter((nav: Navigation) => nav.id !== deleteNavigation.id) }
+          data: { navigations: navigations.filter((nav: Navigation) => nav.id !== deleteNavigation.id) },
         });
       }}
     >
@@ -93,7 +93,7 @@ const NavigationQM = adopt({
       update={(cache, { data: { updateNavigation } }) => {
         const { navigations } = cache.readQuery({
           query: queries.NAVIGATION_LIST,
-          variables: { website }
+          variables: { website },
         });
         cache.writeQuery({
           query: queries.NAVIGATION_LIST,
@@ -104,18 +104,17 @@ const NavigationQM = adopt({
                 return updateNavigation;
               }
               return nav;
-            })
-          }
+            }),
+          },
         });
       }}
     >
       {updateNavigation => render(updateNavigation)}
     </Mutation>
   ),
-
 });
 
-interface Properties { }
+interface Properties {}
 
 interface State {
   name: string;
@@ -147,13 +146,12 @@ interface CreateNavigationOutput {
 }
 
 class Navigations extends Component<Properties, State> {
-
   private readonly DEFAULT: State = {
     name: null,
     id: null,
     edit: false,
     showModal: false,
-    showBuilder: false
+    showBuilder: false,
   };
 
   constructor(props: Properties) {
@@ -170,58 +168,61 @@ class Navigations extends Component<Properties, State> {
       id,
       name,
       edit: true,
-      showModal: true
+      showModal: true,
     });
   }
 
   showBuilder(id: string): void {
     this.setState({
       id,
-      showBuilder: true
+      showBuilder: true,
     });
   }
 
   render(): React.ReactNode {
-
     return (
       <>
-        <Button
-          type="primary"
-          style={{ marginBottom: 16 }}
-          onClick={() => this.showCreateModal()}
-        >
+        <Button type="primary" style={{ marginBottom: 16 }} onClick={() => this.showCreateModal()}>
           Add new navigation
         </Button>
         <NavigationQM>
-          {({ navigations, website, createNavigation, updateNavigation, deleteNavigation }: {
-            navigations: Navigation[],
-            website: string,
-            createNavigation: (data: QueryVariables<CreateNavigationInput>) => Promise<CreateNavigationOutput>,
-            updateNavigation: (data: QueryVariables<UpdateNavigationInput>) => Promise<void>,
-            deleteNavigation: (data: QueryVariables<DeleteNavigationInput>) => Promise<void>
+          {({
+            navigations,
+            website,
+            createNavigation,
+            updateNavigation,
+            deleteNavigation,
+          }: {
+            navigations: Navigation[];
+            website: string;
+            createNavigation: (data: QueryVariables<CreateNavigationInput>) => Promise<CreateNavigationOutput>;
+            updateNavigation: (data: QueryVariables<UpdateNavigationInput>) => Promise<void>;
+            deleteNavigation: (data: QueryVariables<DeleteNavigationInput>) => Promise<void>;
           }) => {
             const tableData = navigations.map((a: Navigation) => ({ ...a, key: a.id }));
 
-            const COLUMNS = [{
-              title: 'Name',
-              dataIndex: 'name',
-              key: 'name',
-              width: '50%'
-            }, {
-              title: 'Actions',
-              key: 'actions',
-              render: (record: Navigation) => (
-                <Actions
-                  id={record.id}
-                  edit={(id: string) => this.showEditModal(id, navigations.find(a => a.id === id).name)}
-                  build={(id: string) => this.showBuilder(id)}
-                  remove={async (id: string) => {
-                    await deleteNavigation({ variables: { id } });
-                    message.success('Navigation removed!');
-                  }}
-                />
-              )
-            }];
+            const COLUMNS = [
+              {
+                title: 'Name',
+                key: 'name',
+                width: '50%',
+              },
+              {
+                title: 'Actions',
+                key: 'actions',
+                render: (record: Navigation) => (
+                  <Actions
+                    id={record.id}
+                    edit={(id: string) => this.showEditModal(id, navigations.find(a => a.id === id).name)}
+                    build={(id: string) => this.showBuilder(id)}
+                    remove={async (id: string) => {
+                      await deleteNavigation({ variables: { id } });
+                      message.success('Navigation removed!');
+                    }}
+                  />
+                ),
+              },
+            ];
 
             return (
               <>
@@ -234,7 +235,7 @@ class Navigations extends Component<Properties, State> {
                     this.setState({ showModal: false });
                     const data: NavigationWithJoin = {
                       name,
-                      website: { connect: { id: website } }
+                      website: { connect: { id: website } },
                     };
 
                     if (this.state.edit) {
@@ -250,8 +251,7 @@ class Navigations extends Component<Properties, State> {
                   }}
                   onCancel={() => this.setState({ ...this.DEFAULT })}
                 />
-                {
-                  this.state.showBuilder &&
+                {this.state.showBuilder && (
                   <BuilderModal
                     visible={this.state.showBuilder}
                     id={this.state.id}
@@ -261,16 +261,14 @@ class Navigations extends Component<Properties, State> {
                       message.success('Navigation structure saved!');
                     }}
                   />
-                }
+                )}
               </>
             );
           }}
         </NavigationQM>
       </>
     );
-
   }
-
 }
 
 export default Navigations;

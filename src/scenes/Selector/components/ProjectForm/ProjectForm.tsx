@@ -30,11 +30,10 @@ interface State {
 }
 
 class ProjectForm extends Component<Properties, State> {
-
   private RESET_ERROR_VALUES = {
     nameError: false,
     langsError: false,
-    defLangError: false
+    defLangError: false,
   };
 
   private RESET_STATE_VALUES: State = {
@@ -43,14 +42,14 @@ class ProjectForm extends Component<Properties, State> {
     langs: [],
     defLang: null,
 
-    ...this.RESET_ERROR_VALUES
+    ...this.RESET_ERROR_VALUES,
   };
 
   constructor(props: Properties) {
     super(props);
 
     this.state = {
-      ...this.RESET_STATE_VALUES
+      ...this.RESET_STATE_VALUES,
     };
 
     this.handleSave = this.handleSave.bind(this);
@@ -94,7 +93,7 @@ class ProjectForm extends Component<Properties, State> {
 
     if (someError) {
       this.setState({
-        ...errors
+        ...errors,
       });
 
       return;
@@ -104,7 +103,7 @@ class ProjectForm extends Component<Properties, State> {
     let languages = {} as LooseObject;
     if (!this.props.data || !this.props.data.languages) {
       languages = {
-        connect: this.state.langs.map((lang: string) => ({ id: lang }))
+        connect: this.state.langs.map((lang: string) => ({ id: lang })),
       };
     } else {
       const langs = this.props.data.languages.map((lang: LooseObject) => {
@@ -112,22 +111,26 @@ class ProjectForm extends Component<Properties, State> {
       });
 
       // connect - Find what is new
-      const connect = this.state.langs.filter((lang: string) => {
-        if (langs.indexOf(lang) > -1) {
-          return false;
-        }
+      const connect = this.state.langs
+        .filter((lang: string) => {
+          if (langs.indexOf(lang) > -1) {
+            return false;
+          }
 
-        return true;
-      }).map((lang: string) => ({ id: lang }));
+          return true;
+        })
+        .map((lang: string) => ({ id: lang }));
 
       // disconnect - Find what is missing
-      const disconnect = langs.filter((lang: string) => {
-        if (this.state.langs.indexOf(lang) > -1) {
-          return false;
-        }
+      const disconnect = langs
+        .filter((lang: string) => {
+          if (this.state.langs.indexOf(lang) > -1) {
+            return false;
+          }
 
-        return true;
-      }).map((lang: string) => ({ id: lang }));
+          return true;
+        })
+        .map((lang: string) => ({ id: lang }));
 
       if (connect.length > 0) {
         languages.connect = connect;
@@ -150,7 +153,7 @@ class ProjectForm extends Component<Properties, State> {
     }
 
     this.setState({
-      ...this.RESET_STATE_VALUES
+      ...this.RESET_STATE_VALUES,
     });
   }
 
@@ -160,14 +163,14 @@ class ProjectForm extends Component<Properties, State> {
     }
 
     this.setState({
-      ...this.RESET_STATE_VALUES
+      ...this.RESET_STATE_VALUES,
     });
   }
 
   handleInputChange(name: string, value: string) {
     this.setState({
       ...this.state,
-      [name]: value
+      [name]: value,
     });
   }
 
@@ -176,7 +179,7 @@ class ProjectForm extends Component<Properties, State> {
       if (indexOf(value, this.state.defLang) < 0) {
         this.setState({
           [name]: value as string[],
-          defLang: null
+          defLang: null,
         });
 
         return;
@@ -185,7 +188,7 @@ class ProjectForm extends Component<Properties, State> {
 
     this.setState({
       ...this.state,
-      [name]: value
+      [name]: value,
     });
   }
 
@@ -194,19 +197,13 @@ class ProjectForm extends Component<Properties, State> {
     const labelStyle = {
       textAlign: 'right',
       paddingTop: '4px',
-      paddingRight: '8px'
+      paddingRight: '8px',
     } as React.CSSProperties;
     const labelSize = 6;
 
     return (
       <>
-        <div style={{ textAlign: 'center' }}>
-        {isNew ?
-          <h1>Create Project</h1>
-        :
-          <h1>Edit Project</h1>
-        }
-        </div>
+        <div style={{ textAlign: 'center' }}>{isNew ? <h1>Create Project</h1> : <h1>Edit Project</h1>}</div>
 
         <div style={{ margin: '12px 0px 18px 0px', padding: '0px 20px' }}>
           <Row>
@@ -214,13 +211,13 @@ class ProjectForm extends Component<Properties, State> {
               <span>Name:</span>
             </Col>
             <Col span={24 - labelSize}>
-              <Input value={this.state.name} onChange={(e) => this.handleInputChange('name', e.target.value)} />
+              <Input value={this.state.name} onChange={e => this.handleInputChange('name', e.target.value)} />
             </Col>
           </Row>
           <Row style={{ paddingTop: '6px', display: this.state.nameError ? '' : 'none' }}>
             <Col span={labelSize} />
             <Col span={24 - labelSize} style={{ textAlign: 'center' }}>
-                <span style={{ color: 'red' }}>Please enter some name!</span>
+              <span style={{ color: 'red' }}>Please enter some name!</span>
             </Col>
           </Row>
           <Row style={{ marginTop: '8px' }}>
@@ -230,7 +227,7 @@ class ProjectForm extends Component<Properties, State> {
               </Tooltip>
             </Col>
             <Col span={24 - labelSize}>
-              <Input value={this.state.defName} onChange={(e) => this.handleInputChange('defName', e.target.value)} />
+              <Input value={this.state.defName} onChange={e => this.handleInputChange('defName', e.target.value)} />
             </Col>
           </Row>
           <Row style={{ marginTop: '8px' }}>
@@ -267,7 +264,7 @@ class ProjectForm extends Component<Properties, State> {
                       mode="multiple"
                       style={{ width: '100%' }}
                       placeholder="Please select languages"
-                      onChange={(val) => this.handleSelectChange('langs', val as Array<string>)}
+                      onChange={val => this.handleSelectChange('langs', val as Array<string>)}
                       value={this.state.langs}
                     >
                       {data.languages && data.languages.map((lang: LooseObject) => {
@@ -282,7 +279,7 @@ class ProjectForm extends Component<Properties, State> {
           <Row style={{ paddingTop: '6px', display: this.state.langsError ? '' : 'none' }}>
             <Col span={labelSize} />
             <Col span={24 - labelSize} style={{ textAlign: 'center' }}>
-                <span style={{ color: 'red' }}>Please select at least one language!</span>
+              <span style={{ color: 'red' }}>Please select at least one language!</span>
             </Col>
           </Row>
           <Row style={{ marginTop: '8px' }}>
@@ -293,13 +290,7 @@ class ProjectForm extends Component<Properties, State> {
               <Query query={queries.LANGUAGES}>
                 {({ loading, data, error }) => {
                   if (loading) {
-                    return (
-                      <Select
-                        style={{ width: '100%' }}
-                        placeholder="Loading languages..."
-                        disabled={true}
-                      />
-                    );
+                    return <Select style={{ width: '100%' }} placeholder="Loading languages..." disabled={true} />;
                   }
 
                   if (error) {
@@ -317,7 +308,7 @@ class ProjectForm extends Component<Properties, State> {
                       style={{ width: '100%' }}
                       onChange={(val) => this.handleSelectChange('defLang', val as string[])}
                       value={[this.state.defLang]}
-                      notFoundContent="Please select firstly some languages"
+                      notFoundContent="Please select firstly some languages"  
                     >
                       {data.languages && data.languages.map((lang: LooseObject) => {
                         if (indexOf(this.state.langs, lang.id) > -1) {
@@ -335,14 +326,18 @@ class ProjectForm extends Component<Properties, State> {
           <Row style={{ paddingTop: '6px', display: this.state.defLangError ? '' : 'none' }}>
             <Col span={labelSize} />
             <Col span={24 - labelSize} style={{ textAlign: 'center' }}>
-                <span style={{ color: 'red' }}>Please select default language!</span>
+              <span style={{ color: 'red' }}>Please select default language!</span>
             </Col>
           </Row>
         </div>
 
         <div style={{ textAlign: 'center' }}>
-          <Button type="primary" onClick={this.handleSave}>{isNew ? 'Create' : 'Save'}</Button>
-          <Button style={{ marginLeft: '12px' }} onClick={this.handleCancel}>Cancel</Button>
+          <Button type="primary" onClick={this.handleSave}>
+            {isNew ? 'Create' : 'Save'}
+          </Button>
+          <Button style={{ marginLeft: '12px' }} onClick={this.handleCancel}>
+            Cancel
+          </Button>
         </div>
       </>
     );
@@ -361,10 +356,9 @@ class ProjectForm extends Component<Properties, State> {
       name: data.name,
       defName: data.defaultName,
       langs,
-      defLang
+      defLang,
     });
   }
-
 }
 
 export default ProjectForm;

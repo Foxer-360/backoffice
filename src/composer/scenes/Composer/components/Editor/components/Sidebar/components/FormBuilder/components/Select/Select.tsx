@@ -21,7 +21,6 @@ interface IMySelectProps {
 }
 
 export default class MySelect extends React.Component<IMySelectProps> {
-
   constructor(props: IMySelectProps) {
     super(props);
 
@@ -38,14 +37,9 @@ export default class MySelect extends React.Component<IMySelectProps> {
 
     return (
       <div style={{ paddingBottom: '5px' }}>
-      {this.props.notitle && this.props.notitle === true ? null
-        : <label>{this.props.label}</label>}
+        {this.props.notitle && this.props.notitle === true ? null : <label>{this.props.label}</label>}
 
-        <Select
-          defaultValue={this.props.value}
-          placeholder={this.props.placeholder}
-          onSelect={this.handleChange}
-        >
+        <Select defaultValue={this.props.value} placeholder={this.props.placeholder} onSelect={this.handleChange}>
           {Object.keys(options).map((key: string, index: number) => {
             return (
               <Select.Option

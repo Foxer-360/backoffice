@@ -55,8 +55,6 @@ span.task-title-date {
   color: #a5a5a5;
 }
 
-
-
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -90,8 +88,11 @@ body ::-webkit-scrollbar-thumb {
 }
 
 .chat-list-wrapper {
+}
+
+.chat-list-wrapper > div {
   overflow-y: scroll;
-  height: 68vh;
+  height: 50vh;
 }
 
 .chat-control-wrapper {

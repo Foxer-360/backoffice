@@ -123,17 +123,22 @@ export const PAGE_LIST = gql`
       }
       translations {
         id
-        language {
-          id
-          code
-        }
         url
         name
         status
         content
+        description
+        language {
+          id
+          code
+          name
+          englishName
+        }
       }
       tags {
         id
+        name
+        __typename
       }
     }
   }

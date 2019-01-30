@@ -26,44 +26,64 @@ export interface State {
 
 const PAGE_TASK_LIST = gql`
   query getPageTaskList($pageTranslation: ID!) {
-    pageTasks(
-      where: { pageTranslation: { id: $pageTranslation } }
-      orderBy: updatedAt_DESC
-    ) {
+    pageTasks(where: { pageTranslation: { id: $pageTranslation } }, orderBy: updatedAt_DESC) {
       id
       name
       description
       done
       updatedAt
       user {
-        name
+        username
         avatar
         email
+      }
+      pageTranslation {
+        id
+        name
+        page {
+          id
+          website {
+            id
+            defaultLanguage {
+              id
+            }
+          }
+        }
       }
     }
   }
 `;
 
 export const CREATE_TASK = gql`
-  mutation createTask($pageTranslation: PageTranslationCreateOneWithoutTasksInput!, $name: String!,
-  $description: String!, $done: Boolean!) {
-    createPageTask(
-      data: {
-        pageTranslation: $pageTranslation
-        name: $name
-        description: $description
-        done: $done
-      }
-    ) {
+  mutation createTask(
+    $pageTranslation: PageTranslationCreateOneWithoutTasksInput!
+    $name: String!
+    $description: String!
+    $done: Boolean!
+  ) {
+    createPageTask(data: { pageTranslation: $pageTranslation, name: $name, description: $description, done: $done }) {
       id
       name
       description
       done
       updatedAt
       user {
-        name
+        username
         avatar
         email
+      }
+      pageTranslation {
+        id
+        name
+        page {
+          id
+          website {
+            id
+            defaultLanguage {
+              id
+            }
+          }
+        }
       }
     }
   }
@@ -71,22 +91,29 @@ export const CREATE_TASK = gql`
 
 export const UPDATE_TASK = gql`
   mutation updateTask($id: ID!, $name: String!, $description: String!) {
-    updatePageTask(
-      where: { id: $id }
-      data: {
-        name: $name
-        description: $description
-      }
-    ) {
+    updatePageTask(where: { id: $id }, data: { name: $name, description: $description }) {
       id
       name
       description
       done
       updatedAt
       user {
-        name
+        username
         avatar
         email
+      }
+      pageTranslation {
+        id
+        name
+        page {
+          id
+          website {
+            id
+            defaultLanguage {
+              id
+            }
+          }
+        }
       }
     }
   }
@@ -94,21 +121,29 @@ export const UPDATE_TASK = gql`
 
 export const TOGGLE_TASK_DONE = gql`
   mutation toggleTask($id: ID!, $done: Boolean!) {
-    updatePageTask(
-      where: { id: $id }
-      data: {
-        done: $done
-      }
-    ) {
+    updatePageTask(where: { id: $id }, data: { done: $done }) {
       id
       name
       description
       done
       updatedAt
       user {
-        name
+        username
         avatar
         email
+      }
+      pageTranslation {
+        id
+        name
+        page {
+          id
+          website {
+            id
+            defaultLanguage {
+              id
+            }
+          }
+        }
       }
     }
   }
@@ -116,16 +151,14 @@ export const TOGGLE_TASK_DONE = gql`
 
 export const REMOVE_TASK = gql`
   mutation removeTask($id: ID!) {
-    deletePageTask(
-      where: { id: $id }
-    ) {
+    deletePageTask(where: { id: $id }) {
       id
       name
       description
       done
       updatedAt
       user {
-        name
+        username
         avatar
         email
       }
@@ -135,35 +168,28 @@ export const REMOVE_TASK = gql`
 
 const PAGE_CHAT_LIST = gql`
   query getPageChatList($page: ID!) {
-    pageChats(
-      where: { page: { id: $page } }
-      orderBy: createdAt_DESC
-    ) {
+    pageChats(where: { page: { id: $page } }, orderBy: createdAt_DESC) {
       id
       text
       createdAt
       user {
-        name
+        username
         avatar
         email
       }
+  
     }
   }
 `;
 
 export const CREATE_CHAT = gql`
   mutation createChat($page: PageCreateOneWithoutChatsInput!, $text: String!) {
-    createPageChat(
-      data: {
-        page: $page
-        text: $text
-      }
-    ) {
+    createPageChat(data: { page: $page, text: $text }) {
       id
       text
       createdAt
       user {
-        name
+        username
         avatar
         email
       }
@@ -205,7 +231,7 @@ const QueryAndMutationsForTasks = adopt({
                 // Add node into array
                 return {
                   ...prev,
-                  pageTasks: prev.pageTasks.concat([node])
+                  pageTasks: prev.pageTasks.concat([node]),
                 };
               }
 
@@ -217,12 +243,12 @@ const QueryAndMutationsForTasks = adopt({
                     if (task.id === node.id) {
                       return {
                         ...task,
-                        ...node
+                        ...node,
                       };
                     }
 
                     return task;
-                  })
+                  }),
                 };
               }
 
@@ -236,10 +262,10 @@ const QueryAndMutationsForTasks = adopt({
                     }
 
                     return true;
-                  })
+                  }),
                 };
               }
-            }
+            },
           });
         };
 
@@ -257,12 +283,12 @@ const QueryAndMutationsForTasks = adopt({
       update={(cache, { data: { createPageTask } }) => {
         const { pageTasks } = cache.readQuery({
           query: PAGE_TASK_LIST,
-          variables: { pageTranslation }
+          variables: { pageTranslation },
         });
         cache.writeQuery({
           query: PAGE_TASK_LIST,
           variables: { pageTranslation },
-          data: { pageTasks: pageTasks.concat([createPageTask]) }
+          data: { pageTasks: pageTasks.concat([createPageTask]) },
         });
       }}
     >
@@ -272,8 +298,8 @@ const QueryAndMutationsForTasks = adopt({
           const res = {
             ...task,
             pageTranslation: {
-              connect: { id: pageTranslation }
-            }
+              connect: { id: pageTranslation },
+            },
           };
 
           createTask({ variables: res });
@@ -289,8 +315,8 @@ const QueryAndMutationsForTasks = adopt({
           toggleTask({
             variables: {
               id,
-              done
-            }
+              done,
+            },
           });
         };
 
@@ -305,8 +331,8 @@ const QueryAndMutationsForTasks = adopt({
           updateTask({
             variables: {
               id,
-              ...task
-            }
+              ...task,
+            },
           });
         };
 
@@ -320,7 +346,7 @@ const QueryAndMutationsForTasks = adopt({
       update={(cache, { data: { deletePageTask } }) => {
         const { pageTasks } = cache.readQuery({
           query: PAGE_TASK_LIST,
-          variables: { pageTranslation }
+          variables: { pageTranslation },
         });
         const removed = pageTasks.filter((task: LooseObject) => {
           if (task.id === deletePageTask.id) {
@@ -332,7 +358,7 @@ const QueryAndMutationsForTasks = adopt({
         cache.writeQuery({
           query: PAGE_TASK_LIST,
           variables: { pageTranslation },
-          data: { pageTasks: removed }
+          data: { pageTasks: removed },
         });
       }}
     >
@@ -344,7 +370,7 @@ const QueryAndMutationsForTasks = adopt({
         return render(fce);
       }}
     </Mutation>
-  )
+  ),
 });
 
 interface QaMForTasksVars {
@@ -396,9 +422,9 @@ const QueryAndMutationsForChats = adopt({
 
               return {
                 ...prev,
-                pageChats: res
+                pageChats: res,
               };
-            }
+            },
           });
         };
 
@@ -416,13 +442,13 @@ const QueryAndMutationsForChats = adopt({
       update={(cache, { data: { createPageChat } }) => {
         const { pageChats } = cache.readQuery({
           query: PAGE_CHAT_LIST,
-          variables: { page }
+          variables: { page },
         });
 
         cache.writeQuery({
           query: PAGE_CHAT_LIST,
           variables: { page },
-          data: { pageChats: pageChats.concat([createPageChat]) }
+          data: { pageChats: pageChats.concat([createPageChat]) },
         });
       }}
     >
@@ -431,15 +457,15 @@ const QueryAndMutationsForChats = adopt({
           creeatePageChat({
             variables: {
               page: { connect: { id: page } },
-              text
-            }
+              text,
+            },
           });
         };
 
         return render(fce);
       }}
     </Mutation>
-  )
+  ),
 });
 
 interface QaMForChatsVars {
@@ -455,7 +481,7 @@ interface QaMForChatsVars {
 
 class ChatTasks extends Component<Properties, State> {
   private RESET_STATE = {
-    hidden: true
+    hidden: true,
   } as State;
 
   private CHAT_COLUMN_SIZE = 15;
@@ -464,7 +490,7 @@ class ChatTasks extends Component<Properties, State> {
     super(props);
 
     this.state = {
-      ...this.RESET_STATE
+      ...this.RESET_STATE,
     };
   }
 
@@ -496,6 +522,7 @@ class ChatTasks extends Component<Properties, State> {
                       </Spin>
                     );
                   }
+
                   if (tasks.error) {
                     return <Tasks tasks={[]} />;
                   }
@@ -531,7 +558,8 @@ class ChatTasks extends Component<Properties, State> {
                   }
 
                   return (
-                  <Chat chats={chats.data} onCreate={create} subscribe={chats.subscribe} refetch={chats.refetch} />);
+                    <Chat chats={chats.data} onCreate={create} subscribe={chats.subscribe} refetch={chats.refetch} />
+                  );
                 }}
               </QueryAndMutationsForChats>
             </Tabs.TabPane>

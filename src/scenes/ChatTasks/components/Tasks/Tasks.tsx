@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { Button, Col, Input, List, Modal, Popconfirm, Row, Switch, Checkbox, Tag, Icon } from 'antd';
-import TaskList from '@source/components/Ui/TaskList';
+import { Button, Col, Input, List, Modal, Popconfirm, Row, Switch, Checkbox, Tag, Icon, Divider } from 'antd';
 
 const { Component } = React;
 
@@ -33,6 +32,7 @@ export interface TaskItem {
   done: boolean;
   updatedAt: Date;
   user?: LooseObject;
+  pageTranslation?: LooseObject;
 }
 
 const Title = (name: string, date: Date) => (
@@ -49,9 +49,8 @@ const ListRenderItem = (
 ) => (item: TaskItem) => (
   <List.Item style={{ borderBottom: '1px solid e8e8e8', borderTop: ' 1px solid e8e8e8' }}>
     {/* <List.Item.Meta title={Title(item.name, item.updatedAt)} description={item.description} />
-  */}
-
-    <List.Item>
+     */}
+    <>
       <div className={'dashBoard__card__task'}>
         <div className={'dashBoard__card__task__main'}>
           <Checkbox checked={item.done} onChange={() => toggle(item.id, !item.done)}>
@@ -64,17 +63,12 @@ const ListRenderItem = (
         </div>
 
         <div className={'dashBoard__card__task__detail'}>
-          {item.user &&
-            item.user.name &&
-            <span style={{ color: '#c6c6c6' }}>By {item.user.name}</span>
-          }
+          {item.user && item.user.name && <span style={{ color: '#c6c6c6' }}>By {item.user.name}</span>}
 
           <div>
             <Icon type={'tag'} />
             <span>
-              <Tag color="geekblue">BUG</Tag>
-              <Tag color="blue">JS</Tag>
-              <Tag color="cyan">CSS</Tag>
+              {item.pageTranslation && <Tag color="geekblue">{item.pageTranslation && item.pageTranslation.name}</Tag>}
             </span>
           </div>
         </div>
@@ -89,13 +83,13 @@ const ListRenderItem = (
             style={{ marginRight: '8px' }}
             onClick={() => edit(item.id, { name: item.name, description: item.description })}
           />
-          
+
           <Popconfirm title="Are you sure to delete this task?" onConfirm={() => remove(item.id)}>
             <Button type="danger" size="small" icon="delete" />
           </Popconfirm>
         </div>
       </div>
-    </List.Item>
+    </>
   </List.Item>
 );
 
@@ -170,6 +164,7 @@ class Tasks extends Component<Properties, State> {
             <Switch checked={this.state.showFinished} onChange={this.handleFinishedFilterSwitch} />
           </div>
 
+          {/*** Do not display this filter right now.
           <div
             style={{
               margin: '12px 0 12px',
@@ -181,10 +176,13 @@ class Tasks extends Component<Properties, State> {
             <span>Unfinished tasks first</span>
             <Switch checked={this.state.unfinishedFirst} onChange={this.handleUnfinishedFirstSwitch} />
           </div>
+           */}
         </div>
 
+        <Divider type="horizontal" />
+
         {/* List with tasks */}
-        <div style={{ overflowY: 'scroll', overflowX: 'hidden', height: '350px', paddingRight: '8px' }}>
+        <div style={{ overflowY: 'scroll', overflowX: 'hidden', paddingRight: '8px' }}>
           <List
             itemLayout={'vertical'}
             dataSource={data}
@@ -193,10 +191,12 @@ class Tasks extends Component<Properties, State> {
           />
         </div>
 
+        <Divider type="horizontal" />
+
         {/* Bottom control panel */}
-        <div style={{ marginTop: '12px', display: 'block-inline' }}>
-          <Button type="primary" onClick={this.handleCreateTask}>
-            Add new Task
+        <div style={{ display: 'block-inline', textAlign: 'center' }}>
+          <Button type="ghost" onClick={this.handleCreateTask} style={{}}>
+            <Icon type="plus" /> Create new task
           </Button>
         </div>
 

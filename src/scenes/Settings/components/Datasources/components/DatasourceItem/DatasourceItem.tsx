@@ -137,8 +137,11 @@ class DatasourceItem extends Component<Properties, State> {
   onChange = (datasource) => async ({ formData }: LooseObject) => {
 
     await this.setState({ formData });
-
-    const slug = datasource.slug.map(key => formData[key] || '').join('-').toLowerCase();
+    const slug = datasource.slug
+      .map(p => 
+        p.split('.').reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, formData) || ''
+      )
+      .join('-').toLowerCase();
     const uniqueSlug = this.getUniqueSlug(datasource, slug, 0);
 
     await this.setState({ 

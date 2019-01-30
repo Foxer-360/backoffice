@@ -1,17 +1,20 @@
 import decode from 'jwt-decode';
 import auth0 from 'auth0-js';
-import { request } from 'graphql-request';
 
 const ID_TOKEN_KEY = 'id_token';
 const ACCESS_TOKEN_KEY = 'access_token';
 const USER_KEY = 'user';
 const IS_APPLICATION_LOGGING_OUT = 'loginout';
 
+let renewTimer = null;
+
 const CLIENT_ID = process.env.REACT_APP_AUTH0_CLIENT_ID || 'C3APVkj7pSphv9x7qLZ7ib1eeyPO5lOh';
 const CLIENT_DOMAIN = process.env.REACT_APP_AUTH0_CLIENT_DOMAIN || 'nevim42.eu.auth0.com';
 const REDIRECT = process.env.REACT_APP_AUTH0_REDIRECT || 'http://localhost:3000/callback';
 // const SCOPE = 'YOUR_SCOPE';
 const AUDIENCE = process.env.REACT_APP_AUTH0_AUDIENCE || 'http://localhost:8000/';
+const SCOPE = 'openid profile email user_metadata app_metadata picture';
+const RESPONSE_TYPE = 'token id_token';
 
 var auth = new auth0.WebAuth({
   clientID: CLIENT_ID,
@@ -20,10 +23,10 @@ var auth = new auth0.WebAuth({
 
 export function login() {
   auth.authorize({
-    responseType: 'token id_token',
+    responseType: RESPONSE_TYPE,
     redirectUri: REDIRECT,
     audience: AUDIENCE,
-    scope: 'openid profile email user_metadata app_metadata picture'
+    scope: SCOPE
   });
 }
 
@@ -73,24 +76,6 @@ function getParameterByName(name: any) {
   return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
 }
 
-// Get and store access_token in local storage
-export function setAccessToken() {
-  let accessToken = getParameterByName('access_token');
-  if (!accessToken) {
-    return;
-  }
-  localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-}
-
-// Get and store id_token in local storage
-export function setIdToken() {
-  let idToken = getParameterByName('id_token');
-  if (!idToken) {
-    return;
-  }
-  localStorage.setItem(ID_TOKEN_KEY, idToken);
-}
-
 export function getError() {
   const error = getParameterByName('error');
   return error;
@@ -126,4 +111,77 @@ function getTokenExpirationDate(encodedToken: any) {
 function isTokenExpired(token: any) {
   const expirationDate = getTokenExpirationDate(token);
   return expirationDate < new Date();
+}
+
+export async function setSession(
+  authResult?: LooseObject,
+  silent: boolean = false
+) {
+  const idToken = (authResult && authResult.idToken) || getParameterByName(ID_TOKEN_KEY);
+  const expiresAt: Date = getTokenExpirationDate(idToken);
+  localStorage.setItem(ID_TOKEN_KEY, idToken);
+  localStorage.setItem(ACCESS_TOKEN_KEY, (authResult && authResult.accessToken) || getParameterByName(ACCESS_TOKEN_KEY));
+
+  // tslint:disable-next-line:no-any
+  const expiresIn: any = (authResult && authResult.expiresIn) || (expiresAt.getTime() - new Date().getTime());
+
+  localStorage.setItem(
+      'expires_at',
+      // tslint:disable-next-line:no-any
+      '' + expiresAt.getTime()
+  );
+
+  // zapne casovac
+  if (expiresIn > 10) {
+      startRenewTimer(expiresIn);
+  }
+
+  restartRenewTimer();
+  if (silent) {
+      return;
+  }
+}
+
+/**
+ * Renew token - use silent authentication
+ */
+// tslint:disable-next-line:no-any
+async function renew() {
+    const job = new Promise(resolve => {
+      auth.checkSession(
+            {
+                // tslint:disable-next-line:no-any
+                audience: AUDIENCE,
+                responseType: RESPONSE_TYPE,
+                scope: SCOPE,
+                redirectUri: REDIRECT
+            },
+            (err, authResult) => {
+                // Renewed tokens or error
+                if (err) {
+                    logout();
+                } else {
+                    setSession(authResult, false);
+                }
+            }
+        );
+    });
+
+    await job;
+}
+
+// tslint:disable-next-line:no-any
+function startRenewTimer(expiresIn: any) {
+  if (renewTimer !== null) {
+      clearInterval(renewTimer);
+  }
+  if (!isNaN(expiresIn) && parseInt(expiresIn, 0) > 0) {
+      renewTimer = setTimeout(() => {
+          renew();
+      }, parseInt(expiresIn, 0));
+  }
+}
+
+function restartRenewTimer() {
+  startRenewTimer( (parseInt(localStorage.getItem('expires_at') as string, 10) - new Date().getTime()) );
 }
