@@ -10,6 +10,7 @@ import JSONInput from 'react-json-editor-ajrm';
 import locale    from 'react-json-editor-ajrm/locale/en';
 import * as Ajv from 'ajv';
 import { urlize } from  'urlize';
+import { capitalizeFirstLetter } from '@source/utils/index';
 
 const ajv = new Ajv();
 
@@ -102,7 +103,10 @@ class DatasourceItem extends Component<Properties, State> {
 
     return (
       <div>
-        <Query query={DATASOURCE} variables={{ id: datasourceId }}>
+        <Query 
+          query={DATASOURCE} 
+          variables={{ id: datasourceId }}
+        >
           {({ data, loading, error }) => {
 
             if (loading) { 
@@ -116,13 +120,18 @@ class DatasourceItem extends Component<Properties, State> {
             const { datasource } = data;
             const validate = ajv.compile(datasource.schema);
 
+            const originalItem = 
+              (datasourceItemId && 
+              datasourceItemId !== 'new' &&
+              datasource.datasourceItems
+                .find(item => item.id === datasourceItemId));
+
             return  <div>
               <Row>
-                <h3>Url slug: {this.state.slug}</h3>
+                <h3>Url slug: {this.state.slug || originalItem.slug}</h3>
               </Row>
               <Row
                 justify={'center'}
-                 
               >
                 <Col
                   span={12}
@@ -136,12 +145,7 @@ class DatasourceItem extends Component<Properties, State> {
                     onSubmit={this.onSubmit(datasource)}
                     onError={this.onError}
                     formData={
-                      this.state.formData ||
-                      (datasourceItemId && 
-                        datasourceItemId !== 'new' &&
-                        datasource.datasourceItems
-                          .find(item => item.id === datasourceItemId).content
-                      ) || {}}
+                      this.state.formData || (originalItem && originalItem.content) || {}}
                   />
                 </Col>
                 <Col
@@ -154,7 +158,7 @@ class DatasourceItem extends Component<Properties, State> {
                       borderBottom: '1px solid #e5e5e5'
                     }}
                   >
-                    Doctor data
+                    {capitalizeFirstLetter(datasource.type)} data
                   </p>
                   {this.state.errors && this.state.errors.length > 0 &&
                     <Alert
@@ -171,12 +175,7 @@ class DatasourceItem extends Component<Properties, State> {
                       return e;
                     }}
                     placeholder={
-                      this.state.formData ||
-                      (datasourceItemId && 
-                        datasourceItemId !== 'new' &&
-                        datasource.datasourceItems
-                          .find(item => item.id === datasourceItemId).content
-                      ) || {}}
+                      this.state.formData || (originalItem && originalItem.content) || {}}
                     locale={locale}
                     width={'100%'}
                     onChange={async ({ jsObject: formData }) => {
@@ -184,7 +183,6 @@ class DatasourceItem extends Component<Properties, State> {
                         await this.onChange(datasource)({ formData }); 
                         await this.setState({ errors: [] });
                       } else {
-                        console.log(validate.errors);
                         this.setState({ errors: validate.errors });
                       }
                     }}
@@ -224,11 +222,11 @@ class DatasourceItem extends Component<Properties, State> {
       }
     } = this.props;
 
-    if (datasource.datasourceItems.some(item => item.slug === `${slug}-${index}` && datasourceItemId !== item.id)) {
+    if (datasource.datasourceItems.some(item => item.slug === `${slug}${(index > 0 ? `-${index}` : '')}` && datasourceItemId !== item.id)) {
       index++;
       return this.getUniqueSlug(datasource, slug, index);
     } else {
-      return `${slug}-${index}`;
+      return `${slug}${(index > 0 ? `-${index}` : '')}`;
     }
   }
 
@@ -239,6 +237,9 @@ class DatasourceItem extends Component<Properties, State> {
           datasourceItemId,
 
         }
+      },
+      history: {
+        push
       }
     } = this.props;
 
@@ -247,7 +248,11 @@ class DatasourceItem extends Component<Properties, State> {
       return;
     }
 
-    this.updateItem(datasource, datasourceItemId);
+    if (!this.state.formData) {
+      push(`/datasource-items/${datasource.id}`);
+    } else {
+      this.updateItem(datasource, datasourceItemId);
+    }
 
   }
 

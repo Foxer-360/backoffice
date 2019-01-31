@@ -401,7 +401,7 @@ class DatasourceModal extends Component<Properties, State> {
         push
       }
     } = this.props;
-    
+
     const isValid = await this.validate();
 
     if (!isValid) { return; }

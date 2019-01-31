@@ -17,4 +17,8 @@ const dateFormatter = inputDate => {
   return finalDate;
 };
 
-export { deepCopy, dateFormatter };
+const capitalizeFirstLetter = (text: string) => {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
+
+export { deepCopy, dateFormatter, capitalizeFirstLetter };

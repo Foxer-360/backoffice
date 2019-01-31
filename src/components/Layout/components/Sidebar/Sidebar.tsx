@@ -3,6 +3,7 @@ import { Icon, Menu } from 'antd';
 import { Link } from 'react-router-dom';
 import gql from 'graphql-tag';
 import { client } from '@source/services/graphql';
+import { capitalizeFirstLetter } from '@source/utils/index';
 import { Query } from 'react-apollo';
 import Pluralize from 'pluralize';
 
@@ -38,10 +39,6 @@ const DATASOURCES = gql`{
     displayInNavigation
   }
 }`;
-
-const capitalizeFirstLetter = (text: string) => {
-  return text.charAt(0).toUpperCase() + text.slice(1);
-};
 
 class Sidebar extends Component<Properties, State> {
 
