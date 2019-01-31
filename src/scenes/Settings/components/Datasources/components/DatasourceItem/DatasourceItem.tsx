@@ -181,7 +181,7 @@ class DatasourceItem extends Component<Properties, State> {
                     width={'100%'}
                     onChange={async ({ jsObject: formData }) => {
                       if (validate(formData)) { 
-                        await this.setState({ formData }); 
+                        await this.onChange(datasource)({ formData }); 
                         await this.setState({ errors: [] });
                       } else {
                         console.log(validate.errors);
