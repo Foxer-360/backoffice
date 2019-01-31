@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import gql from 'graphql-tag';
 import { client } from '@source/services/graphql';
 import { Query } from 'react-apollo';
+import Pluralize from 'pluralize';
 
 import './sidebar.scss';
 import TagsFilter from '@source/components/TagsFilter';
@@ -37,6 +38,10 @@ const DATASOURCES = gql`{
     displayInNavigation
   }
 }`;
+
+const capitalizeFirstLetter = (text: string) => {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
 
 class Sidebar extends Component<Properties, State> {
 
@@ -130,6 +135,10 @@ class Sidebar extends Component<Properties, State> {
                 Pages
               </Link>
             </Item>
+            {datasources.filter(({ displayInNavigation }) => displayInNavigation).map((datasource) => (<Item key={datasource.type}>
+                <Icon type="usergroup-add" />
+                <Link to={`/datasource-items/${datasource.id}`}>{capitalizeFirstLetter(Pluralize(datasource.type, 42))}</Link>
+              </Item>))}
             <Item key="subscribers">
               <Icon type="usergroup-add" />
               <Link to="/subscribers">Subscribers</Link>
@@ -142,10 +151,6 @@ class Sidebar extends Component<Properties, State> {
               <Icon type="tool" />
               <Link to="/settings">Settings</Link>
             </Item>
-            {datasources.filter(({ displayInNavigation }) => displayInNavigation).map((datasource) => (<Item key={datasource.type}>
-                <Icon type="tool" />
-                <Link to={`/datasource-items/${datasource.id}`}>{datasource.type}</Link>
-              </Item>))}
           </Menu>
           <TagsFilter filteredTags={true} />
         </>);

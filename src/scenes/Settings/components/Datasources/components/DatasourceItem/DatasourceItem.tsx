@@ -1,11 +1,17 @@
 import * as React from 'react';
-import { Row, Col, Table, Button, Popconfirm } from 'antd';
+import { Row, Col, Alert, } from 'antd';
 import Form from 'react-jsonschema-form';
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
 import { withRouter } from 'react-router';
 import { RouteComponentProps } from 'react-router';
 import { client } from '@source/services/graphql';
+import JSONInput from 'react-json-editor-ajrm';
+import locale    from 'react-json-editor-ajrm/locale/en';
+import * as Ajv from 'ajv';
+import { urlize } from  'urlize';
+
+const ajv = new Ajv();
 
 const DATASOURCE = gql`
   query datasource($id: ID!) {
@@ -68,6 +74,7 @@ interface Properties extends RouteComponentProps<LooseObject> { }
 interface State {
   formData?: {};
   slug: String;
+  errors: Array<LooseObject>;
 }
 
 class DatasourceItem extends Component<Properties, State> {
@@ -77,7 +84,8 @@ class DatasourceItem extends Component<Properties, State> {
 
     this.state = {
       formData: null,
-      slug: ''
+      slug: '',
+      errors: [],
     };
   }
 
@@ -106,26 +114,84 @@ class DatasourceItem extends Component<Properties, State> {
             }
 
             const { datasource } = data;
+            const validate = ajv.compile(datasource.schema);
+
             return  <div>
               <Row>
                 <h3>Url slug: {this.state.slug}</h3>
               </Row>
-              <Row>
-                <Form 
-                  schema={datasource.schema}
-                  uiSchema={datasource.uiSchema || {}}
-                  onChange={this.onChange(datasource)}
-                  onSubmit={this.onSubmit(datasource)}
-                  onError={this.onError}
-                  formData={
-                    this.state.formData ||
-                    (datasourceItemId && 
-                      datasourceItemId !== 'new' &&
-                      datasource.datasourceItems
-                        .find(item => item.id === datasourceItemId).content
-                    ) || {}}
-                />
+              <Row
+                justify={'center'}
+                 
+              >
+                <Col
+                  span={12}
+                  style={{ padding: '10px' }}
+                >
+                  <Form
+
+                    schema={datasource.schema}
+                    uiSchema={datasource.uiSchema || {}}
+                    onChange={this.onChange(datasource)}
+                    onSubmit={this.onSubmit(datasource)}
+                    onError={this.onError}
+                    formData={
+                      this.state.formData ||
+                      (datasourceItemId && 
+                        datasourceItemId !== 'new' &&
+                        datasource.datasourceItems
+                          .find(item => item.id === datasourceItemId).content
+                      ) || {}}
+                  />
+                </Col>
+                <Col
+                  span={12}
+                  style={{ padding: '10px' }}
+                >
+                  <p 
+                    style={{ 
+                      fontSize: '21px',
+                      borderBottom: '1px solid #e5e5e5'
+                    }}
+                  >
+                    Doctor data
+                  </p>
+                  {this.state.errors && this.state.errors.length > 0 &&
+                    <Alert
+                      style={{ marginTop: 10 }}
+                      message="Error Text"
+                      description={<>
+                        {this.state.errors.map(e => (<p>{e.dataPath || ''} {e.message}</p>))}
+                      </>}
+                      type="error"
+                    />}
+                  <JSONInput
+                    id={'jsonData'}
+                    modifyErrorText={(e) => {
+                      return e;
+                    }}
+                    placeholder={
+                      this.state.formData ||
+                      (datasourceItemId && 
+                        datasourceItemId !== 'new' &&
+                        datasource.datasourceItems
+                          .find(item => item.id === datasourceItemId).content
+                      ) || {}}
+                    locale={locale}
+                    width={'100%'}
+                    onChange={async ({ jsObject: formData }) => {
+                      if (validate(formData)) { 
+                        await this.setState({ formData }); 
+                        await this.setState({ errors: [] });
+                      } else {
+                        console.log(validate.errors);
+                        this.setState({ errors: validate.errors });
+                      }
+                    }}
+                  />
+                </Col>
               </Row>
+
             </div>;
 
           }}
@@ -137,11 +203,11 @@ class DatasourceItem extends Component<Properties, State> {
   onChange = (datasource) => async ({ formData }: LooseObject) => {
 
     await this.setState({ formData });
-    const slug = datasource.slug
+    const slug = urlize(datasource.slug
       .map(p => 
         p.split('.').reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, formData) || ''
       )
-      .join('-').toLowerCase();
+      .join('-').toLowerCase());
     const uniqueSlug = this.getUniqueSlug(datasource, slug, 0);
 
     await this.setState({ 
