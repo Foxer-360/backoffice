@@ -1,10 +1,31 @@
 import { ILooseObject } from '@source/composer/types';
-import { Icon, Popconfirm, Collapse, Card } from 'antd';
+import { Icon, Popconfirm, Collapse, Card, Select } from 'antd';
 import * as React from 'react';
 import { IFormSchema } from '../../FormBuilder';
 import InputRenderer from '../InputRenderer';
 import Section from '../Section';
 import debounce from 'lodash/debounce';
+import gql from 'graphql-tag';
+import { Query } from 'react-apollo';
+import { AntAnchor } from 'antd/lib/anchor/Anchor';
+
+const Option = Select.Option;
+
+const DATASOURCES = gql`
+  query { 
+    datasources {
+      id
+      type
+      schema
+      slug
+      datasourceItems {
+        id
+        slug
+        content
+      }
+    }
+  }
+`;
 
 // tslint:disable:jsx-no-multiline-js
 // tslint:disable:jsx-no-lambda
@@ -12,7 +33,8 @@ import debounce from 'lodash/debounce';
 interface IArrayInputsProps {
   title: string;
   name: string;
-  data: ILooseObject[];
+  // tslint:disable-next-line:no-any
+  data: any;
   items: IFormSchema;
   // tslint:disable-next-line:no-any
   onChange: (e: React.ChangeEvent | any) => void;
@@ -170,12 +192,57 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     if (this.state.loading) {
       return <Card loading={true} />;
     }
+
+    return (
+    <Query query={DATASOURCES}>{({ error, loading, data }) => {
+
+      if (error) { return 'Error...'; }
+      if (loading) { return 'Loading...'; }
+
+      const { datasources } = data;
     return (
       <Section title={this.props.title}>
         {/* 
           If there accordion=false the bugs is commig beacause activeTab just a single number
         */}
 
+        <Select 
+          defaultValue="Select dynamic source" 
+          style={{ width: 120 }} 
+          onChange={(id) => {
+            this.props.onChange({
+              target: {
+                name: this.props.name,
+                value: { datasourceId: id, data: {} }
+              }
+            });
+          }}
+        >
+          {datasources.map(datasource => <Option key={datasource.id} value={datasource.id}>{datasource.type}</Option>)}
+        </Select>
+
+        {this.props.data.datasourceId && 
+          <div>
+            {this.props.items &&
+            this.props.items.properties &&
+            Object.keys(this.props.items.properties).map((elementName: string, j: number) => {
+              const element = this.props.items.properties[elementName];
+
+              return (
+                <InputRenderer
+                  key={`${j}`}
+                  id={`${j}`}
+                  name={elementName}
+                  {...element}
+                  value={this.props.data.data[elementName]}
+                  onChange={this.onChange}
+                  mediaLibraryChange={this.mediaLibraryChange}
+                />
+              );
+            })}
+          </div>
+        }
+        {!this.props.data.datasourceId && 
         <Collapse accordion={true} onChange={(key: string) => this.onChangeTab(key)}>
           {this.props.data &&
             this.props.data.map((dataRow: ILooseObject, index: number) => {
@@ -251,8 +318,9 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
               Add new item
             </a>
           </div>
-        </Collapse>
-      </Section>
+        </Collapse>}
+    </Section>); 
+    }}</Query>
     );
   }
 }
