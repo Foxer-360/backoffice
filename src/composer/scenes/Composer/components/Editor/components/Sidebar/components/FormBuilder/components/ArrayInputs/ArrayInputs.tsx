@@ -1,5 +1,5 @@
 import { ILooseObject } from '@source/composer/types';
-import { Icon, Popconfirm, Collapse, Card, Select } from 'antd';
+import { Icon, Popconfirm, Collapse, Card, Select, Popover, Button, Alert, Row, Input } from 'antd';
 import * as React from 'react';
 import { IFormSchema } from '../../FormBuilder';
 import InputRenderer from '../InputRenderer';
@@ -49,6 +49,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
   constructor(props: IArrayInputsProps) {
     super(props);
     this.onChange = this.onChange.bind(this);
+    this.onDynamicSourceDataChange = this.onDynamicSourceDataChange.bind(this);
     this.onEditTab = this.onEditTab.bind(this);
     this.mediaLibraryChange = this.mediaLibraryChange.bind(this);
     this.getNextIdValue = this.getNextIdValue.bind(this);
@@ -165,6 +166,38 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     });
   }
 
+  // tslint:disable-next-line:no-any
+  public onDynamicSourceDataChange(e: any) {
+
+    const newData = {...this.props.data.data};
+
+    newData[e.target.name] = e.target.value;
+
+    this.props.onChange({
+      target: {
+        name: this.props.name,
+        value: {
+          ...this.props.data,
+          data: newData,
+        }
+      }
+    });
+  }
+
+  // tslint:disable-next-line:no-any
+  public onDynamicSourceChange = (key) => (val: any) => {
+
+    this.props.onChange({
+      target: {
+        name: this.props.name,
+        value: {
+          ...this.props.data,
+          [key]: val,
+        }
+      }
+    });
+  }
+
   public mediaLibraryChange(media: { value: object; name: string }) {
     let rowIndex = this.props.data.findIndex((row: ILooseObject) => row.id === this.props.activeTab);
 
@@ -205,24 +238,43 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
         {/* 
           If there accordion=false the bugs is commig beacause activeTab just a single number
         */}
-
-        <Select 
-          defaultValue="Select dynamic source" 
-          style={{ width: 120 }} 
-          onChange={(id) => {
-            this.props.onChange({
-              target: {
-                name: this.props.name,
-                value: { datasourceId: id, data: {} }
-              }
-            });
-          }}
-        >
-          {datasources.map(datasource => <Option key={datasource.id} value={datasource.id}>{datasource.type}</Option>)}
-        </Select>
-
         {this.props.data.datasourceId && 
           <div>
+            <Card>
+              <Row style={{ paddingBottom: 10 }}>
+                Datsource: {this.dynamicSourceSelect(datasources)}
+                <Button
+                    style={{ marginLeft: 5 }}
+                    onClick={() => this.props.onChange({
+                      target: {
+                        name: this.props.name,
+                        value: [],
+                      },
+                    })}
+                >
+                  Fill static data
+                </Button>
+              </Row>
+              <Row style={{ paddingBottom: 10 }}>
+                Order by: <Input
+                  style={{ width: 250 }}
+                  defaultValue={this.props.data.orderBy || ''}
+                  onChange={(e) => this.onDynamicSourceChange('orderBy')(e.target.value)}
+                />
+              </Row>
+              {this.props.data.orderBy &&
+                <Row>
+                  Order:
+                  <Select
+                    style={{ marginLeft: 5, width: 120 }}
+                    onChange={this.onDynamicSourceChange('order')}
+                    value={this.props.data.order || 'ASC'}
+                  >
+                    <Option value={'ASC'} key={'ASC'}>Ascending</Option>
+                    <Option value={'DESC'} key={'DESC'}>Descending</Option>
+                  </Select>
+                </Row>}
+            </Card>
             {this.props.items &&
             this.props.items.properties &&
             Object.keys(this.props.items.properties).map((elementName: string, j: number) => {
@@ -235,94 +287,136 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                   name={elementName}
                   {...element}
                   value={this.props.data.data[elementName]}
-                  onChange={this.onChange}
+                  onChange={this.onDynamicSourceDataChange}
                   mediaLibraryChange={this.mediaLibraryChange}
                 />
               );
             })}
           </div>
         }
-        {!this.props.data.datasourceId && 
-        <Collapse accordion={true} onChange={(key: string) => this.onChangeTab(key)}>
-          {this.props.data &&
-            this.props.data.map((dataRow: ILooseObject, index: number) => {
-              let title = null;
-              if (this.props.items.properties) {
-                const properties: LooseObject = this.props.items.properties;
-                title = (properties.title && properties.title.type === 'string' && dataRow.title) || `Item ${index}`;
-              }
-
-              const panelTitle = (
-                <>
-                  <div
-                    onClick={e => {
-                      e.stopPropagation();
-                    }}
-                  >
-                    {title || 'new item'}
-
-                    <div style={{ position: 'absolute', top: '30%', right: '35px' }}>
-                      <Icon
-                        onClick={() => this.onEditTab(index.toString(), 'up')}
-                        type="arrow-up"
-                        style={{ marginRight: '5px' }}
-                      />
-                      <Icon onClick={() => this.onEditTab(index.toString(), 'down')} type="arrow-down" />
-                    </div>
-
-                    <Popconfirm
-                      title="Are you sure delete this tab?"
-                      onConfirm={() => this.removeItem(dataRow.id)}
-                      okText="Yes"
-                      cancelText="No"
-                    >
-                      <Icon
-                        type="close"
-                        theme="outlined"
-                        style={{ color: '#f5222d', position: 'absolute', top: '40%', right: '15px' }}
-                        className="anticon anticon-close ant-tabs-close-x"
-                      />
-                    </Popconfirm>
-                  </div>
-                </>
-              );
-
-              return (
-                <Collapse.Panel key={dataRow.id} header={panelTitle}>
-                  {this.props.items &&
-                    this.props.items.properties &&
-                    Object.keys(this.props.items.properties).map((elementName: string, j: number) => {
-                      const element = this.props.items.properties[elementName];
-
-                      return (
-                        <InputRenderer
-                          key={`${dataRow.id}_${j}`}
-                          id={`${dataRow.id}_${j}`}
-                          name={elementName}
-                          {...element}
-                          value={dataRow[elementName]}
-                          onChange={this.onChange}
-                          mediaLibraryChange={this.mediaLibraryChange}
-                        />
-                      );
-                    })}
-                </Collapse.Panel>
-              );
-            })}
-          <div key={'new-collapse'} className={'ant-collapse-item'} style={{ backgroundColor: 'white' }}>
-            <a
-              className={'ant-collapse-header'}
-              onClick={() => this.onNewTab()}
-              style={{ display: 'block', padding: '10px 0', textAlign: 'center', color: '#1890ff' }}
+        {!this.props.data.datasourceId && <>
+          <Popover 
+            content={<>
+              <Row style={{ paddingBottom: 10 }}>
+                  <Alert
+                    message={'By selection of dynamic datasource actual data will be erased.'}
+                    type={'warning'}
+                    showIcon={true}
+                  />
+              </Row>
+              <Row>  
+                Datsource: {this.dynamicSourceSelect(datasources)}
+              </Row>
+            </>}
+          >
+            <Button
+              style={{ marginBottom: 10 }}
             >
-              Add new item
-            </a>
-          </div>
-        </Collapse>}
+              Select dynamic source
+            </Button>
+          </Popover>
+          <Collapse accordion={true} onChange={(key: string) => this.onChangeTab(key)}>
+            {this.props.data &&
+              this.props.data.map((dataRow: ILooseObject, index: number) => {
+                let title = null;
+                if (this.props.items.properties) {
+                  const properties: LooseObject = this.props.items.properties;
+                  title = (properties.title && properties.title.type === 'string' && dataRow.title) || `Item ${index}`;
+                }
+
+                const panelTitle = (
+                  <>
+                    <div
+                      onClick={e => {
+                        e.stopPropagation();
+                      }}
+                    >
+                      {title || 'new item'}
+
+                      <div style={{ position: 'absolute', top: '30%', right: '35px' }}>
+                        <Icon
+                          onClick={() => this.onEditTab(index.toString(), 'up')}
+                          type="arrow-up"
+                          style={{ marginRight: '5px' }}
+                        />
+                        <Icon onClick={() => this.onEditTab(index.toString(), 'down')} type="arrow-down" />
+                      </div>
+
+                      <Popconfirm
+                        title="Are you sure delete this tab?"
+                        onConfirm={() => this.removeItem(dataRow.id)}
+                        okText="Yes"
+                        cancelText="No"
+                      >
+                        <Icon
+                          type="close"
+                          theme="outlined"
+                          style={{ color: '#f5222d', position: 'absolute', top: '40%', right: '15px' }}
+                          className="anticon anticon-close ant-tabs-close-x"
+                        />
+                      </Popconfirm>
+                    </div>
+                  </>
+                );
+
+                return (
+                  <Collapse.Panel key={dataRow.id} header={panelTitle}>
+                    {this.props.items &&
+                      this.props.items.properties &&
+                      Object.keys(this.props.items.properties).map((elementName: string, j: number) => {
+                        const element = this.props.items.properties[elementName];
+
+                        return (
+                          <InputRenderer
+                            key={`${dataRow.id}_${j}`}
+                            id={`${dataRow.id}_${j}`}
+                            name={elementName}
+                            {...element}
+                            value={dataRow[elementName]}
+                            onChange={this.onChange}
+                            mediaLibraryChange={this.mediaLibraryChange}
+                          />
+                        );
+                      })}
+                  </Collapse.Panel>
+                );
+              })}
+            <div key={'new-collapse'} className={'ant-collapse-item'} style={{ backgroundColor: 'white' }}>
+              <a
+                className={'ant-collapse-header'}
+                onClick={() => this.onNewTab()}
+                style={{ display: 'block', padding: '10px 0', textAlign: 'center', color: '#1890ff' }}
+              >
+                Add new item
+              </a>
+            </div>
+          </Collapse>
+        </>}
     </Section>); 
     }}</Query>
     );
   }
+
+  dynamicSourceSelect(datasources: Array<LooseObject>) {
+    return (
+      <Select 
+        defaultValue={this.props.data.datasourceId || 'Select'}
+        style={{ width: 120 }}
+        onChange={(id) => {
+          this.props.onChange({
+            target: {
+              name: this.props.name,
+              value: {
+                datasourceId: id,
+                data: {},
+              }
+            }
+          });
+        }}
+      >
+      {datasources.map(datasource => <Option key={datasource.id} value={datasource.id}>{datasource.type}</Option>)}
+      </Select>);
+  } 
 }
 
 export default ArrayInputs;
