@@ -5,7 +5,7 @@
     }
 
     .avatar-uploader > .ant-upload {
-      max-width: 250px;
+      max-width: 250px;  
       min-width: 250px;
       min-height: 250px;
       height: auto;
@@ -36,10 +36,10 @@
 
   &__gallery {
     &__row {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      justify-content: flex-start;
+      // display: flex;
+      // flex-direction: row;
+      // flex-wrap: wrap;
+      // justify-content: flex-start;
 
       .ant-upload-list-picture-card {
         width: 32%;
