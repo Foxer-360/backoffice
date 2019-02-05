@@ -7,7 +7,8 @@ import Section from '../Section';
 import debounce from 'lodash/debounce';
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
-import { AntAnchor } from 'antd/lib/anchor/Anchor';
+import deref from 'json-schema-deref-sync';
+import { client } from '@source/services/graphql';
 
 const Option = Select.Option;
 
@@ -39,10 +40,12 @@ interface IArrayInputsProps {
   // tslint:disable-next-line:no-any
   onChange: (e: React.ChangeEvent | any) => void;
   activeTab: number;
+  schemaPaths: Array<string>;
 }
 
 interface IArrayInputsState {
   loading: boolean;
+  schemaPaths: Array<string>;
 }
 
 class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> {
@@ -56,6 +59,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     this.onChangeTab = this.onChangeTab.bind(this);
     this.state = {
       loading: true,
+      schemaPaths: []
     };
   }
 
@@ -92,6 +96,16 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
       this.setState({ loading: false });
     } else {
       this.setState({ loading: false });
+    }
+
+    if (this.props.data.datasourceId) {
+      client.query({
+        query: DATASOURCES
+      }).then((res: LooseObject) => {
+        if (res && res.data && res.data.datasources) {
+          this.setSchemaPaths(res.data.datasources, this.props.data.datasourceId);
+        }
+      });
     }
   }
 
@@ -198,6 +212,52 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     });
   }
 
+  public onDynamicSourceSelection = (datasources) => async (id) => {
+
+    await this.setSchemaPaths(datasources, id);
+
+    this.props.onChange({
+      target: {
+        name: this.props.name,
+        value: {
+          datasourceId: id,
+          data: {},
+        }
+      }
+    });
+  }
+
+  public async setSchemaPaths(datasources: Array<LooseObject>, datasourceId: string) {
+    const datasource = datasources.find(source => source.id === datasourceId);
+
+    if (!datasource) { return; }
+
+    const schemaWithoutRefs = deref(datasource.schema);
+    const paths = [];
+    this.getSchemaPaths(schemaWithoutRefs, '', paths);
+
+    await this.setState({ schemaPaths: paths });
+  }
+
+  public getSchemaPaths(schemaWithoutRefs: LooseObject, path: string, paths: Array<string>) {
+    if (!schemaWithoutRefs.properties && schemaWithoutRefs.type === 'string') {
+      paths.push(`${path}%`);
+    } else if (schemaWithoutRefs.properties) {
+      Object.keys(schemaWithoutRefs.properties).forEach(key => {
+        let newPath = String(path);
+        let prefix = path.length > 0 ? ',' : '';
+        if (schemaWithoutRefs.properties[key].type === 'array') {
+          newPath += `${prefix}${key},[n]`;
+          return this.getSchemaPaths(schemaWithoutRefs.properties[key].items, newPath, paths);
+        } else {
+          newPath += `${prefix}${key}`;
+          return this.getSchemaPaths(schemaWithoutRefs.properties[key], newPath, paths);
+        }
+      
+      });
+    }
+  }
+
   public mediaLibraryChange(media: { value: object; name: string }) {
     let rowIndex = this.props.data.findIndex((row: ILooseObject) => row.id === this.props.activeTab);
 
@@ -255,25 +315,49 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                   Fill static data
                 </Button>
               </Row>
-              <Row style={{ paddingBottom: 10 }}>
-                Order by: <Input
-                  style={{ width: 250 }}
-                  defaultValue={this.props.data.orderBy || ''}
-                  onChange={(e) => this.onDynamicSourceChange('orderBy')(e.target.value)}
-                />
+              <Row>
+                <Section title={'Order by'}>
+                  <Row style={{ paddingBottom: 10 }}>
+                    Key: <Input
+                      style={{ width: 250 }}
+                      defaultValue={this.props.data.orderBy || ''}
+                      onChange={(e) => this.onDynamicSourceChange('orderBy')(e.target.value)}
+                    />
+                  </Row>
+                  {this.props.data.orderBy &&
+                    <Row style={{ paddingBottom: 10 }}>
+                      Order:
+                      <Select
+                        style={{ marginLeft: 5, width: 120 }}
+                        onChange={this.onDynamicSourceChange('order')}
+                        value={this.props.data.order || 'ASC'}
+                      >
+                        <Option value={'ASC'} key={'ASC'}>Ascending</Option>
+                        <Option value={'DESC'} key={'DESC'}>Descending</Option>
+                      </Select>
+                    </Row>}
+                  </Section>
+                </Row>
+              <Row>
+                <Section title={'Filter by'}>
+                <Row style={{ paddingBottom: 10 }}>
+                  Key: <Input
+                    style={{ width: 250 }}
+                    defaultValue={this.props.data.filterBy || ''}
+                    onChange={(e) => this.onDynamicSourceChange('filterBy')(e.target.value)}
+                  />
+                </Row>
+                {this.props.data.filterBy &&
+                  <Row>
+                    Includes:
+                    <Input
+                      style={{ marginLeft: 5, width: 250 }}
+                      defaultValue={this.props.data.includes || ''}
+                      onChange={(e) => this.onDynamicSourceChange('includes')(e.target.value)}
+                    />
+                  </Row>}
+                </Section>
               </Row>
-              {this.props.data.orderBy &&
-                <Row>
-                  Order:
-                  <Select
-                    style={{ marginLeft: 5, width: 120 }}
-                    onChange={this.onDynamicSourceChange('order')}
-                    value={this.props.data.order || 'ASC'}
-                  >
-                    <Option value={'ASC'} key={'ASC'}>Ascending</Option>
-                    <Option value={'DESC'} key={'DESC'}>Descending</Option>
-                  </Select>
-                </Row>}
             </Card>
             {this.props.items &&
             this.props.items.properties &&
@@ -288,6 +372,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                   {...element}
                   value={this.props.data.data[elementName]}
                   onChange={this.onDynamicSourceDataChange}
+                  schemaPaths={[ ...this.state.schemaPaths, ...this.props.schemaPaths]}
                   mediaLibraryChange={this.mediaLibraryChange}
                 />
               );
@@ -402,17 +487,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
       <Select 
         defaultValue={this.props.data.datasourceId || 'Select'}
         style={{ width: 120 }}
-        onChange={(id) => {
-          this.props.onChange({
-            target: {
-              name: this.props.name,
-              value: {
-                datasourceId: id,
-                data: {},
-              }
-            }
-          });
-        }}
+        onChange={this.onDynamicSourceSelection(datasources)}
       >
       {datasources.map(datasource => <Option key={datasource.id} value={datasource.id}>{datasource.type}</Option>)}
       </Select>);
