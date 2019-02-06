@@ -88,7 +88,6 @@ class ImageGallery extends React.Component<IImageGalleryProps, IImageGalleryStat
 
         <Row justify={'center'}>
           <Col span={24}>
-            {console.log(this.props)}
             <Pagination
               defaultCurrent={1}
               current={this.props.currentPage}
