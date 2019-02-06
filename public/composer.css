@@ -74,7 +74,7 @@ body {
   width: 100%;
   max-width: 150px;
   height: 150px;
-  margin: 0 5px 5px 0;
+  margin: 0 0px 8px 0 !important;
 }
 .mediaLibrary__gallery__row .ant-upload-list-item-done img {
   width: 100%;

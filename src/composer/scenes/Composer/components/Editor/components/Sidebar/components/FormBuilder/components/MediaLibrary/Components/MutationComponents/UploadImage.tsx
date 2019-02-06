@@ -51,7 +51,7 @@ class UploadImage extends React.Component<IUploadImageProps, IUploadImageState> 
       .catch(err => {
         this.setState({ loading: false });
         notification.error({
-          description: 'Could not delete   image' + ' ' + err,
+          description: 'Could not delete image' + ' ' + err,
           message: 'Error',
         });
       });
