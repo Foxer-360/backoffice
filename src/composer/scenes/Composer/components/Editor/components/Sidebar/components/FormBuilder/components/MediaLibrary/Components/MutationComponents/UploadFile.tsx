@@ -31,6 +31,8 @@ class UploadFile extends React.Component<IUploadFileProps, IUploadFileState> {
     // tslint:disable:no-any
     fileList.forEach((file: any) => {
       formData.append('file', file);
+      formData.append('category', process.env.REACT_APP_MEDIA_LIBRARY_SERVER__CATEGORY + '/docs');
+      formData.append('type', 'file');
     });
 
     this.setState({ loading: true });
@@ -42,12 +44,16 @@ class UploadFile extends React.Component<IUploadFileProps, IUploadFileState> {
         'Content-Type': 'multipart/form-data',
       },
       method: 'post',
-      url: `/upload`,
+      url: `${process.env.REACT_APP_MEDIA_LIBRARY_SERVER}/uploadFile`,
     })
       .then(response => {
         this.setState({ loading: false });
+
         const file = response.data.createFile ? response.data.createFile : response.data.file;
-        const CompleteFile = { value: { ...file, ...mediaData }, name: 'image' };
+
+        const CompleteFile = { value: { ...file, ...mediaData }, name: 'file' };
+
+        console.log('%c Emilio: ', 'background: #222; color: #83FFFF', response);
 
         if (response.data.createFile) {
           notification.success({

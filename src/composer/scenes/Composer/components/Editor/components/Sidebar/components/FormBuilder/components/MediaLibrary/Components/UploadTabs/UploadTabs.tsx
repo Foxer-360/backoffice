@@ -57,7 +57,7 @@ export default class UploadTabs extends React.Component<UploadTabsProps, UploadT
           </Tabs.TabPane>
 
           <Tabs.TabPane tab="Files" key="3">
-            <UploadFile closeEditor={() => this.props.closeDrawer()} onChange={() => console.log('changing!')}>
+            <UploadFile closeEditor={() => this.props.closeDrawer()} onChange={this.props.onChange}>
               <FileEditor
                 name={this.props.name}
                 onChange={media => {

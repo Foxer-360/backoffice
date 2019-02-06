@@ -10,6 +10,8 @@ export interface FileEditorProps {
   closeEditor?: () => void;
   loading?: boolean;
   name: string;
+  // tslint:disable:no-any
+  file?: any;
 }
 
 export interface FileEditorState {
@@ -49,12 +51,13 @@ export default class FileEditor extends React.Component<FileEditorProps, FileEdi
     };
 
     return (
-      <div className={'mediaLibrary__editor'}>
+      <div className={'mediaLibrary__editor'}>  
         <Row>
           <Col span={24}>
             <Upload {...props}>
               <Button>
-                  <Icon type={this.props.loading ? 'loading' : 'plus'} />Select File
+                <Icon type={this.props.loading ? 'loading' : 'plus'} />
+                Select File
               </Button>
             </Upload>
           </Col>
@@ -75,7 +78,9 @@ export default class FileEditor extends React.Component<FileEditorProps, FileEdi
               Place
             </Button>
 
-            <Button type="danger" onClick={() => this.props.closeEditor()}>Close</Button>
+            <Button type="danger" onClick={() => this.props.closeEditor()}>
+              Close
+            </Button>
           </Col>
         </Row>
       </div>

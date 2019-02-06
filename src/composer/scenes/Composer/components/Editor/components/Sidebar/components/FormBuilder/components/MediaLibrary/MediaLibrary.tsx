@@ -64,7 +64,7 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
       <div>
         <div className={'ant-divider ant-divider-horizontal ant-divider-with-text-left'}>
           <span className={'ant-divider-inner-text'}>
-            {this.state.drawerType === 'editor' ? 'Media Editor: ' : 'Media Library'}
+            {this.state.drawerType === 'editor' ? `Media Editor: ${this.props.name} ` : 'Media Library'}
           </span>
         </div>
 
