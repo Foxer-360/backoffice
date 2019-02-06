@@ -9,6 +9,7 @@ const { Component } = React;
 const { confirm } = Modal;
 
 interface CustomProperty {
+  id: string;
   key: string;
   value: string;
   isDeleted: boolean;
@@ -20,6 +21,9 @@ export interface State {
   title: string;
   perex: string;
   image: string;
+  titleId: string;
+  perexId: string;
+  imageId: string;
 
   // Custom properties
   properties: CustomProperty[];
@@ -32,11 +36,12 @@ export interface State {
 }
 
 interface Record {
+  id: string;
   key: string;
   value: string;
 }
 
-interface ChangesOnSave {
+export interface ChangesOnSave {
   add: Record[];
   remove: Record[];
   update: Record[];
@@ -61,6 +66,9 @@ class AnnotationForm extends Component<Properties, State> {
       title: '',
       perex: '',
       image: '',
+      titleId: '',
+      perexId: '',
+      imageId: '',
 
       properties: [],
 
@@ -92,6 +100,7 @@ class AnnotationForm extends Component<Properties, State> {
     const count = this.state.properties.length + 1;
 
     const newProp = {
+      id: '',
       key: 'New Property #' + count,
       value: '',
       isNew: true,
@@ -198,20 +207,18 @@ class AnnotationForm extends Component<Properties, State> {
 
     // Check if state is different from new props
     const rec = [];
-    rec.push({ key: 'title', value: this.state.title });
-    rec.push({ key: 'perex', value: this.state.perex });
-    rec.push({ key: 'image', value: this.state.image });
+    rec.push({ id: this.state.titleId, key: 'title', value: this.state.title });
+    rec.push({ id: this.state.perexId, key: 'perex', value: this.state.perex });
+    rec.push({ id: this.state.imageId, key: 'image', value: this.state.image });
 
     this.state.properties.forEach((p: CustomProperty) => {
-      rec.push({ key: p.key, value: p.value });
+      rec.push({ id: p.id, key: p.key, value: p.value });
     });
 
     // Nothing to change
     if (deepEqual(this.props.records, rec)) {
       return;
     }
-
-    console.log(rec, prevProps.records, this.props.records);
 
     // Otherwise ask, if user wants to refresh data
     const onOk = () => {
@@ -231,6 +238,9 @@ class AnnotationForm extends Component<Properties, State> {
       title: '',
       perex: '',
       image: '',
+      titleId: '',
+      perexId: '',
+      imageId: '',
 
       properties: [],
     };
@@ -241,9 +251,11 @@ class AnnotationForm extends Component<Properties, State> {
         case 'perex':
         case 'image':
           result[r.key] = r.value;
+          result[r.key + 'Id'] = r.id;
           break;
         default:
           const p = {
+            id: r.id,
             key: r.key,
             value: r.value,
             isNew: false,
@@ -285,35 +297,35 @@ class AnnotationForm extends Component<Properties, State> {
     });
 
     if (isTitleNew) {
-      add.push({ key: 'title', value: this.state.title });
+      add.push({ id: '', key: 'title', value: this.state.title });
     } else {
-      update.push({ key: 'title', value: this.state.title });
+      update.push({ id: this.state.titleId, key: 'title', value: this.state.title });
     }
 
     if (isPerexNew) {
-      add.push({ key: 'perex', value: this.state.perex });
+      add.push({ id: '', key: 'perex', value: this.state.perex });
     } else {
-      update.push({ key: 'perex', value: this.state.perex });
+      update.push({ id: this.state.perexId, key: 'perex', value: this.state.perex });
     }
 
     if (isImageNew) {
-      add.push({ key: 'image', value: this.state.image });
+      add.push({ id: '', key: 'image', value: this.state.image });
     } else {
-      update.push({ key: 'image', value: this.state.image });
+      update.push({ id: this.state.imageId, key: 'image', value: this.state.image });
     }
 
     this.state.properties.forEach((p: CustomProperty) => {
       if (p.isNew && !p.isDeleted) {
-        add.push({ key: p.key, value: p.value });
+        add.push({ id: p.id, key: p.key, value: p.value });
         return;
       }
 
       if (!p.isNew && p.isDeleted) {
-        remove.push({ key: p.key, value: p.value });
+        remove.push({ id: p.id, key: p.key, value: p.value });
         return;
       }
 
-      update.push({ key: p.key, value: p.value });
+      update.push({ id: p.id, key: p.key, value: p.value });
     });
 
     const changeObject = { add, remove, update };
