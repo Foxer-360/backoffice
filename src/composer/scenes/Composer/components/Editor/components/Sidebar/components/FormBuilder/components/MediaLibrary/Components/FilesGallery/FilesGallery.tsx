@@ -13,6 +13,8 @@ export interface IFileGalleryProps {
   // tslint:disable-next-line:no-any
   files?: any[];
   loading?: boolean;
+  search?: (query: string) => void;
+  searchQuery?: string;
 }
 
 export interface IFileGalleryState {
@@ -49,11 +51,11 @@ class FileGallery extends React.Component<IFileGalleryProps, IFileGalleryState> 
     }
   }
 
-  public showDrawer = (image?: object) => {
-    if (!image) {
+  public showDrawer = (file?: object) => {
+    if (!file) {
       this.setState({ isDrawerVisible: true, selectedFile: null });
     } else {
-      this.setState({ isDrawerVisible: true, selectedFile: image });
+      this.setState({ isDrawerVisible: true, selectedFile: file });
     }
   }
 
@@ -69,14 +71,27 @@ class FileGallery extends React.Component<IFileGalleryProps, IFileGalleryState> 
     return (
       <div className={'mediaLibrary__gallery'}>
         <Row style={{ marginBottom: '26px' }}>
-          <Col span={24}>
-            <Input.Search placeholder="Search a file" />
-          </Col>
+          {!this.props.loading && (
+            <Col span={24}>
+              <Input
+                placeholder={'Search a file'}
+                value={this.props.searchQuery}
+                onChange={e => this.props.search(e.target.value)}
+                suffix={
+                  this.props.searchQuery &&
+                  this.props.searchQuery.length > 0 && (
+                    <Icon type="close-circle" style={{ cursor: 'pointer' }} onClick={() => this.props.search('')} />
+                  )
+                }
+                prefix={<Icon type="search" />}
+              />
+            </Col>
+          )}
         </Row>
 
         <Row>
           <Col span={24}>
-            <div className={'mediaLibrary__gallery__row'} style={{ height: '570px' }}>
+            <div className={'mediaLibrary__gallery__row'} style={{ height: '570px', marginTop: 24 }}>
               <List
                 className={'mediaLibrary__fileGallery__list'}
                 bordered={true}
@@ -84,7 +99,9 @@ class FileGallery extends React.Component<IFileGalleryProps, IFileGalleryState> 
                 renderItem={item => (
                   <List.Item
                     style={{ cursor: 'pointer' }}
-                    actions={[<Button icon={'eye'} type="primary" key={item.id} />]}
+                    actions={[
+                      <Button onClick={() => this.showDrawer(item)} icon={'eye'} type="primary" key={item.id} />,
+                    ]}
                   >
                     <span style={{ marginRight: '15px' }}>
                       <Icon type={this.getFileTypeIcon(item.filename)} style={{ fontSize: '24px' }} />
@@ -109,10 +126,7 @@ class FileGallery extends React.Component<IFileGalleryProps, IFileGalleryState> 
           destroyOnClose={true}
           width={500}
         >
-          <UploadFile
-            closeEditor={() => this.closeDrawer()}
-            onChange={this.props.placeFile}
-          >
+          <UploadFile closeEditor={() => this.closeDrawer()} onChange={this.props.placeFile}>
             <FileEditor
               name={this.props.name}
               file={this.state.selectedFile}

@@ -51,15 +51,24 @@ export default class FileEditor extends React.Component<FileEditorProps, FileEdi
     };
 
     return (
-      <div className={'mediaLibrary__editor'}>  
+      <div className={'mediaLibrary__editor'}>
         <Row>
           <Col span={24}>
-            <Upload {...props}>
-              <Button>
-                <Icon type={this.props.loading ? 'loading' : 'plus'} />
-                Select File
-              </Button>
-            </Upload>
+            {!this.props.file && (
+              <Upload {...props}>
+                <Button>
+                  <Icon type={this.props.loading ? 'loading' : 'plus'} />
+                  Select File
+                </Button>
+              </Upload>
+            )}
+
+            {this.props.file && (
+              <span>
+                <Icon type={'file'} />
+                {' ' + this.props.file.filename}
+              </span>
+            )}
           </Col>
         </Row>
 
@@ -70,9 +79,16 @@ export default class FileEditor extends React.Component<FileEditorProps, FileEdi
               type={'primary'}
               style={{ marginRight: '16px' }}
               onClick={() => {
-                this.props.uploadFile(this.state.fileList, {
-                  type: 'file',
-                });
+                if (!this.props.file) {
+                  this.props.uploadFile(this.state.fileList, {
+                    type: 'file',
+                  });
+                } else {
+                  this.props.onChange({
+                    name: this.props.name,
+                    value: { ...this.props.file, type: 'file' },
+                  });
+                }
               }}
             >
               Place

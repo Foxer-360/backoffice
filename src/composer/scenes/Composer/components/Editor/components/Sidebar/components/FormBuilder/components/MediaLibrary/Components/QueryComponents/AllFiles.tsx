@@ -11,6 +11,7 @@ export interface IAllFilesState {
   loading: boolean;
   offset: number;
   limit: number;
+  query: string;
 }
 
 class AllFiles extends React.Component<{}, IAllFilesState> {
@@ -22,6 +23,7 @@ class AllFiles extends React.Component<{}, IAllFilesState> {
       loading: false,
       limit: 15,
       offset: 1,
+      query: null,
     };
   }
 
@@ -59,9 +61,21 @@ class AllFiles extends React.Component<{}, IAllFilesState> {
   }
 
   public paginateFiles = () => {
-    return this.state.files.filter(
+    let files = this.state.files;
+
+    if (this.state.query && this.state.query.length > 0) {
+      files = files.filter(file => file.filename.includes(this.state.query));
+    }
+
+    return files.filter(
       (file, i) => i + 1 > this.state.limit * (this.state.offset - 1) && i + 1 <= this.state.limit * this.state.offset
     );
+  }
+
+  public search = (query: string) => {
+    this.setState({
+      query: query,
+    });
   }
 
   public render() {
@@ -75,6 +89,8 @@ class AllFiles extends React.Component<{}, IAllFilesState> {
         currentPage: this.state.offset,
         totalFiles: this.state.files.length,
         filesPerPage: this.state.limit,
+        search: this.search,
+        searchQuery: this.state.query,
       });
     });
 
