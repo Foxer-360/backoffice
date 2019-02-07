@@ -1,5 +1,5 @@
 import { ILooseObject } from '@source/composer/types';
-import { Col, Drawer, Input, Pagination, Row, Spin } from 'antd';
+import { Col, Drawer, Input, Pagination, Row, Spin, Icon } from 'antd';
 import * as React from 'react';
 import ImageEditor from '../ImageEditor/ImageEditor';
 import UploadImage from '../MutationComponents/UploadImage';
@@ -20,6 +20,8 @@ export interface IImageGalleryProps {
   totalImages?: number;
   imagesPerPage?: number;
   changePage?: (pageNum: number) => void;
+  search?: (query: string) => void;
+  searchQuery?: string;
 }
 
 export interface IImageGalleryState {
@@ -57,9 +59,22 @@ class ImageGallery extends React.Component<IImageGalleryProps, IImageGalleryStat
     return (
       <div className={'mediaLibrary__gallery'}>
         <Row style={{ marginBottom: '26px' }}>
-          <Col span={24}>
-            <Input.Search placeholder="Search and Image" />
-          </Col>
+          {!this.props.loading && (
+            <Col span={24}>
+              <Input
+                placeholder={'Search a file'}
+                value={this.props.searchQuery}
+                onChange={e => this.props.search(e.target.value)}
+                suffix={
+                  this.props.searchQuery &&
+                  this.props.searchQuery.length > 0 && (
+                    <Icon type="close-circle" style={{ cursor: 'pointer' }} onClick={() => this.props.search('')} />
+                  )
+                }
+                prefix={<Icon type="search" />}
+              />
+            </Col>
+          )}
         </Row>
 
         <hr className="hSep" />

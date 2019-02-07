@@ -11,6 +11,7 @@ export interface IAllImagesState {
   loading: boolean;
   offset: number;
   limit: number;
+  query: string;
 }
 
 class AllImages extends React.Component<{}, IAllImagesState> {
@@ -22,6 +23,7 @@ class AllImages extends React.Component<{}, IAllImagesState> {
       loading: false,
       limit: 15,
       offset: 1,
+      query: null,
     };
   }
 
@@ -59,9 +61,21 @@ class AllImages extends React.Component<{}, IAllImagesState> {
   }
 
   public paginateImages = () => {
-    return this.state.images.filter(
+    let images = this.state.images;
+
+    if (this.state.query && this.state.query.length > 0) {
+      images = images.filter(image => image.filename.includes(this.state.query));
+    }
+
+    return images.filter(
       (image, i) => i + 1 > this.state.limit * (this.state.offset - 1) && i + 1 <= this.state.limit * this.state.offset
     );
+  }
+
+  public search = (query: string) => {
+    this.setState({
+      query: query,
+    });
   }
 
   public render() {
@@ -75,6 +89,8 @@ class AllImages extends React.Component<{}, IAllImagesState> {
         currentPage: this.state.offset,
         totalImages: this.state.images.length,
         imagesPerPage: this.state.limit,
+        search: this.search,
+        searchQuery: this.state.query,
       });
     });
 
