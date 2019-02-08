@@ -32,14 +32,13 @@ export default class MyInput extends React.Component<IMyInputProps> {
           {this.props.notitle && this.props.notitle === true ? null
             : <label>{this.props.label}</label>}
           <Mention
-            // type={this.props.type}
-            // name={this.props.name}
             {...((this.props.type === 'number' && {pattern: '[0-9]*'}) || {})}
             defaultValue={this.props.value}
             defaultSuggestions={schemaPaths}
             placeholder={this.props.placeholder}
             onChange={this.onMentionChange}
             prefix={'%'}
+            notFoundContent={'No datasource schema key path found.'}
           />
         </div>
       );

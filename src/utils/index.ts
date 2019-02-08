@@ -21,23 +21,4 @@ const capitalizeFirstLetter = (text: string) => {
   return text.charAt(0).toUpperCase() + text.slice(1);
 };
 
-const getSchemaPaths = function (schemaWithoutRefs: LooseObject, path: string, paths: Array<string>) {
-  if (!schemaWithoutRefs.properties && schemaWithoutRefs.type === 'string') {
-    paths.push(`${path}%`);
-  } else if (schemaWithoutRefs.properties) {
-    Object.keys(schemaWithoutRefs.properties).forEach(key => {
-      let newPath = String(path);
-      let prefix = path.length > 0 ? ',' : '';
-      if (schemaWithoutRefs.properties[key].type === 'array') {
-        newPath += `${prefix}${key},[n]`;
-        return getSchemaPaths(schemaWithoutRefs.properties[key].items, newPath, paths);
-      } else {
-        newPath += `${prefix}${key}`;
-        return getSchemaPaths(schemaWithoutRefs.properties[key], newPath, paths);
-      }
-    
-    });
-  }
-};
-
-export { deepCopy, dateFormatter, capitalizeFirstLetter, getSchemaPaths };
+export { deepCopy, dateFormatter, capitalizeFirstLetter };

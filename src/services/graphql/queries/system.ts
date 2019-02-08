@@ -277,3 +277,29 @@ export const TAG_LIST = gql`
     }
   }
 `;
+
+export const GET_PAGES_URLS = gql`
+  query pagesUrls($language: ID!) {
+    pagesUrls(where: { language: $language }) {
+      id
+      page
+      url
+      name
+      description
+    }
+  }
+`;
+
+export const GET_TAGS = gql`
+  query {
+    tags {
+      id
+      name
+      color
+      displayInNavigation
+      pages {
+        id
+      }
+    }
+  }
+`;

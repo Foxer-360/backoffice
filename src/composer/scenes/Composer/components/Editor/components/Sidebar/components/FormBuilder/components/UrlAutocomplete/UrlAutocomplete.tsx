@@ -47,14 +47,17 @@ export interface IUrlAutocomplete {
     url: string;
     urlNewWindow: boolean;
     pageId?: string;
+    pageSourcedUrl?: boolean;
   };
   placeholder?: string;
   // tslint:disable-next-line:no-any
   onChange: (e: React.ChangeEvent<Element> | any) => void;
+  pageSourceAvailable?: boolean;
 }
 
 export interface IState {
   urlNewWindow: boolean;
+  pageSourcedUrl: boolean;
 }
 
 class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
@@ -63,6 +66,7 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
 
     this.state = {
       urlNewWindow: false,
+      pageSourcedUrl: false,
     };
   }
 
@@ -85,7 +89,7 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
   }
 
   render() {
-    const { onChange, value } = this.props;
+    const { onChange, value, pageSourceAvailable } = this.props;
 
     return (
       <ComposedQuery>
@@ -110,7 +114,7 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
               {this.props.notitle && this.props.notitle === true ? null : <label>{this.props.label}</label>}
               {pagesUrls && pagesUrls.length > 0 && (
                 <div>
-                  <AutoComplete
+                  {!value.pageSourcedUrl && <><AutoComplete
                     dataSource={pagesUrls.map(source => source.url).filter(u => u !== '')}
                     filterOption={(inputValue, { props: { children } }: LooseObject) =>
                       children.toUpperCase().includes(inputValue.toUpperCase())}
@@ -128,7 +132,17 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
                     }}
                   >
                     Open in New window
-                  </Checkbox>
+                  </Checkbox><br/></>}
+                  {pageSourceAvailable && <Checkbox
+                    checked={value && value.pageSourcedUrl}
+                    onChange={() => {
+                      this.setState({ pageSourcedUrl: !this.state.pageSourcedUrl }, () => {
+                        this.onChange({ pageSourcedUrl: this.state.pageSourcedUrl });
+                      });
+                    }}
+                  >
+                    Use dynamic page as source.
+                  </Checkbox>}
                 </div>
               )}
               {pagesUrls && pagesUrls.length === 0 && (

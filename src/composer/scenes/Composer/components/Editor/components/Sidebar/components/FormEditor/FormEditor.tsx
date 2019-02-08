@@ -1,6 +1,6 @@
 import { ILooseObject } from '@source/composer/types';
-import { Context } from '@source/composer/utils';
-import { Button, Icon, Select, Row, Card } from 'antd';
+import { Context, getSchemaPaths } from '@source/composer/utils';
+import { Button, Icon, Select, Row, Card, AutoComplete } from 'antd';
 import debounce from 'lodash/debounce';
 import * as React from 'react';
 import { IComponentsServiceLikeClass } from '../../../../../../Composer';
@@ -9,7 +9,6 @@ import { Query } from 'react-apollo';
 import { adopt } from 'react-adopt';
 import gql from 'graphql-tag';
 import deref from 'json-schema-deref-sync';
-import { getSchemaPaths } from '@source/utils';
 import { client } from '@source/services/graphql';
 
 const { Option } = Select;
@@ -110,7 +109,7 @@ const ComposedQuery = adopt({
       if (pageUrl) {
         let result;
         let index = 0;
-        console.log(pageUrl.url);
+
         while (result = regex.exec(pageUrl.url)) {
           if (result[1]) {
             const datasource = datasources.find(source => source.type.toLowerCase() === result[1]);
@@ -160,10 +159,13 @@ class FormEditor extends React.Component<IProperties, {}> {
                 return (
                   <Row key={i}>
                     {i + 1} url slug:
-                    <Select
+                    <AutoComplete
                       style={{ marginLeft: 5, width: 160 }}
                       key={datasource.id}
-                      defaultValue={(datasourceItems && datasourceItems[i] && datasourceItems[i].id) || `Select ${datasource.type} url slug.`}
+                      filterOption={(inputValue, { props: { children } }: LooseObject) =>
+                      children.toUpperCase().includes(inputValue.toUpperCase())}
+                      defaultValue={(datasourceItems && datasourceItems[i] && datasourceItems[i].id)}
+                      placeholder={`Select ${datasource.type} url slug.`}
                       onChange={
                         this.onDatasourceItemSelect(
                           datasource,
@@ -176,7 +178,7 @@ class FormEditor extends React.Component<IProperties, {}> {
                         <Option key={item.id} value={item.id}>
                           {item.slug}
                         </Option>)}
-                    </Select>
+                    </AutoComplete>
                   </Row>);
               })}
             </Card>
