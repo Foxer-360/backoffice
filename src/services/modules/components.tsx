@@ -130,7 +130,6 @@ class ComponentsModule {
   }
 
   public getComponent(type: string) {
-    getProjectId();
     const name = this.name2instance[type];
     const i = this.instances[name];
 
@@ -142,7 +141,6 @@ class ComponentsModule {
   }
 
   public getComponentResource(type: string) {
-    getProjectId();
     const name = this.name2instance[type];
     const i = this.instances[name];
 
@@ -154,7 +152,6 @@ class ComponentsModule {
   }
 
   public getForm(type: string) {
-    getProjectId();
     const name = this.name2instance[type];
     const i = this.instances[name];
 
@@ -162,9 +159,23 @@ class ComponentsModule {
   }
 
   public getStyles() {
-    const res = config.components.map((lib) => {
-      return lib.paths.relative.style;
-    }).filter((style) => {
+    const id = getProjectId();
+    let allowed = getProjectComponents(id);
+
+    let mapFce = (lib: LibDefinition) => {
+      if (allowed.includes(lib.name)) {
+        return lib.paths.relative.style;
+      }
+
+      return null;
+    };
+    if (!allowed || allowed.length < 1) {
+      mapFce = (lib: LibDefinition) => {
+        return lib.paths.relative.style;
+      };
+    }
+
+    const res = config.components.map(mapFce).filter((style) => {
       return style ? true : false;
     });
 
