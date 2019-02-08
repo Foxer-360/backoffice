@@ -50,10 +50,7 @@ class UploadFile extends React.Component<IUploadFileProps, IUploadFileState> {
         this.setState({ loading: false });
 
         const file = response.data.createFile ? response.data.createFile : response.data.file;
-
         const CompleteFile = { value: { ...file, ...mediaData }, name: 'file' };
-
-        console.log('%c Emilio: ', 'background: #222; color: #83FFFF', response);
 
         if (response.data.createFile) {
           notification.success({

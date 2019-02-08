@@ -60,6 +60,9 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
 
   public render() {
     const { mediaData } = this.props;
+
+    console.log('%c Emilio: media ', 'background: #222; color: #83FFFF', this.props);
+
     return (
       <div>
         <div className={'ant-divider ant-divider-horizontal ant-divider-with-text-left'}>

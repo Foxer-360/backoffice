@@ -227,6 +227,8 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                     Object.keys(this.props.items.properties).map((elementName: string, j: number) => {
                       const element = this.props.items.properties[elementName];
 
+                      console.log('%c Emilio: as', 'background: #222; color: #83FFFF', element);
+
                       return (
                         <InputRenderer
                           key={`${dataRow.id}_${j}`}

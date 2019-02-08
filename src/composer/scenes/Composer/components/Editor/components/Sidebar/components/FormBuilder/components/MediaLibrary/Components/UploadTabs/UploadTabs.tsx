@@ -35,7 +35,7 @@ export default class UploadTabs extends React.Component<UploadTabsProps, UploadT
             <UploadImage closeEditor={() => this.props.closeDrawer()} onChange={this.props.onChange}>
               <ImageEditor
                 name={this.props.name}
-                image={this.props.mediaData}
+                image={this.props.mediaData && this.props.mediaData.type === 'image' ? this.props.mediaData : null}
                 onChange={media => {
                   this.props.onChange(media);
                   this.props.closeDrawer();

@@ -76,7 +76,7 @@ class ImageEditor extends React.Component<IImageEditorProps, IImageEditorState> 
       showUploadList: false,
     };
 
-    const { image } = this.props;  
+    const { image } = this.props;
 
     const uploadedFile = this.state.fileList[0];
     const imageBase64 = uploadedFile && uploadedFile.base64;
@@ -96,13 +96,14 @@ class ImageEditor extends React.Component<IImageEditorProps, IImageEditorState> 
                 <Upload {...props} listType={'picture-card'}>
                   {imageBase64 && <img src={imageBase64} alt="file" />}
                   {image && image.filename && !imageBase64 && <img src={getImgUrl(image)} alt="file" />}
-                  {!imageBase64 && !image.filename && uploadButton}
+                  {!imageBase64 && !image && uploadButton}
                 </Upload>
 
                 <p className="imageInfo">
                   {!uploadedFile && image && this.getImageInfo(image)}
                   {uploadedFile && this.getImageInfo(uploadedFile)}
                 </p>
+
                 <p className="imageInfo">
                   {uploadedFile && uploadedFile.name}
                   {!uploadedFile && image && image.filename}
