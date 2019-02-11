@@ -24,6 +24,7 @@ interface InputRendererProps {
   onChange: (e: React.ChangeEvent | any) => void;
   // tslint:disable-next-line:no-any
   mediaLibraryChange: (value: any) => void;
+  schemaPaths?: Array<string>;
 }
 
 class InputRenderer extends React.Component<InputRendererProps & IFormSchemaElement, {}> {
@@ -47,6 +48,7 @@ class InputRenderer extends React.Component<InputRendererProps & IFormSchemaElem
             placeholder={this.props.placeholder}
             value={this.props.value}
             onChange={this.props.onChange}
+            schemaPaths={this.props.schemaPaths}
           />
         );
 
