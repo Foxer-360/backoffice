@@ -14,6 +14,7 @@ import {
   Tag,
   Drawer,
   Tabs,
+  Radio,
   Col,
 } from 'antd';
 import * as React from 'react';
@@ -31,6 +32,8 @@ import { LOCAL_SELECTED_WEBSITE } from '@source/services/graphql/queries/local';
 
 const TabPane = Tabs.TabPane;
 const { Panel } = Collapse;
+const RadioButton = Radio.Button;
+const RadioGroup = Radio.Group;
 
 const Option = Select.Option;
 
@@ -91,7 +94,7 @@ interface IArrayInputsProps {
 interface IArrayInputsState {
   loading: boolean;
   schemaPaths: Array<string>;
-  datasourceOptionsVisible: boolean;
+  displayDataSourceDrawer: boolean;
 }
 
 class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> {
@@ -106,7 +109,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     this.state = {
       loading: true,
       schemaPaths: [],
-      datasourceOptionsVisible: false,
+      displayDataSourceDrawer: false,
     };
   }
 
@@ -120,6 +123,12 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     });
 
     return (parseInt(highestIdValue, 10) + 1).toString();
+  }
+
+  displayDataSourceDrawer(value: boolean) {
+    this.setState({
+      displayDataSourceDrawer: value,
+    });
   }
 
   async componentDidMount() {
@@ -348,48 +357,43 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
           */}
 
               {(this.props.data.datasourceId || this.props.data.sourceType === 'pages') && (
-                <Button onClick={() => this.setState({ datasourceOptionsVisible: true })}>Datasource options</Button>
+                <a
+                  onClick={() => this.displayDataSourceDrawer(true)}
+                  style={{
+                    margin: '24px 0 ',
+                    width: '100%',
+                    textAlign: 'center',
+                    display: 'block',
+                    color: 'rgb(24, 144, 255)',
+                    fontWeight: 500,
+                  }}
+                >
+                  Adjust Connection
+                </a>
               )}
-              <Drawer
-                width={720}
-                placement="right"
-                closable={true}
-                onClose={() => this.setState({ datasourceOptionsVisible: false })}
-                visible={this.state.datasourceOptionsVisible}
-              >
-                {this.props.data.datasourceId && this.dynamicSourceOptions(datasources)}
-                {this.props.data.sourceType === 'pages' && this.pagesSourceOptions(tags)}
-              </Drawer>
+
               {!(this.props.data.datasourceId || this.props.data.sourceType === 'pages') && (
                 <>
-                  <Popover
-                    content={
-                      <>
-                        <Row style={{ paddingBottom: 10 }}>
-                          <Alert
-                            message={'By selection of dynamic datasource actual data will be erased.'}
-                            type={'warning'}
-                            showIcon={true}
-                          />
-                        </Row>
-                        <Row>Datsource: {this.dynamicSourceSelect(datasources)}</Row>
-                      </>
-                    }
+                  <a
+                    onClick={() => this.displayDataSourceDrawer(true)}
+                    style={{
+                      margin: '24px 0 ',
+                      width: '100%',
+                      textAlign: 'center',
+                      display: 'block',
+                      color: 'rgb(24, 144, 255)',
+                      fontWeight: 500,
+                    }}
                   >
-                    <Button style={{ marginBottom: 10 }}>Select dynamic source</Button>
-                  </Popover>
-                  <Popconfirm
-                    placement="bottom"
-                    title={'By page datasource you will delete actual data. Do you want to continue?'}
-                    onConfirm={this.selectPageSource}
-                    okText="Yes"
-                    cancelText="No"
-                  >
-                    <Button style={{ marginBottom: 10 }}>Select pages source</Button>
-                  </Popconfirm>
+                    Connect to Data Source
+                  </a>
+
                   <Collapse accordion={true} onChange={(key: string) => this.onChangeTab(key)}>
                     {this.props.data &&
-                      this.props.data.map((dataRow: ILooseObject, index: number) => {
+                      this.props.data.data &&
+                      Object.keys(this.props.data.data).map((property: string, index: number) => {
+                        const dataRow = this.props.items.properties[property];
+
                         let title = null;
                         if (this.props.items.properties) {
                           const properties: LooseObject = this.props.items.properties;
@@ -468,6 +472,68 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                   </Collapse>
                 </>
               )}
+
+              <Drawer
+                width={720}
+                placement="right"
+                closable={true}
+                visible={this.state.displayDataSourceDrawer}
+                onClose={() => this.setState({ displayDataSourceDrawer: false })}
+              >
+                {!(this.props.data.datasourceId || this.props.data.sourceType === 'pages') && (
+                  <Row style={{ paddingBottom: 24 }}>
+                    <Popover
+                      content={
+                        <>
+                          <Row style={{ paddingBottom: 10 }}>
+                            <Alert
+                              message={'By selection of dynamic datasource actual data will be erased.'}
+                              type={'warning'}
+                              showIcon={true}
+                            />
+                          </Row>
+                          <Row>{this.dynamicSourceSelect(datasources)}</Row>
+                        </>
+                      }
+                    >
+                      <Button style={{ marginBottom: 10 }}>Select dynamic source</Button>
+                    </Popover>
+
+                    <Popconfirm
+                      placement="bottom"
+                      title={'By page datasource you will delete actual data. Do you want to continue?'}
+                      onConfirm={this.selectPageSource}
+                      okText="Yes"
+                      cancelText="No"
+                    >
+                      <Button style={{ marginBottom: 10, marginLeft: 12 }}>Select pages source</Button>
+                    </Popconfirm>
+                  </Row>
+                )}
+
+                {this.props.data.datasourceId && this.dynamicSourceOptions(datasources)}
+
+                {this.props.data.sourceType === 'pages' && this.pagesSourceOptions(tags)}
+              </Drawer>
+
+              {this.props.items &&
+                this.props.items.properties &&
+                Object.keys(this.props.items.properties).map((elementName: string, j: number) => {
+                  const element = this.props.items.properties[elementName];
+
+                  return (
+                    <InputRenderer
+                      key={`${j}`}
+                      id={`${j}`}
+                      name={elementName}
+                      {...element}
+                      value={this.props.data && this.props.data.data && this.props.data.data[elementName]}
+                      onChange={this.onDynamicSourceDataChange}
+                      schemaPaths={[...this.state.schemaPaths, ...this.props.schemaPaths]}
+                      mediaLibraryChange={this.mediaLibraryChange}
+                    />
+                  );
+                })}
             </Section>
           );
         }}
@@ -478,7 +544,9 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
   dynamicSourceSelect(datasources: Array<LooseObject>) {
     return (
       <Col span={24}>
-        <p style={{ marginRight: '12px' }}>Datsource:</p>
+        <div style={{ marginRight: '12px' }}>
+          <label>Datsource:</label>
+        </div>
         <Select
           defaultValue={this.props.data.datasourceId || 'Select'}
           style={{ width: 120 }}
@@ -511,29 +579,40 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
 
   dynamicSourceOptions = datasources => {
     return (
-      <div>
+      <>
         <Tabs defaultActiveKey="1">
           <TabPane tab="Data Source" key="1">
             <Section title={'Datasource options'}>
-              <Row>Description</Row>
-              <Row style={{ padding: '24px 0 ' }}>
-                {this.dynamicSourceSelect(datasources)}
+              <Row style={{ paddingBottom: 24 }}>
+                <Popover
+                  content={
+                    <>
+                      <Row style={{ paddingBottom: 10 }}>
+                        <Alert
+                          message={'By selection of dynamic datasource actual data will be erased.'}
+                          type={'warning'}
+                          showIcon={true}
+                        />
+                      </Row>
+                      <Row>{this.dynamicSourceSelect(datasources)}</Row>
+                    </>
+                  }
+                >
+                  <Button style={{ marginBottom: 10 }}>Select dynamic source</Button>
+                </Popover>
 
-                <Col span={24} style={{ marginTop: '12px' }}>
-                  <Button
-                    onClick={() =>
-                      this.props.onChange({
-                        target: {
-                          name: this.props.name,
-                          value: [],
-                        },
-                      })
-                    }
-                  >
-                    Fill static data
-                  </Button>
-                </Col>
+                <Popconfirm
+                  placement="bottom"
+                  title={'By page datasource you will delete actual data. Do you want to continue?'}
+                  onConfirm={this.selectPageSource}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <Button style={{ marginBottom: 10, marginLeft: 12 }}>Select pages source</Button>
+                </Popconfirm>
               </Row>
+              <Row>Description</Row>
+              <Row style={{ padding: '24px 0 ' }}>{this.dynamicSourceSelect(datasources)}</Row>
 
               <Row>
                 <Section title={'Limit'}>
@@ -549,9 +628,30 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                   </Row>
                 </Section>
               </Row>
+
+              <Row style={{ paddingBottom: 10 }}>
+                <Col span={6} offset={18}>
+                  <Button
+                    icon={'close-circle'}
+                    type="danger"
+                    style={{ marginLeft: 5 }}
+                    onClick={() => {
+                      this.displayDataSourceDrawer(false);
+                      this.props.onChange({
+                        target: {
+                          name: this.props.name,
+                          value: [],
+                        },
+                      });
+                    }}
+                  >
+                    DISCONNECT
+                  </Button>
+                </Col>
+              </Row>
             </Section>
           </TabPane>
-          <TabPane tab="Order" key="2">
+          <TabPane tab="Order by" key="2">
             <Row>
               <Section title={'Order by'}>
                 <Row>Description</Row>
@@ -584,7 +684,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
               </Section>
             </Row>
           </TabPane>
-          <TabPane tab="Filter" key="3">
+          <TabPane tab="Filter by" key="3">
             <Row>
               <Section title={'Filter by'}>
                 <Row>Description</Row>
@@ -619,7 +719,9 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                           key={`${i}`}
                         >
                           <Row style={{ paddingBottom: 10 }}>
-                            <p style={{ marginRight: '12px' }}>Key:</p>
+                            <div style={{ marginRight: '12px' }}>
+                              <label>Key:</label>
+                            </div>
                             <Input
                               style={{ width: 250 }}
                               defaultValue={filter.filterBy || ''}
@@ -627,7 +729,9 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                             />
                           </Row>
                           <Row style={{ paddingBottom: 10 }}>
-                            <p style={{ marginRight: '12px' }}>Includes:</p>
+                            <div style={{ marginRight: '12px' }}>
+                              <label>Includes:</label>
+                            </div>
                             <Input
                               style={{ width: 250 }}
                               defaultValue={filter.includes || ''}
@@ -651,55 +755,78 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
               </Section>
             </Row>
           </TabPane>
-          <TabPane tab="Properties" key="4">
-            {this.props.items &&
-              this.props.items.properties &&
-              Object.keys(this.props.items.properties).map((elementName: string, j: number) => {
-                const element = this.props.items.properties[elementName];
-
-                return (
-                  <InputRenderer
-                    key={`${j}`}
-                    id={`${j}`}
-                    name={elementName}
-                    {...element}
-                    value={this.props.data.data[elementName]}
-                    onChange={this.onDynamicSourceDataChange}
-                    schemaPaths={[...this.state.schemaPaths, ...this.props.schemaPaths]}
-                    mediaLibraryChange={this.mediaLibraryChange}
-                  />
-                );
-              })}
-          </TabPane>
         </Tabs>
-      </div>
+      </>
     );
   }
 
   pagesSourceOptions = tags => {
     return (
-      <div>
-        <Section title={'Datasource options'}>
-          <Row style={{ paddingBottom: 10 }}>
-            <Button
-              style={{ marginLeft: 5 }}
-              onClick={() =>
-                this.props.onChange({
-                  target: {
-                    name: this.props.name,
-                    value: [],
-                  },
-                })
-              }
-            >
-              Fill static data
-            </Button>
-          </Row>
+      <Tabs>
+        <TabPane tab="DataSource Options" key="1">
+          <Section title={'Tags'}>
+            <Row style={{ padding: '24px 0' }}>
+              <Popover content={<div>{this.getUninsertedTags(tags)}</div>} trigger="click" placement="top">
+                <Popover content={<div>{this.getUninsertedTags(tags)}</div>} trigger="hover" placement="top">
+                  <Button>
+                    Select tag <Icon type="down" />
+                  </Button>
+                </Popover>
+              </Popover>
+            </Row>
+            <Row>
+              {tags
+                .filter(({ id }) => this.props.data.tagIds.some(tagId => tagId === id))
+                .map(({ color, name, id }: LooseObject, key) => {
+                  return (
+                    <Tag key={key} color={color} onClick={() => this.deleteTag(id)}>
+                      {name}
+                    </Tag>
+                  );
+                })}
+            </Row>
+          </Section>
 
+          <Section title={'Limit'}>
+            <Row style={{ padding: '24px 0' }}>
+              <InputNumber
+                style={{ width: 160 }}
+                defaultValue={this.props.data.limit || ''}
+                onChange={limit => this.onDynamicSourceChange('limit')(limit)}
+              />
+              <br />
+              Let it empty or with zero for no limit.
+            </Row>
+          </Section>
+
+          <Row style={{ padding: '24px 0' }}>
+            <Col span={6} offset={18}>
+              <Button
+                icon={'close-circle'}
+                type="danger"
+                style={{ marginLeft: 5 }}
+                onClick={() => {
+                  this.displayDataSourceDrawer(false);
+                  this.props.onChange({
+                    target: {
+                      name: this.props.name,
+                      value: [],
+                    },
+                  });
+                }}
+              >
+                DISCONNECT
+              </Button>
+            </Col>
+          </Row>
+        </TabPane>
+
+        <TabPane tab="Order by" key="2">
           <Row>
             <Section title={'Order by'}>
-              <Row style={{ paddingBottom: 10 }}>
-                Key:{' '}
+              <Row>Description</Row>
+              <Row style={{ padding: '24px 0' }}>
+                <label style={{ marginRight: '12px' }}>Key:</label>
                 <Input
                   style={{ width: 160 }}
                   defaultValue={this.props.data.orderBy || ''}
@@ -725,8 +852,12 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
               )}
             </Section>
           </Row>
+        </TabPane>
+
+        <TabPane tab="Filter by" key="3">
           <Row>
             <Section title={'Filter by'}>
+              <Row>Description</Row>
               <Collapse accordion={true} onChange={(key: string) => this.onChangeTab(key)}>
                 {this.props.data.filters &&
                   this.props.data.filters.map((filter, i) => (
@@ -756,17 +887,21 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                       key={`${i}`}
                     >
                       <Row style={{ paddingBottom: 10 }}>
-                        Key:{' '}
+                        <div>
+                          <label>Key:</label>
+                        </div>
                         <Input
-                          style={{ width: 160 }}
+                          style={{ width: 250 }}
                           defaultValue={filter.filterBy || ''}
                           onChange={e => this.onfilterByChange(e.target.value, i)}
                         />
                       </Row>
                       <Row>
-                        Includes:
+                        <div>
+                          <label>Includes:</label>
+                        </div>
                         <Input
-                          style={{ marginLeft: 5, width: 250 }}
+                          style={{ width: 250 }}
                           defaultValue={filter.includes || ''}
                           onChange={e => this.onIncludesChange(e.target.value, i)}
                         />
@@ -785,45 +920,9 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
               </Collapse>
             </Section>
           </Row>
-          <Row>
-            <Section title={'Tags'}>
-              <Row style={{ paddingBottom: 10 }}>
-                <Popover content={<div>{this.getUninsertedTags(tags)}</div>} trigger="click" placement="top">
-                  <Popover content={<div>{this.getUninsertedTags(tags)}</div>} trigger="hover" placement="top">
-                    <Button>
-                      Select tag <Icon type="down" />
-                    </Button>
-                  </Popover>
-                </Popover>
-              </Row>
-              <Row>
-                {tags
-                  .filter(({ id }) => this.props.data.tagIds.some(tagId => tagId === id))
-                  .map(({ color, name, id }: LooseObject, key) => {
-                    return (
-                      <Tag key={key} color={color} onClick={() => this.deleteTag(id)}>
-                        {name}
-                      </Tag>
-                    );
-                  })}
-              </Row>
-            </Section>
-          </Row>
-          <Row>
-            <Section title={'Limit'}>
-              <Row style={{ paddingBottom: 10 }}>
-                <InputNumber
-                  style={{ width: 160 }}
-                  defaultValue={this.props.data.limit || ''}
-                  onChange={limit => this.onDynamicSourceChange('limit')(limit)}
-                />
-                <br />
-                Let it empty or with zero for no limit.
-              </Row>
-            </Section>
-          </Row>
-        </Section>
-        {this.props.items &&
+        </TabPane>
+
+        {/* {this.props.items &&
           this.props.items.properties &&
           Object.keys(this.props.items.properties).map((elementName: string, j: number) => {
             const element = this.props.items.properties[elementName];
@@ -841,8 +940,8 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                 mediaLibraryChange={this.mediaLibraryChange}
               />
             );
-          })}
-      </div>
+          })} */}
+      </Tabs>
     );
   }
 
