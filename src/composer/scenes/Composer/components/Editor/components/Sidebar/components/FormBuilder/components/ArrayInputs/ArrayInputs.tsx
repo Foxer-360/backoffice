@@ -90,8 +90,8 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
       await this.props.onChange({
         target: {
           name: this.props.name,
-          value: newData,
-        },
+          value: newData
+        }
       });
       this.setState({ loading: false });
     } else {
@@ -121,8 +121,8 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     this.props.onChange({
       target: {
         name: this.props.name,
-        value: newData,
-      },
+        value: newData
+      }
     });
   }
 
@@ -146,8 +146,8 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     this.props.onChange({
       target: {
         name: this.props.name,
-        value: newData,
-      },
+        value: newData
+      }
     });
   }
 
@@ -156,8 +156,8 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     this.props.onChange({
       target: {
         name: this.props.name,
-        value: newData,
-      },
+        value: newData
+      }
     });
   }
 
@@ -175,8 +175,8 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     this.props.onChange({
       target: {
         name: this.props.name,
-        value: newData,
-      },
+        value: newData
+      }
     });
   }
 
@@ -268,7 +268,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     const newData = [...this.props.data];
     const value = {
       recommendedSizes: this.props.data[rowIndex][media.name] && this.props.data[rowIndex][media.name].recommendedSizes,
-      ...media.value,  
+      ...media.value
     };
 
     newData[rowIndex][media.name] = value;
@@ -276,8 +276,8 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     this.props.onChange({
       target: {
         name: this.props.name,
-        value: newData,
-      },
+        value: newData
+      }
     });
   }
 

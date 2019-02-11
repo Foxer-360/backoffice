@@ -1,6 +1,6 @@
 import { ILooseObject } from '@source/composer/types';
 import { getImgUrl } from '@source/composer/utils';
-import { Button, Col, Icon, Row, Spin, Upload, Input } from 'antd';
+import { Button, Col, Icon, Row, Spin, Upload, Popconfirm } from 'antd';
 import * as React from 'react';
 
 // tslint:disable:jsx-no-multiline-js
@@ -13,6 +13,7 @@ export interface IImageEditorProps {
   loading?: boolean;
   onChange?: (media: object) => void;
   closeEditor?: () => void;
+  deleteImage?: (id: string) => void;
   name: string;
 }
 
@@ -94,7 +95,7 @@ class ImageEditor extends React.Component<IImageEditorProps, IImageEditorState> 
               <Col span={24}>
                 <Upload {...props} listType={'picture-card'}>
                   {imageBase64 && <img src={imageBase64} alt="file" />}
-                  {image && !imageBase64 && <img src={getImgUrl(image)} alt="file" />}
+                  {image && image.filename && !imageBase64 && <img src={getImgUrl(image)} alt="file" />}
                   {!imageBase64 && !image && uploadButton}
                 </Upload>
 
@@ -102,6 +103,7 @@ class ImageEditor extends React.Component<IImageEditorProps, IImageEditorState> 
                   {!uploadedFile && image && this.getImageInfo(image)}
                   {uploadedFile && this.getImageInfo(uploadedFile)}
                 </p>
+
                 <p className="imageInfo">
                   {uploadedFile && uploadedFile.name}
                   {!uploadedFile && image && image.filename}
@@ -111,8 +113,8 @@ class ImageEditor extends React.Component<IImageEditorProps, IImageEditorState> 
 
             <hr className={'hSep'} />
 
-            <Row>
-              <Col span={24}>
+            <Row justify={'space-between'} type={'flex'}>
+              <Col span={12}>
                 <Button
                   type={'primary'} // tslint:disable:no-console
                   onClick={() => {
@@ -146,6 +148,20 @@ class ImageEditor extends React.Component<IImageEditorProps, IImageEditorState> 
                 >
                   Close
                 </Button>
+              </Col>
+
+              <Col span={5} offset={7} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Popconfirm
+                  title="Are you sure delete this image?"
+                  onConfirm={() => this.props.deleteImage(this.props.image.id)}
+                  okText="Yes"
+                  cancelText="No"
+                  icon={<Icon type="exclamation-circle" />}
+                >
+                  <Button type="danger" icon="trash">
+                    Delete
+                  </Button>
+                </Popconfirm>
               </Col>
             </Row>
           </>
