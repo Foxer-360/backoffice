@@ -14,8 +14,9 @@ import {
   Tag,
   Drawer,
   Tabs,
-  Radio,
+  Divider,
   Col,
+  Radio,
 } from 'antd';
 import * as React from 'react';
 import { IFormSchema } from '../../FormBuilder';
@@ -32,7 +33,6 @@ import { LOCAL_SELECTED_WEBSITE } from '@source/services/graphql/queries/local';
 
 const TabPane = Tabs.TabPane;
 const { Panel } = Collapse;
-const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 
 const Option = Select.Option;
@@ -95,6 +95,7 @@ interface IArrayInputsState {
   loading: boolean;
   schemaPaths: Array<string>;
   displayDataSourceDrawer: boolean;
+  typeOfDynamicSource: string;
 }
 
 class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> {
@@ -107,6 +108,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     this.getNextIdValue = this.getNextIdValue.bind(this);
     this.onChangeTab = this.onChangeTab.bind(this);
     this.state = {
+      typeOfDynamicSource: null,
       loading: true,
       schemaPaths: [],
       displayDataSourceDrawer: false,
@@ -127,6 +129,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
 
   displayDataSourceDrawer(value: boolean) {
     this.setState({
+      typeOfDynamicSource: null,
       displayDataSourceDrawer: value,
     });
   }
@@ -329,6 +332,13 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     });
   }
 
+  public changeDynamicSource = e => {
+    let value = e.target.value;
+    this.setState({
+      typeOfDynamicSource: value,
+    });
+  }
+
   public render() {
     if (this.state.loading) {
       return <Card loading={true} />;
@@ -362,12 +372,14 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                   style={{
                     margin: '24px 0 ',
                     width: '100%',
-                    textAlign: 'center',
                     display: 'block',
                     color: 'rgb(24, 144, 255)',
                     fontWeight: 500,
                   }}
                 >
+                  <span style={{ marginRight: 6, fontSize: '12px' }}>
+                    <Icon type="edit" style={{ color: 'rgb(24,144,255)' }} />
+                  </span>
                   Adjust Connection
                 </a>
               )}
@@ -379,12 +391,14 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                     style={{
                       margin: '24px 0 ',
                       width: '100%',
-                      textAlign: 'center',
                       display: 'block',
                       color: 'rgb(24, 144, 255)',
                       fontWeight: 500,
                     }}
                   >
+                    <span style={{ marginRight: 6, fontSize: '12px' }}>
+                      <Icon type="plus" style={{ color: 'rgb(24,144,255)' }} />
+                    </span>
                     Connect to Data Source
                   </a>
 
@@ -480,9 +494,53 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                 visible={this.state.displayDataSourceDrawer}
                 onClose={() => this.setState({ displayDataSourceDrawer: false })}
               >
+                <h4>Dynamic Connection:</h4>
+                <Divider type="horizontal" />
                 {!(this.props.data.datasourceId || this.props.data.sourceType === 'pages') && (
-                  <Row style={{ paddingBottom: 24 }}>
-                    <Popover
+                  <>
+                    <Row style={{ paddingBottom: 24 }}>
+                      <RadioGroup onChange={this.changeDynamicSource}>
+                        <Radio value={'dataSource'}>Dynamic Source</Radio>
+                        <Radio value={'pageSource'}>Page Source</Radio>
+                      </RadioGroup>
+                    </Row>
+
+                    <Row style={{ paddingBottom: 24 }}>
+                      {this.state.typeOfDynamicSource === 'dataSource' && (
+                        <Popover
+                          content={
+                            <>
+                              <Row style={{ paddingBottom: 10 }}>
+                                <Alert
+                                  message={'By selection of dynamic datasource actual data will be erased.'}
+                                  type={'warning'}
+                                  showIcon={true}
+                                />
+                              </Row>
+                              <Row>{this.dynamicSourceSelect(datasources)}</Row>
+                            </>
+                          }
+                        >
+                          <Button type="primary" style={{ marginBottom: 10, marginLeft: 12 }}>
+                            Select
+                          </Button>
+                        </Popover>
+                      )}
+                      {this.state.typeOfDynamicSource === 'pageSource' && (
+                        <Popconfirm
+                          placement="bottom"
+                          title={'By page datasource you will delete actual data. Do you want to continue?'}
+                          onConfirm={this.selectPageSource}
+                          okText="Yes"
+                          cancelText="No"
+                        >
+                          <Button type="primary" style={{ marginBottom: 10, marginLeft: 12 }}>
+                            Select
+                          </Button>
+                        </Popconfirm>
+                      )}
+
+                      {/* <Popover
                       content={
                         <>
                           <Row style={{ paddingBottom: 10 }}>
@@ -507,8 +565,9 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                       cancelText="No"
                     >
                       <Button style={{ marginBottom: 10, marginLeft: 12 }}>Select pages source</Button>
-                    </Popconfirm>
-                  </Row>
+                    </Popconfirm> */}
+                    </Row>
+                  </>
                 )}
 
                 {this.props.data.datasourceId && this.dynamicSourceOptions(datasources)}
@@ -544,12 +603,10 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
   dynamicSourceSelect(datasources: Array<LooseObject>) {
     return (
       <Col span={24}>
-        <div style={{ marginRight: '12px' }}>
-          <label>Datsource:</label>
-        </div>
+        <label style={{ marginRight: 12 }}>Datasource:</label>
         <Select
           defaultValue={this.props.data.datasourceId || 'Select'}
-          style={{ width: 120 }}
+          style={{ maxWidth: 250, width: '100%' }}
           onChange={this.onDynamicSourceSelection(datasources)}
         >
           {datasources.map(datasource => (
@@ -581,178 +638,132 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     return (
       <>
         <Tabs defaultActiveKey="1">
-          <TabPane tab="Data Source" key="1">
-            <Section title={'Datasource options'}>
-              <Row style={{ paddingBottom: 24 }}>
-                <Popover
-                  content={
-                    <>
-                      <Row style={{ paddingBottom: 10 }}>
-                        <Alert
-                          message={'By selection of dynamic datasource actual data will be erased.'}
-                          type={'warning'}
-                          showIcon={true}
-                        />
-                      </Row>
-                      <Row>{this.dynamicSourceSelect(datasources)}</Row>
-                    </>
-                  }
+          <TabPane tab="DataSource Options" key="1">
+            <Row style={{ padding: '24px 0 ' }}>{this.dynamicSourceSelect(datasources)}</Row>
+
+            <Row style={{ paddingBottom: 10 }}>
+              <Col span={6} offset={18}>
+                <Button
+                  icon={'close-circle'}
+                  type="danger"
+                  style={{ marginLeft: 5 }}
+                  onClick={() => {
+                    this.displayDataSourceDrawer(false);
+                    this.props.onChange({
+                      target: {
+                        name: this.props.name,
+                        value: [],
+                      },
+                    });
+                  }}
                 >
-                  <Button style={{ marginBottom: 10 }}>Select dynamic source</Button>
-                </Popover>
-
-                <Popconfirm
-                  placement="bottom"
-                  title={'By page datasource you will delete actual data. Do you want to continue?'}
-                  onConfirm={this.selectPageSource}
-                  okText="Yes"
-                  cancelText="No"
-                >
-                  <Button style={{ marginBottom: 10, marginLeft: 12 }}>Select pages source</Button>
-                </Popconfirm>
-              </Row>
-              <Row>Description</Row>
-              <Row style={{ padding: '24px 0 ' }}>{this.dynamicSourceSelect(datasources)}</Row>
-
-              <Row>
-                <Section title={'Limit'}>
-                  <Row style={{ padding: '24px 0' }}>
-                    <InputNumber
-                      style={{ width: 160 }}
-                      defaultValue={this.props.data.limit || ''}
-                      onChange={limit => this.onDynamicSourceChange('limit')(limit)}
-                    />
-                    <br />
-                    <br />
-                    Let it empty or with zero for no limit.
-                  </Row>
-                </Section>
-              </Row>
-
-              <Row style={{ paddingBottom: 10 }}>
-                <Col span={6} offset={18}>
-                  <Button
-                    icon={'close-circle'}
-                    type="danger"
-                    style={{ marginLeft: 5 }}
-                    onClick={() => {
-                      this.displayDataSourceDrawer(false);
-                      this.props.onChange({
-                        target: {
-                          name: this.props.name,
-                          value: [],
-                        },
-                      });
-                    }}
-                  >
-                    DISCONNECT
-                  </Button>
-                </Col>
-              </Row>
-            </Section>
-          </TabPane>
-          <TabPane tab="Order by" key="2">
-            <Row>
-              <Section title={'Order by'}>
-                <Row>Description</Row>
-
-                <Row style={{ padding: '24px 0' }}>
-                  <label style={{ marginRight: '12px' }}>Key:</label>
-                  <Input
-                    style={{ width: 160 }}
-                    defaultValue={this.props.data.orderBy || ''}
-                    onChange={e => this.onDynamicSourceChange('orderBy')(e.target.value)}
-                  />
-                </Row>
-                {this.props.data.orderBy && (
-                  <Row style={{ padding: '24px 0' }}>
-                    Order:
-                    <Select
-                      style={{ marginLeft: 5, width: 120 }}
-                      onChange={this.onDynamicSourceChange('order')}
-                      value={this.props.data.order || 'ASC'}
-                    >
-                      <Option value={'ASC'} key={'ASC'}>
-                        Ascending
-                      </Option>
-                      <Option value={'DESC'} key={'DESC'}>
-                        Descending
-                      </Option>
-                    </Select>
-                  </Row>
-                )}
-              </Section>
+                  DISCONNECT
+                </Button>
+              </Col>
             </Row>
           </TabPane>
+
+          <TabPane tab="Order by" key="2">
+            <Row style={{ padding: '24px 0' }}>
+              <label style={{ marginRight: '12px' }}>Key:</label>
+              <Input
+                style={{ maxWidth: 250, width: '100%' }}
+                defaultValue={this.props.data.orderBy || ''}
+                onChange={e => this.onDynamicSourceChange('orderBy')(e.target.value)}
+              />
+            </Row>
+            {this.props.data.orderBy && (
+              <Row style={{ padding: '24px 0' }}>
+                Order:
+                <Select
+                  style={{ marginLeft: 5, width: 120 }}
+                  onChange={this.onDynamicSourceChange('order')}
+                  value={this.props.data.order || 'ASC'}
+                >
+                  <Option value={'ASC'} key={'ASC'}>
+                    Ascending
+                  </Option>
+                  <Option value={'DESC'} key={'DESC'}>
+                    Descending
+                  </Option>
+                </Select>
+              </Row>
+            )}
+          </TabPane>
           <TabPane tab="Filter by" key="3">
-            <Row>
-              <Section title={'Filter by'}>
-                <Row>Description</Row>
-
-                <Row style={{ padding: '24px 0' }}>
-                  <Collapse accordion={true} onChange={(key: string) => this.onChangeTab(key)}>
-                    {this.props.data.filters &&
-                      this.props.data.filters.map((filter, i) => (
-                        <Panel
-                          header={
-                            <div
-                              onClick={e => {
-                                e.stopPropagation();
-                              }}
-                            >
-                              Filter {i + 1}
-                              <Popconfirm
-                                title="Are you sure delete this filter?"
-                                onConfirm={() => this.onFilterDelete(i)}
-                                okText="Yes"
-                                cancelText="No"
-                              >
-                                <Icon
-                                  type="close"
-                                  theme="outlined"
-                                  style={{ color: '#f5222d', position: 'absolute', top: '40%', right: '15px' }}
-                                  className="anticon anticon-close ant-tabs-close-x"
-                                />
-                              </Popconfirm>
-                            </div>
-                          }
-                          key={`${i}`}
+            <Row style={{ padding: '24px 0' }}>
+              <Collapse accordion={true} onChange={(key: string) => this.onChangeTab(key)}>
+                {this.props.data.filters &&
+                  this.props.data.filters.map((filter, i) => (
+                    <Panel
+                      header={
+                        <div
+                          onClick={e => {
+                            e.stopPropagation();
+                          }}
                         >
-                          <Row style={{ paddingBottom: 10 }}>
-                            <div style={{ marginRight: '12px' }}>
-                              <label>Key:</label>
-                            </div>
-                            <Input
-                              style={{ width: 250 }}
-                              defaultValue={filter.filterBy || ''}
-                              onChange={e => this.onfilterByChange(e.target.value, i)}
+                          Filter {i + 1}
+                          <Popconfirm
+                            title="Are you sure delete this filter?"
+                            onConfirm={() => this.onFilterDelete(i)}
+                            okText="Yes"
+                            cancelText="No"
+                          >
+                            <Icon
+                              type="close"
+                              theme="outlined"
+                              style={{ color: '#f5222d', position: 'absolute', top: '40%', right: '15px' }}
+                              className="anticon anticon-close ant-tabs-close-x"
                             />
-                          </Row>
-                          <Row style={{ paddingBottom: 10 }}>
-                            <div style={{ marginRight: '12px' }}>
-                              <label>Includes:</label>
-                            </div>
-                            <Input
-                              style={{ width: 250 }}
-                              defaultValue={filter.includes || ''}
-                              onChange={e => this.onIncludesChange(e.target.value, i)}
-                            />
-                          </Row>
-                        </Panel>
-                      ))}
+                          </Popconfirm>
+                        </div>
+                      }
+                      key={`${i}`}
+                    >
+                      <Row style={{ paddingBottom: 10 }}>
+                        <Col span={12}>
+                          <label style={{ marginRight: 12 }}>Key:</label>
+                          <Input
+                            style={{ maxWidth: 250, width: '100%' }}
+                            defaultValue={filter.filterBy || ''}
+                            onChange={e => this.onfilterByChange(e.target.value, i)}
+                          />
+                        </Col>
 
-                    <div key={'new-collapse'} className={'ant-collapse-item'} style={{ backgroundColor: 'white' }}>
-                      <a
-                        className={'ant-collapse-header'}
-                        onClick={() => this.onNewFilterBy()}
-                        style={{ display: 'block', padding: '10px 0', textAlign: 'center', color: '#1890ff' }}
-                      >
-                        Add new item
-                      </a>
-                    </div>
-                  </Collapse>
-                </Row>
-              </Section>
+                        <Col span={12}>
+                          <label style={{ marginRight: 12 }}>Includes:</label>
+                          <Input
+                            style={{ maxWidth: 250, width: '100%' }}
+                            defaultValue={filter.includes || ''}
+                            onChange={e => this.onIncludesChange(e.target.value, i)}
+                          />
+                        </Col>
+                      </Row>
+                    </Panel>
+                  ))}
+
+                <div key={'new-collapse'} className={'ant-collapse-item'} style={{ backgroundColor: 'white' }}>
+                  <a
+                    className={'ant-collapse-header'}
+                    onClick={() => this.onNewFilterBy()}
+                    style={{ display: 'block', padding: '10px 0', textAlign: 'center', color: '#1890ff' }}
+                  >
+                    Add new item
+                  </a>
+                </div>
+              </Collapse>
+            </Row>
+          </TabPane>
+
+          <TabPane tab="Limit by" key="4">
+            <Row style={{ padding: '24px 0' }}>
+              <InputNumber
+                placeholder={'limit'}
+                style={{ maxWidth: 250, width: '100%' }}
+                defaultValue={this.props.data.limit || ''}
+                onChange={limit => this.onDynamicSourceChange('limit')(limit)}
+              />
+              <span style={{ marginLeft: 24 }}>Let it empty or with zero for no limit.</span>
             </Row>
           </TabPane>
         </Tabs>
@@ -787,18 +798,6 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
             </Row>
           </Section>
 
-          <Section title={'Limit'}>
-            <Row style={{ padding: '24px 0' }}>
-              <InputNumber
-                style={{ width: 160 }}
-                defaultValue={this.props.data.limit || ''}
-                onChange={limit => this.onDynamicSourceChange('limit')(limit)}
-              />
-              <br />
-              Let it empty or with zero for no limit.
-            </Row>
-          </Section>
-
           <Row style={{ padding: '24px 0' }}>
             <Col span={6} offset={18}>
               <Button
@@ -822,103 +821,107 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
         </TabPane>
 
         <TabPane tab="Order by" key="2">
-          <Row>
-            <Section title={'Order by'}>
-              <Row>Description</Row>
-              <Row style={{ padding: '24px 0' }}>
-                <label style={{ marginRight: '12px' }}>Key:</label>
-                <Input
-                  style={{ width: 160 }}
-                  defaultValue={this.props.data.orderBy || ''}
-                  onChange={e => this.onDynamicSourceChange('orderBy')(e.target.value)}
-                />
-              </Row>
-              {this.props.data.orderBy && (
-                <Row style={{ paddingBottom: 10 }}>
-                  Order:
-                  <Select
-                    style={{ marginLeft: 5, width: 120 }}
-                    onChange={this.onDynamicSourceChange('order')}
-                    value={this.props.data.order || 'ASC'}
-                  >
-                    <Option value={'ASC'} key={'ASC'}>
-                      Ascending
-                    </Option>
-                    <Option value={'DESC'} key={'DESC'}>
-                      Descending
-                    </Option>
-                  </Select>
-                </Row>
-              )}
-            </Section>
+          <Row style={{ padding: '24px 0' }}>
+            <label style={{ marginRight: '12px' }}>Key:</label>
+            <Input
+              style={{ maxWidth: 250, width: '100%' }}
+              defaultValue={this.props.data.orderBy || ''}
+              onChange={e => this.onDynamicSourceChange('orderBy')(e.target.value)}
+            />
           </Row>
+          {this.props.data.orderBy && (
+            <Row style={{ paddingBottom: 10 }}>
+              Order:
+              <Select
+                style={{ marginLeft: 5, width: 120 }}
+                onChange={this.onDynamicSourceChange('order')}
+                value={this.props.data.order || 'ASC'}
+              >
+                <Option value={'ASC'} key={'ASC'}>
+                  Ascending
+                </Option>
+                <Option value={'DESC'} key={'DESC'}>
+                  Descending
+                </Option>
+              </Select>
+            </Row>
+          )}
         </TabPane>
 
         <TabPane tab="Filter by" key="3">
-          <Row>
-            <Section title={'Filter by'}>
-              <Row>Description</Row>
-              <Collapse accordion={true} onChange={(key: string) => this.onChangeTab(key)}>
-                {this.props.data.filters &&
-                  this.props.data.filters.map((filter, i) => (
-                    <Panel
-                      header={
-                        <div
-                          onClick={e => {
-                            e.stopPropagation();
-                          }}
-                        >
-                          Filter {i + 1}
-                          <Popconfirm
-                            title="Are you sure delete this filter?"
-                            onConfirm={() => this.onFilterDelete(i)}
-                            okText="Yes"
-                            cancelText="No"
-                          >
-                            <Icon
-                              type="close"
-                              theme="outlined"
-                              style={{ color: '#f5222d', position: 'absolute', top: '40%', right: '15px' }}
-                              className="anticon anticon-close ant-tabs-close-x"
-                            />
-                          </Popconfirm>
-                        </div>
-                      }
-                      key={`${i}`}
+          <Row>Description</Row>
+          <Collapse accordion={true} onChange={(key: string) => this.onChangeTab(key)}>
+            {this.props.data.filters &&
+              this.props.data.filters.map((filter, i) => (
+                <Panel
+                  header={
+                    <div
+                      onClick={e => {
+                        e.stopPropagation();
+                      }}
                     >
-                      <Row style={{ paddingBottom: 10 }}>
-                        <div>
-                          <label>Key:</label>
-                        </div>
-                        <Input
-                          style={{ width: 250 }}
-                          defaultValue={filter.filterBy || ''}
-                          onChange={e => this.onfilterByChange(e.target.value, i)}
+                      Filter {i + 1}
+                      <Popconfirm
+                        title="Are you sure delete this filter?"
+                        onConfirm={() => this.onFilterDelete(i)}
+                        okText="Yes"
+                        cancelText="No"
+                      >
+                        <Icon
+                          type="close"
+                          theme="outlined"
+                          style={{ color: '#f5222d', position: 'absolute', top: '40%', right: '15px' }}
+                          className="anticon anticon-close ant-tabs-close-x"
                         />
-                      </Row>
-                      <Row>
-                        <div>
-                          <label>Includes:</label>
-                        </div>
-                        <Input
-                          style={{ width: 250 }}
-                          defaultValue={filter.includes || ''}
-                          onChange={e => this.onIncludesChange(e.target.value, i)}
-                        />
-                      </Row>
-                    </Panel>
-                  ))}
-                <div key={'new-collapse'} className={'ant-collapse-item'} style={{ backgroundColor: 'white' }}>
-                  <a
-                    className={'ant-collapse-header'}
-                    onClick={() => this.onNewFilterBy()}
-                    style={{ display: 'block', padding: '10px 0', textAlign: 'center', color: '#1890ff' }}
-                  >
-                    Add new item
-                  </a>
-                </div>
-              </Collapse>
-            </Section>
+                      </Popconfirm>
+                    </div>
+                  }
+                  key={`${i}`}
+                >
+                  <Row style={{ paddingBottom: 10 }}>
+                    <Col span={12}>
+                      <label>Key:</label>
+                      <Input
+                        style={{ maxWidth: 250, width: '100%' }}
+                        defaultValue={filter.filterBy || ''}
+                        onChange={e => this.onfilterByChange(e.target.value, i)}
+                      />
+                    </Col>
+
+                    <Col span={12}>
+                      <div>
+                        <label>Includes:</label>
+                      </div>
+                      <Input
+                        style={{ maxWidth: 250, width: '100%' }}
+                        defaultValue={filter.includes || ''}
+                        onChange={e => this.onIncludesChange(e.target.value, i)}
+                      />
+                    </Col>
+                  </Row>
+                </Panel>
+              ))}
+            <div key={'new-collapse'} className={'ant-collapse-item'} style={{ backgroundColor: 'white' }}>
+              <a
+                className={'ant-collapse-header'}
+                onClick={() => this.onNewFilterBy()}
+                style={{ display: 'block', padding: '10px 0', textAlign: 'center', color: '#1890ff' }}
+              >
+                Add new item
+              </a>
+            </div>
+          </Collapse>
+        </TabPane>
+
+        <TabPane tab="Limit by" key="4">
+          <Row style={{ padding: '24px 0' }}>
+            <InputNumber
+              placeholder={'Limit'}
+              style={{ maxWidth: 250, width: '100%' }}
+              defaultValue={this.props.data.limit || ''}
+              onChange={limit => this.onDynamicSourceChange('limit')(limit)}
+            />
+            <span style={{ marginLeft: 12 }}>Let it empty or with zero for no limit.</span>
           </Row>
         </TabPane>
 
