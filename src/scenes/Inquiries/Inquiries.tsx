@@ -20,6 +20,7 @@ const INQUIRIES = gql`
       message
       url
       createdAt
+      formType
       ip
     }
   }
@@ -35,6 +36,11 @@ const columns = [
     dataIndex: 'createdAt',
     key: 'createdAt',
   }, {
+    title: 'Form type',
+    dataIndex: 'formType',
+    key: 'formType',
+  },
+  {
     title: 'Ip',
     dataIndex: 'ip',
     key: 'ip',
@@ -55,11 +61,11 @@ class Inquiries extends Component<Properties, State> {
         <p>{row.message.phone}</p>
         <p><strong>Message:</strong></p>
         <p>{row.message.text}</p>
-        <p>
+        {row.message.attachment && <p>
           <a href={row.message.attachment} target={'_blank'}>
           <Icon type="download" /> Download attachment
           </a>
-        </p>
+        </p>}
       </div>
     );
   }
