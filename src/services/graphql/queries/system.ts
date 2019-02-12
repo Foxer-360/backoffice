@@ -53,6 +53,7 @@ export const GET_PROJECTS = gql`
         id
         name
       }
+      components
     }
   }
 `;
@@ -79,6 +80,7 @@ export const GET_PROJECT = gql`
         id
         name
       }
+      components
     }
   }
 `;
