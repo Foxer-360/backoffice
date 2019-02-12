@@ -24,7 +24,6 @@ export interface Properties {
 
 // tslint:disable-next-line:no-any
 const Wrapped = (Comp: any, withoutBackground?: boolean, ...rest): any => {
-  console.log(rest);
   if (!withoutBackground) {
     return () => (
       <Content color="white">

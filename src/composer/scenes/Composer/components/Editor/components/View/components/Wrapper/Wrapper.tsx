@@ -5,6 +5,7 @@ import { IComponentsServiceLikeClass, IEditorInfo, ILockInfo } from '../../../..
 import UserEditor from './components/UserEditor';
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
+import * as R from 'ramda';
 
 const GET_CONTEXT = gql`{
   datasourceItems @client
@@ -289,42 +290,66 @@ class Wrapper extends React.Component<IProperties, IState> {
         if (loading) { return 'Loading...'; }
         
         const { datasourceItems } = data;
-         
-        const parsedData = addContextInformationsFromDatasourceItems(datasourceItems, this.props.content[this.props.position].data);
 
-        return (
-          <div
-            style={wrapperStyle}
-            draggable={true}
-            onDragStart={this.handleDragStart}
-            onDragEnd={this.handleDragEnd}
-          >
-            {/* There is control for component */}
-            <div className="wrapper-header">
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <button className="ui-button" onClick={this.handleEdit} disabled={locked}>
-                  Edit
-                </button>
-                <button className="ui-button" onClick={this.handleRemove} disabled={locked}>
-                  Remove
-                </button>
-                <div className="editMove" />
-              </div>
-              {locked ? (
-                <div style={{ float: 'right', marginRight: '16px' }}>
-                  <UserEditor editors={this.props.editors} id={editor} />
+        const regex = /%cx,([^%]*)%/g;
+        
+        let stringifiedData = JSON.stringify(this.props.content[this.props.position].data);
+        let replacedData = String(stringifiedData);
+        let result;
+        while ((result = regex.exec(stringifiedData)) && datasourceItems && datasourceItems.length > 0) {
+          console.log(datasourceItems);
+          if (result[1]) {
+            try {
+              const searchKeys = result[1].split(',');
+              if (Array.isArray(searchKeys) && searchKeys.length > 0) {
+                const getValueFromDatasourceItems = R.path(searchKeys);
+                const replacement = getValueFromDatasourceItems(datasourceItems.filter(item => item.content).map(item => item.content));
+                if (replacement) {
+                  
+                  replacedData = replacedData.replace(result[0], replacement);
+                }
+              }    
+            } catch (e) {
+              console.log(e);
+            }
+          }
+        }
+                    
+          const parsedData = JSON.parse(replacedData);
+
+          return (
+            <div
+              style={wrapperStyle}
+              draggable={true}
+              onDragStart={this.handleDragStart}
+              onDragEnd={this.handleDragEnd}
+            >
+              {/* There is control for component */}
+              <div className="wrapper-header">
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <button className="ui-button" onClick={this.handleEdit} disabled={locked}>
+                    Edit
+                  </button>
+                  <button className="ui-button" onClick={this.handleRemove} disabled={locked}>
+                    Remove
+                  </button>
+                  <div className="editMove" />
                 </div>
-              ) : null}
-            </div>
+                {locked ? (
+                  <div style={{ float: 'right', marginRight: '16px' }}>
+                    <UserEditor editors={this.props.editors} id={editor} />
+                  </div>
+                ) : null}
+              </div>
 
-            {/* There is component */}
-            <RenderErrorCatcher>
-              <Comp
-                data={parsedData}
-              />
-            </RenderErrorCatcher>
-          </div>
-        );
+              {/* There is component */}
+              <RenderErrorCatcher>
+                <Comp
+                  data={parsedData}
+                />
+              </RenderErrorCatcher>
+            </div>
+          );
 
       }}</Query>);
     }

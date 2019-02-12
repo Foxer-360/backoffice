@@ -204,6 +204,7 @@ class Navigations extends Component<Properties, State> {
             const COLUMNS = [
               {
                 title: 'Name',
+                dataIndex: 'name',
                 key: 'name',
                 width: '50%',
               },

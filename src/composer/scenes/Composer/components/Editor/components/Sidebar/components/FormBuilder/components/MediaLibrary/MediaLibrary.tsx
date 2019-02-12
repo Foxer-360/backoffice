@@ -60,24 +60,38 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
 
   public render() {
     const { mediaData } = this.props;
+
     return (
       <div>
         <div className={'ant-divider ant-divider-horizontal ant-divider-with-text-left'}>
           <span className={'ant-divider-inner-text'}>
-            {this.state.drawerType === 'editor' ? 'Media Editor: ' : 'Media Library'}
+            {this.state.drawerType === 'editor' ? `Media Editor: ${this.props.name} ` : 'Media Library'}
           </span>
         </div>
 
-        {mediaData && mediaData.filename && (
-          <div
-            className={'ant-upload ant-upload-select ant-upload-select-picture-card'}
-            onClick={() => this.showDrawer('editor')}
-            style={{ margin: '0px auto 6px', width: '100%', maxWidth: '250px' }}
-          >
-            <span className={'ant-upload'}>
-              <img style={{ width: '100%' }} src={getImgUrl(mediaData)} alt="file" />
-            </span>
-          </div>
+        {mediaData && mediaData.filename && mediaData.type === 'image' && (
+          <>
+            <div
+              className={'ant-upload ant-upload-select ant-upload-select-picture-card'}
+              onClick={() => this.showDrawer('editor')}
+              style={{ margin: '0px auto 6px', width: '100%', maxWidth: '250px' }}
+            >
+              <span className={'ant-upload'}>
+                <img style={{ width: '100%' }} src={getImgUrl(mediaData)} alt="file" />
+              </span>
+            </div>
+
+            <Row style={{ margin: '0 0 24px' }}>
+              <Col span={24}>
+                <label>Image alt text </label>
+                <Input
+                  onChange={e => this.onChangeAlt(e.target.value)}
+                  defaultValue={mediaData && mediaData.alt ? mediaData.alt : ''}
+                  placeholder={'Alt Text'}
+                />
+              </Col>
+            </Row>
+          </>
         )}
 
         {mediaData && mediaData.recommendedSizes && (
@@ -90,16 +104,20 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
           <iframe src={mediaData.url} style={{ width: '100%', height: '300px' }} />
         )}
 
-        <Row style={{ margin: '0 0 24px' }}>
-          <Col span={24}>
-            <label>Image alt text </label>
-            <Input
-              onChange={e => this.onChangeAlt(e.target.value)}
-              defaultValue={mediaData && mediaData.alt ? mediaData.alt : ''}
-              placeholder={'Alt Text'}
-            />
-          </Col>
-        </Row>
+        {mediaData && mediaData.type === 'file' && (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              flexDirection: 'column',
+              alignItems: 'center',
+              padding: '24px 0 0',
+            }}
+          >
+            <Icon type="file" style={{ fontSize: 40, marginBottom: 14 }} />
+            <p>{mediaData.filename}</p>
+          </div>
+        )}
 
         <Row gutter={6} style={{ display: 'flex', justifyContent: 'left', padding: '0 3px' }}>
           <Button onClick={() => this.showDrawer('editor')} style={{ marginRight: '16px', minWidth: '105px' }}>

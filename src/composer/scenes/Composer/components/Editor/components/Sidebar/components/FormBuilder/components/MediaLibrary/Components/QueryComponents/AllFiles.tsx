@@ -5,21 +5,21 @@ import * as React from 'react';
 // tslint:disable:jsx-no-multiline-js
 // tslint:disable:jsx-no-lambda
 
-export interface IAllImagesState {
+export interface IAllFilesState {
   // tslint:disable:no-any
-  images: any[];
+  files: any[];
   loading: boolean;
   offset: number;
   limit: number;
   query: string;
 }
 
-class AllImages extends React.Component<{}, IAllImagesState> {
+class AllFiles extends React.Component<{}, IAllFilesState> {
   constructor(props: {}) {
     super(props);
 
     this.state = {
-      images: [],
+      files: [],
       loading: false,
       limit: 15,
       offset: 1,
@@ -28,10 +28,10 @@ class AllImages extends React.Component<{}, IAllImagesState> {
   }
 
   public componentDidMount() {
-    this.fetchImages();
+    this.fetchFiles();
   }
 
-  public fetchImages = () => {
+  public fetchFiles = () => {
     this.setState({
       loading: true,
     });
@@ -42,15 +42,15 @@ class AllImages extends React.Component<{}, IAllImagesState> {
       },
       method: 'get',
       url: `${process.env.REACT_APP_MEDIA_LIBRARY_SERVER}/find${'?category=' +
-        process.env.REACT_APP_MEDIA_LIBRARY_SERVER__CATEGORY}/`,
+        process.env.REACT_APP_MEDIA_LIBRARY_SERVER__CATEGORY}/docs/`,
     })
       .then(response => {
-        this.setState({ images: response.data.files, loading: false });
+        this.setState({ files: response.data.files, loading: false });
       })
       .catch(response => {
         this.setState({ loading: false });
         notification.error({
-          description: 'There was an error fetching images',
+          description: 'There was an error fetching files',
           message: 'Error',
         });
       });
@@ -60,15 +60,15 @@ class AllImages extends React.Component<{}, IAllImagesState> {
     this.setState({ offset: pageNum });
   }
 
-  public paginateImages = () => {
-    let images = this.state.images;
+  public paginateFiles = () => {
+    let files = this.state.files;
 
     if (this.state.query && this.state.query.length > 0) {
-      images = images.filter(image => image.filename.includes(this.state.query));
+      files = files.filter(file => file.filename.includes(this.state.query));
     }
 
-    return images.filter(
-      (image, i) => i + 1 > this.state.limit * (this.state.offset - 1) && i + 1 <= this.state.limit * this.state.offset
+    return files.filter(
+      (file, i) => i + 1 > this.state.limit * (this.state.offset - 1) && i + 1 <= this.state.limit * this.state.offset
     );
   }
 
@@ -82,13 +82,13 @@ class AllImages extends React.Component<{}, IAllImagesState> {
     const children = React.Children.map(this.props.children, (child, index) => {
       // tslint:disable:no-any
       return React.cloneElement(child as React.ReactElement<any>, {
-        images: this.paginateImages(),
-        refetch: this.fetchImages,
+        files: this.paginateFiles(),
+        refetch: this.fetchFiles,
         loading: this.state.loading,
         changePage: this.changePage,
         currentPage: this.state.offset,
-        totalImages: this.state.images.length,
-        imagesPerPage: this.state.limit,
+        totalFiles: this.state.files.length,
+        filesPerPage: this.state.limit,
         search: this.search,
         searchQuery: this.state.query,
       });
@@ -98,4 +98,4 @@ class AllImages extends React.Component<{}, IAllImagesState> {
   }
 }
 
-export default AllImages;
+export default AllFiles;
