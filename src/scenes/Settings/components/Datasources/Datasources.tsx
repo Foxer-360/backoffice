@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Query, Mutation } from 'react-apollo';
 import { queries } from '@source/services/graphql';
 import { adopt } from 'react-adopt';
-import { Button, Table } from 'antd';
+import { Button, Table, Popconfirm } from 'antd';
 import Actions from './components/Actions';
 import gql from 'graphql-tag';
 import { Link } from 'react-router-dom';
@@ -160,14 +160,19 @@ class Datasources extends Component<Properties, State> {
               title: 'Actions',
               key: 'actions',
               render: (record: Datasource) => (
-                <Actions
-                  id={record.id}
-                  edit={(id: string) => push(`/datasource/${record.id}`)}
-                  remove={async (id: string) => {
-                    await deleteDatasource({ variables: { id } });
-                  }}
-                />
-              )
+                  <>
+                    <Button size="small" style={{ marginLeft: 6 }} onClick={() => push(`/datasource-items/${record.id}`)}>Items</Button>
+                    <Button size="small" style={{ marginLeft: 6 }} onClick={() => push(`/datasource/${record.id}`)}>Edit</Button>
+                    <Popconfirm
+                      title="Are you sure, you want to remove this item?"
+                      onConfirm={async () => {
+                        await deleteDatasource({ variables: { id: record.id } });
+                      }}
+                    >
+                      <Button size="small" style={{ marginLeft: 6 }} type="danger">Remove</Button>
+                    </Popconfirm>
+                  </>
+                )
             }];
 
             return (
