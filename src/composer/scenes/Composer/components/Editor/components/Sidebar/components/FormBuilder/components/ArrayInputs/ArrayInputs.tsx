@@ -377,7 +377,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                     fontWeight: 500,
                   }}
                 >
-                  <span style={{ marginRight: 6, fontSize: '12px' }}>
+                  <span style={{ marginRight: 4, fontSize: '12px' }}>
                     <Icon type="edit" style={{ color: 'rgb(24,144,255)' }} />
                   </span>
                   Adjust Connection
@@ -396,7 +396,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                       fontWeight: 500,
                     }}
                   >
-                    <span style={{ marginRight: 6, fontSize: '12px' }}>
+                    <span style={{ marginRight: 4, fontSize: '12px' }}>
                       <Icon type="plus" style={{ color: 'rgb(24,144,255)' }} />
                     </span>
                     Connect to Data Source
