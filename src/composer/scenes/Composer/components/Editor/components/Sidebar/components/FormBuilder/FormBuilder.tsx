@@ -28,6 +28,7 @@ interface IFormBuilderProps {
   };
   data?: ILooseObject;
   onChange: (data: ILooseObject) => void;
+  contextSchemaPaths: Array<string>;
 }
 
 class FormBuilder extends React.Component<IFormBuilderProps> {
@@ -80,6 +81,7 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
                 data={(this.props.data && this.props.data[elementName]) || []}
                 onChange={this.handleChange}
                 activeTab={this.props.data.activeTab || 0}
+                schemaPaths={this.props.contextSchemaPaths}
               />
             );
 
@@ -93,6 +95,7 @@ class FormBuilder extends React.Component<IFormBuilderProps> {
                 value={this.props.data && this.props.data[elementName] ? this.props.data[elementName] : null}
                 onChange={this.handleChange}
                 mediaLibraryChange={this.mediaLibraryChange}
+                schemaPaths={this.props.contextSchemaPaths}
               />
             );
         }

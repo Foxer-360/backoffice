@@ -9,11 +9,11 @@ import * as React from 'react';
 export interface IUploadImageProps {
   closeEditor?: () => void;
   onChange?: (media: object) => void;
+  refetch?: () => void;
 }
 
 export interface IUploadImageState {
   loading: boolean;
-
   uploadImage?: (fileList: ILooseObject) => void;
 }
 
@@ -24,6 +24,37 @@ class UploadImage extends React.Component<IUploadImageProps, IUploadImageState> 
     this.state = {
       loading: false,
     };
+  }
+
+  public deleteImage = (id: string) => {
+    this.setState({ loading: true });
+
+    axios({
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
+      method: 'post',
+      url: `${process.env.REACT_APP_MEDIA_LIBRARY_SERVER}/delete`,
+      data: {
+        id: id,
+      },
+    })
+      .then(response => {
+        notification.success({
+          description: 'Image Deleted Successfully',
+          message: 'Success',
+        });
+
+        this.props.closeEditor();
+        this.props.refetch();
+      })
+      .catch(err => {
+        this.setState({ loading: false });
+        notification.error({
+          description: 'Could not delete image' + ' ' + err,
+          message: 'Error',
+        });
+      });
   }
 
   public uploadImage = (fileList: ILooseObject, mediaData: ILooseObject) => {
@@ -85,6 +116,7 @@ class UploadImage extends React.Component<IUploadImageProps, IUploadImageState> 
       return React.cloneElement(child as React.ReactElement<any>, {
         loading: this.state.loading,
         uploadImage: this.uploadImage,
+        deleteImage: this.deleteImage,
       });
     });
 

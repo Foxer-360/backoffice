@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 export const CREATE_PROJECT = gql`
   mutation createProject($name: String!, $defaultName: String!,
-    $languages: LanguageCreateManyInput, $defaultLanguage: LanguageWhereUniqueInput!) {
+    $languages: LanguageCreateManyInput, $defaultLanguage: LanguageWhereUniqueInput!, $components: String!) {
       createProject(
         data: {
           name: $name
@@ -11,6 +11,7 @@ export const CREATE_PROJECT = gql`
           defaultLanguage: {
             connect: $defaultLanguage
           }
+          components: $components
         }
       ) {
         id
@@ -29,13 +30,14 @@ export const CREATE_PROJECT = gql`
           id
           name
         }
+        components
       }
     }
 `;
 
 export const UPDATE_PROJECT = gql`
     mutation updateProject($id: ID!, $name: String!, $defaultName: String!,
-      $languages: LanguageUpdateManyInput, $defaultLanguage: LanguageWhereUniqueInput!) {
+      $languages: LanguageUpdateManyInput, $defaultLanguage: LanguageWhereUniqueInput!, $components: String!) {
         updateProject(
           where: {
             id: $id
@@ -47,6 +49,7 @@ export const UPDATE_PROJECT = gql`
             defaultLanguage: {
               connect: $defaultLanguage
             }
+            components: $components
           }
         ) {
           id
@@ -65,6 +68,7 @@ export const UPDATE_PROJECT = gql`
             id
             name
           }
+          components
         }
       }
 `;
@@ -412,10 +416,10 @@ export const DELETE_TAG = gql`
 
 export const UPDATE_TAG = gql`
   mutation updateTag(
-    $id: ID!, 
-    $name: String!, 
-    $displayInNavigation: Boolean!, 
-    $color: String!, 
+    $id: ID!,
+    $name: String!,
+    $displayInNavigation: Boolean!,
+    $color: String!,
     $plugins: [String!]!
   ) {
     updateTag(

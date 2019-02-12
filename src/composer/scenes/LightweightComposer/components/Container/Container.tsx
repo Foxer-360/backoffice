@@ -30,6 +30,7 @@ class Container extends React.Component<IProperties, {}> {
         );
       } else {
         const Comp = this.props.componentModule.getComponent(node.name);
+        console.log(node.data);
         return (
           <Comp
             data={node.data}

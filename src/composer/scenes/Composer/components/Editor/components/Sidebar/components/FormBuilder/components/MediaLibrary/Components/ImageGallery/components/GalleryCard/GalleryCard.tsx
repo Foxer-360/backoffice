@@ -16,18 +16,18 @@ export interface IGalleryCardProps {
 const GalleryCard: React.SFC<IGalleryCardProps> = ({ toggleEdit, image }) => {
   return (
     <div className={'ant-upload-list ant-upload-list-picture-card'}>
-      <div className="ant-upload-list-item ant-upload-list-item-done">
+      <div
+        className="ant-upload-list-item ant-upload-list-item-done"
+        style={{ cursor: 'pointer' }}
+        onClick={() => toggleEdit(image)}
+      >
         <div className="ant-upload-list-item-info">
           <div className={'mediaLibrary__gallery__img'} style={{ backgroundImage: `url(${getImgUrl(image)})` }} />
         </div>
 
-        <span className={'ant-upload-list-item-actions'}>
-          <Icon
-            type="eye-o"
-            onClick={() => toggleEdit(image)}
-            style={{ cursor: 'pointer', fontSize: '24px', color: 'white', margin: '0 10px' }}
-          />
-        </span>
+        <div className={'ant-upload-list-item-actions'}>
+          <Icon type="eye-o" style={{ fontSize: '26px', color: 'white', width: '100%' }} />
+        </div>  
       </div>
     </div>
   );
