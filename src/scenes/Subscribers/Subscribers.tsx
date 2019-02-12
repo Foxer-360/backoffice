@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { Table } from 'antd';
+import { Table, Popconfirm, Button } from 'antd';
 import gql from 'graphql-tag';
-import { Query } from 'react-apollo';
+import { Query, Mutation } from 'react-apollo';
+import { CSVLink, CSVDownload } from 'react-csv';
+import moment from 'moment';
 
 const { Component } = React;
 
@@ -25,6 +27,14 @@ const SUBSCRIBERS = gql`
   }
 `;
 
+const DELETE_SUBSCRIBER = gql`
+  mutation deleteSubscriber($id: ID!) {
+    deleteSubscriber(where: { id: $id }) {
+      id
+    }
+  }
+`;
+
 const columns = [{
   title: 'Email',
   dataIndex: 'email',
@@ -41,6 +51,24 @@ const columns = [{
   title: 'Ip',
   dataIndex: 'ip',
   key: 'ip',
+}, {
+  title: 'Actions', key: 'actions', width: 200,
+  render: (unused, record) => (
+    <Mutation 
+      mutation={DELETE_SUBSCRIBER}
+      update={(cache, { data: { deleteSubscriber } }) => {
+        const { subscribers } = cache.readQuery({ query: SUBSCRIBERS });
+        cache.writeQuery({
+          query: SUBSCRIBERS,
+          data: { subscribers: subscribers.filter(sub => sub.id !== deleteSubscriber.id )}
+        });
+      }}
+    >
+    {(deleteSubscriber) =>
+      <Popconfirm title="Are you sure, you want to remove this page ?" onConfirm={() => deleteSubscriber({ variables: { id: record.id } })}>
+        <Button size="small" ghost={true} icon="delete" style={{ marginLeft: 6 }} type="danger" />
+      </Popconfirm>}
+    </Mutation>)
 }];
 
 class Subscribers extends Component<Properties, State> {
@@ -59,7 +87,27 @@ class Subscribers extends Component<Properties, State> {
 
           const { subscribers } = data;
 
-          return <Table columns={columns} dataSource={subscribers} />;
+          const csvData = [
+          ];
+
+          if (subscribers && subscribers.length > 0) {
+            csvData.push(Object.keys(subscribers[0]).filter(key => !['id', '__typename'].includes(key)));
+            subscribers.forEach(subscriber => 
+              csvData.push(Object.keys(subscriber).filter(key => !['id', '__typename'].includes(key)).map(key => subscriber[key])));
+          }
+          return <>
+            <Table columns={columns} dataSource={subscribers} />
+            <Button>
+              <CSVLink 
+                data={csvData}
+                filename={`subscribers-${moment().format()}.csv`}
+              >
+                Download csv
+              </CSVLink>
+            </Button>
+            <CSVDownload data={csvData} target="_blank" />
+          
+          </>;
         }}</Query>
       </div>
     );
