@@ -405,10 +405,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
 
                   <Collapse accordion={true} onChange={(key: string) => this.onChangeTab(key)}>
                     {this.props.data &&
-                      this.props.data.data &&
-                      Object.keys(this.props.data.data).map((property: string, index: number) => {
-                        const dataRow = this.props.items.properties[property];
-
+                      this.props.data.map((dataRow: LooseObject, index: number) => {
                         let title = null;
                         if (this.props.items.properties) {
                           const properties: LooseObject = this.props.items.properties;
@@ -537,7 +534,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                 {this.props.data.sourceType === 'pages' && this.pagesSourceOptions(tags)}
               </Drawer>
 
-              {this.props.items &&
+              {/* {this.props.items &&
                 this.props.items.properties &&
                 Object.keys(this.props.items.properties).map((elementName: string, j: number) => {
                   const element = this.props.items.properties[elementName];
@@ -552,10 +549,10 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                       onChange={this.onDynamicSourceDataChange}
                       schemaPaths={[...this.state.schemaPaths, ...this.props.schemaPaths]}
                       mediaLibraryChange={this.mediaLibraryChange}
-                      pageSourceAvailable={this.props.data.sourceType === 'pages'}
+                      pageSourceAvailable={true}
                     />
                   );
-                })}
+                })} */}
             </Section>
           );
         }}
