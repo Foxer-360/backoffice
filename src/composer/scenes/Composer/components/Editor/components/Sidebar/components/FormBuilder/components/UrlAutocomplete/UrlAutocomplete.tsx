@@ -6,9 +6,11 @@ import { Query } from 'react-apollo';
 import { canNotDefineSchemaWithinExtensionMessage } from 'graphql/validation/rules/LoneSchemaDefinition';
 import { adopt } from 'react-adopt';
 
-const GET_CONTEXT = gql`{
-  languageData @client
-}`;
+const GET_CONTEXT = gql`
+  {
+    languageData @client
+  }
+`;
 
 const GET_PAGES_URLS = gql`
   query pagesUrls($language: ID!) {
@@ -23,20 +25,19 @@ const GET_PAGES_URLS = gql`
 `;
 
 const ComposedQuery = adopt({
-  context: ({ render }) => (
-    <Query query={GET_CONTEXT} >
-      {({ data }) => render(data)}
-    </Query>
-  ),
-  getPagesUrls: ({ render, context: { languageData }}) => {
-    if (!languageData) { return render({ loading: true }); }
+  context: ({ render }) => <Query query={GET_CONTEXT}>{({ data }) => render(data)}</Query>,
+  getPagesUrls: ({ render, context: { languageData } }) => {
+    if (!languageData) {
+      return render({ loading: true });
+    }
     return (
-    <Query query={GET_PAGES_URLS} variables={{ language: languageData.id }}>
-      {(data) => {
-        return render(data);
-      }}
-    </Query>);
-  }
+      <Query query={GET_PAGES_URLS} variables={{ language: languageData.id }}>
+        {data => {
+          return render(data);
+        }}
+      </Query>
+    );
+  },
 });
 
 export interface IUrlAutocomplete {
@@ -47,14 +48,17 @@ export interface IUrlAutocomplete {
     url: string;
     urlNewWindow: boolean;
     pageId?: string;
+    pageSourcedUrl?: boolean;
   };
   placeholder?: string;
   // tslint:disable-next-line:no-any
   onChange: (e: React.ChangeEvent<Element> | any) => void;
+  pageSourceAvailable?: boolean;
 }
 
 export interface IState {
   urlNewWindow: boolean;
+  pageSourcedUrl: boolean;
 }
 
 class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
@@ -63,6 +67,7 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
 
     this.state = {
       urlNewWindow: false,
+      pageSourcedUrl: false,
     };
   }
 
@@ -85,12 +90,11 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
   }
 
   render() {
-    const { onChange, value } = this.props;
+    const { onChange, value, pageSourceAvailable } = this.props;
 
     return (
       <ComposedQuery>
-        {({ getPagesUrls: { data }, loading, error}) => {
-
+        {({ getPagesUrls: { data }, loading, error }) => {
           if (loading) {
             return 'Loading...';
           }
@@ -110,25 +114,43 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
               {this.props.notitle && this.props.notitle === true ? null : <label>{this.props.label}</label>}
               {pagesUrls && pagesUrls.length > 0 && (
                 <div>
-                  <AutoComplete
-                    dataSource={pagesUrls.map(source => source.url).filter(u => u !== '')}
-                    filterOption={(inputValue, { props: { children } }: LooseObject) =>
-                      children.toUpperCase().includes(inputValue.toUpperCase())}
-                    defaultValue={pageUrlObj && pageUrlObj ? pageUrlObj.url : value && value.url}
-                    onSearch={newUrl => this.onChange({ url: newUrl }, pagesUrls)}
-                    onSelect={newUrl => this.onChange({ url: newUrl }, pagesUrls)}
-                  />
+                  {(!value || (value && !value.pageSourcedUrl)) && (
+                    <>
+                      <AutoComplete
+                        dataSource={pagesUrls.map(source => source.url).filter(u => u !== '')}
+                        filterOption={(inputValue, { props: { children } }: LooseObject) =>
+                          children.toUpperCase().includes(inputValue.toUpperCase())}
+                        defaultValue={pageUrlObj && pageUrlObj ? pageUrlObj.url : value && value.url}
+                        onSearch={newUrl => this.onChange({ url: newUrl }, pagesUrls)}
+                        onSelect={newUrl => this.onChange({ url: newUrl }, pagesUrls)}
+                      />
 
-                  <Checkbox
-                    checked={value && value.urlNewWindow}
-                    onChange={() => {
-                      this.setState({ urlNewWindow: !this.state.urlNewWindow }, () => {
-                        this.onChange({ urlNewWindow: this.state.urlNewWindow });
-                      });
-                    }}
-                  >
-                    Open in New window
-                  </Checkbox>
+                      <Checkbox
+                        checked={value && value.urlNewWindow}
+                        onChange={() => {
+                          this.setState({ urlNewWindow: !this.state.urlNewWindow }, () => {
+                            this.onChange({ urlNewWindow: this.state.urlNewWindow });
+                          });
+                        }}
+                      >
+                        Open in New window
+                      </Checkbox>
+                    </>
+                  )}
+
+                  {pageSourceAvailable && (
+                    <Checkbox
+                      style={{ margin: '0.6em 0 0.5em' }}
+                      checked={value && value.pageSourcedUrl}
+                      onChange={() => {
+                        this.setState({ pageSourcedUrl: !this.state.pageSourcedUrl }, () => {
+                          this.onChange({ pageSourcedUrl: this.state.pageSourcedUrl });
+                        });
+                      }}
+                    >
+                      Use dynamic page as source.
+                    </Checkbox>
+                  )}
                 </div>
               )}
               {pagesUrls && pagesUrls.length === 0 && (
@@ -152,7 +174,8 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
             </div>
           );
         }}
-      </ComposedQuery>);
+      </ComposedQuery>
+    );
   }
 }
 

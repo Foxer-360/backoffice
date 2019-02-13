@@ -5,25 +5,13 @@ import gql from 'graphql-tag';
 import { Popover, Tag, Icon } from 'antd';
 import { Query, Mutation } from 'react-apollo';
 import { adopt } from 'react-adopt';
+import { GET_TAGS } from '@source/services/graphql/queries/system';
 
 const { Component } = React;
 
 const UPDATE_TAG = gql`
   mutation($connectedPages: [PageWhereUniqueInput!], $disconnectedPages: [PageWhereUniqueInput!], $tagId: ID!) {
     updateTag(data: { pages: { connect: $connectedPages, disconnect: $disconnectedPages } }, where: { id: $tagId }) {
-      id
-      name
-      pages {
-        id
-      }
-      color
-    }
-  }
-`;
-
-const GET_TAGS = gql`
-  query {
-    tags {
       id
       name
       pages {
