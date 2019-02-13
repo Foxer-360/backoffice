@@ -17,6 +17,7 @@ import {
   Divider,
   Col,
   Radio,
+  List,
 } from 'antd';
 import * as React from 'react';
 import { IFormSchema } from '../../FormBuilder';
@@ -466,6 +467,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                                     onChange={this.onChange}
                                     schemaPaths={this.props.schemaPaths}
                                     mediaLibraryChange={this.mediaLibraryChange}
+                                    
                                   />
                                 );
                               })}
@@ -534,8 +536,8 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                 {this.props.data.sourceType === 'pages' && this.pagesSourceOptions(tags)}
               </Drawer>
 
-              {/* {this.props.items &&
-                this.props.items.properties &&
+              {this.props.items &&
+                this.props.items.properties && ( this.props.data.sourceType === 'pages' || this.props.data.datasourceId ) &&
                 Object.keys(this.props.items.properties).map((elementName: string, j: number) => {
                   const element = this.props.items.properties[elementName];
 
@@ -549,10 +551,10 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                       onChange={this.onDynamicSourceDataChange}
                       schemaPaths={[...this.state.schemaPaths, ...this.props.schemaPaths]}
                       mediaLibraryChange={this.mediaLibraryChange}
-                      pageSourceAvailable={true}
+                      pageSourceAvailable={this.props.data.sourceType === 'pages'}
                     />
                   );
-                })} */}
+                })}
             </Section>
           );
         }}
@@ -563,18 +565,25 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
   dynamicSourceSelect(datasources: Array<LooseObject>) {
     return (
       <Col span={24}>
-        <label style={{ marginRight: 12 }}>Datasource:</label>
-        <Select
-          defaultValue={this.props.data.datasourceId || 'Select'}
-          style={{ maxWidth: 250, width: '100%' }}
-          onChange={this.onDynamicSourceSelection(datasources)}
-        >
-          {datasources.map(datasource => (
-            <Option key={datasource.id} value={datasource.id}>
-              {datasource.type}
-            </Option>
-          ))}
-        </Select>
+        <p style={{ marginRight: 12 }}>Datasource:</p>
+
+        <List
+          bordered={true}
+          dataSource={datasources}
+          renderItem={item => (
+            <List.Item
+              style={{ cursor: 'pointer' }}
+              onClick={() => this.onDynamicSourceSelection(datasources)(item.id)}
+            >
+              {this.props.data && this.props.data.datasourceId && this.props.data.datasourceId === item.id && (
+                <span>
+                  <Icon type={'check-circle'} style={{ marginRight: '10px', color: '#339F00', fontSize: 22 }} />
+                </span>
+              )}
+              {item.type}
+            </List.Item>
+          )}
+        />
       </Col>
     );
   }
@@ -599,9 +608,11 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
       <>
         <Tabs defaultActiveKey="1">
           <TabPane tab="DataSource Options" key="1">
-            <Row style={{ padding: '24px 0 ' }}>{this.dynamicSourceSelect(datasources)}</Row>
+            <Row style={{ padding: '24px 0 ', minHeight: 300 }}>{this.dynamicSourceSelect(datasources)}</Row>
 
-            <Row style={{ paddingBottom: 10 }}>
+            <Divider type="horizontal" />
+
+            <Row>
               <Col span={6} offset={18}>
                 <Button
                   icon={'close-circle'}
@@ -738,25 +749,32 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     return (
       <Tabs>
         <TabPane tab="DataSource Options" key="1">
-          <Section title={'Select Tags'}>
-            <Row style={{ padding: '24px 0' }}>
-              <p>Available Tags:</p>
+          <Section title={'Available Tags'}>
+            <Row style={{ padding: '24px 0 ', minHeight: 100 }}>
+              {/* <p>Available Tags:</p> */}
               {this.getUninsertedTags(tags)}
             </Row>
-            <Row>
-              <p>Selected Tags:</p>
-
-              {tags
-                .filter(({ id }) => this.props.data.tagIds.some(tagId => tagId === id))
-                .map(({ color, name, id }: LooseObject, key) => {
-                  return (
-                    <Tag key={key} color={color} onClick={() => this.deleteTag(id)} closable={true}>
-                      {name}
-                    </Tag>
-                  );
-                })}
-            </Row>
           </Section>
+
+          {/* <Divider type="horizontal" /> */}
+
+          <Section title={'Selected Tags'} />
+          <Row style={{ padding: '24px 0 ', minHeight: 100 }}>
+            {/* <p>Selected Tags:</p> */}
+
+            {tags
+              .filter(({ id }) => this.props.data.tagIds.some(tagId => tagId === id))
+              .map(({ color, name, id }: LooseObject, key) => {
+                return (
+                  <Tag key={key} color={color} onClick={() => this.deleteTag(id)} closable={true}>
+                    <Icon type="tag" style={{ marginRight: 6 }} />
+                    {name}
+                  </Tag>
+                );
+              })}
+          </Row>
+
+          <Divider type="horizontal" />
 
           <Row style={{ padding: '24px 0' }}>
             <Col span={6} offset={18}>
@@ -840,7 +858,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                 >
                   <Row style={{ paddingBottom: 10 }}>
                     <Col span={12}>
-                      <label>Key:</label>
+                      <label style={{ marginRight: '12px' }}>Key:</label>
                       <Input
                         style={{ maxWidth: 250, width: '100%' }}
                         defaultValue={filter.filterBy || ''}
@@ -849,9 +867,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                     </Col>
 
                     <Col span={12}>
-                      <div>
-                        <label>Includes:</label>
-                      </div>
+                      <label style={{ marginRight: '12px' }}>Includes:</label>
                       <Input
                         style={{ maxWidth: 250, width: '100%' }}
                         defaultValue={filter.includes || ''}
@@ -898,6 +914,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
       .map(({ color, name, id }, key) => {
         return (
           <Tag key={key} color={color} onClick={() => this.addNewTag(id)}>
+            <Icon type="tag" style={{ marginRight: 6 }} />
             {name}
           </Tag>
         );

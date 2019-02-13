@@ -114,7 +114,7 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
               {this.props.notitle && this.props.notitle === true ? null : <label>{this.props.label}</label>}
               {pagesUrls && pagesUrls.length > 0 && (
                 <div>
-                  {value && !value.pageSourcedUrl && <><AutoComplete
+                  {(!value || ( value && !value.pageSourcedUrl )) && <><AutoComplete
                     dataSource={pagesUrls.map(source => source.url).filter(u => u !== '')}
                     filterOption={(inputValue, { props: { children } }: LooseObject) =>
                       children.toUpperCase().includes(inputValue.toUpperCase())}
@@ -133,6 +133,7 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
                   >
                     Open in New window
                   </Checkbox><br/></>}
+
                   {pageSourceAvailable && <Checkbox
                     checked={value && value.pageSourcedUrl}
                     onChange={() => {
