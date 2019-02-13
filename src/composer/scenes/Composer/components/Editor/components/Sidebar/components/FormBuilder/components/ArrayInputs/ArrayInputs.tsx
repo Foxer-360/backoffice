@@ -410,9 +410,13 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                         let title = null;
                         if (this.props.items.properties) {
                           const properties: LooseObject = this.props.items.properties;
-                          title =
-                            (properties.title && properties.title.type === 'string' && dataRow.title) ||
-                            `Item ${index}`;
+
+                          const titleKeyFromData = Object
+                            .keys(properties)
+                            .find(key => {
+                              return typeof dataRow[key] === 'string';
+                            });
+                          title = dataRow[titleKeyFromData] || `Item ${index}`;
                         }
 
                         const panelTitle = (
@@ -420,6 +424,12 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                             <div
                               onClick={e => {
                                 e.stopPropagation();
+                              }}
+                              style={{
+                                textOverflow: 'ellipsis',
+                                width: '220px',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
                               }}
                             >
                               {title || 'new item'}
