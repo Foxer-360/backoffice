@@ -43,7 +43,7 @@ const TagQM = adopt({
               name: tag.name,
               displayInNavigation: tag.displayInNavigation,
               plugins: tag.plugins,
-              color: tag.color
+              color: tag.color,
             };
             return model;
           });
@@ -53,24 +53,24 @@ const TagQM = adopt({
       </Query>
     );
   },
-  createTag: ({ website, render}) => (
+  createTag: ({ website, render }) => (
     <Mutation
       mutation={mutations.CREATE_TAG}
       update={(cache, { data: { createTag } }) => {
         const { tags } = cache.readQuery({
           query: queries.TAG_LIST,
-          variables: { website }
+          variables: { website },
         });
         cache.writeQuery({
           query: queries.TAG_LIST,
           variables: { website },
-          data: { tags: tags.concat([createTag]) }
+          data: { tags: tags.concat([createTag]) },
         });
       }}
     >
       {createTag => {
         const fce = (data: LooseObject) => {
-          createTag({ variables: { ...data, website }});
+          createTag({ variables: { ...data, website } });
         };
 
         return render(fce);
@@ -83,12 +83,12 @@ const TagQM = adopt({
       update={(cache, { data: { deleteTag } }) => {
         const { tags } = cache.readQuery({
           query: queries.TAG_LIST,
-          variables: { website }
+          variables: { website },
         });
         cache.writeQuery({
           query: queries.TAG_LIST,
           variables: { website },
-          data: { tags: tags.filter((tag: Tag) => tag.id !== deleteTag.id) }
+          data: { tags: tags.filter((tag: Tag) => tag.id !== deleteTag.id) },
         });
       }}
     >
@@ -101,7 +101,7 @@ const TagQM = adopt({
       update={(cache, { data: { updateTag } }) => {
         const { tags } = cache.readQuery({
           query: queries.TAG_LIST,
-          variables: { website }
+          variables: { website },
         });
         cache.writeQuery({
           query: queries.TAG_LIST,
@@ -112,14 +112,14 @@ const TagQM = adopt({
                 return updateTag;
               }
               return tag;
-            })
-          }
+            }),
+          },
         });
       }}
     >
       {updateTag => {
         const fce = (data: LooseObject) => {
-          updateTag({ variables: { ...data }});
+          updateTag({ variables: { ...data } });
         };
 
         return render(fce);
@@ -128,8 +128,7 @@ const TagQM = adopt({
   ),
 });
 
-interface Properties {
-}
+interface Properties {}
 
 interface State {
   name: string;
@@ -158,7 +157,6 @@ interface QaMForModalVars {
 }
 
 class Tags extends Component<Properties, State> {
-
   private readonly DEFAULT: State = {
     name: null,
     displayInNavigation: false,
@@ -186,57 +184,54 @@ class Tags extends Component<Properties, State> {
       color: tag.color,
       plugins: tag.plugins,
       edit: true,
-      showModal: true
+      showModal: true,
     });
   }
 
   render(): React.ReactNode {
-
     return (
       <>
-        <Button
-          type="primary"
-          style={{ marginBottom: 16 }}
-          onClick={() => this.showCreateModal()}
-        >
+        <Button type="primary" style={{ marginBottom: 16 }} onClick={() => this.showCreateModal()}>
           Add new tag
         </Button>
         <TagQM>
           {({ tags, website, createTag, updateTag, deleteTag }: QaMForModalVars) => {
             const tableData = tags.map((a: Tag) => ({ ...a, key: a.id }));
 
-            const COLUMNS = [{
-              title: 'Name',
-              key: 'name',
-              width: '30%',
-            }, {
-              title: 'Display in Navigation',
-              key: 'displayInNavigation',
-              width: '18%',
-              render: (record: Tag) => (
-                <span>{record.displayInNavigation ? 'Yes' : 'No'}</span>
-              )
-            }, {
-              title: 'Color',
-              key: 'color',
-              width: '12%',
-              render: (record: Tag) => (
-                <span style={{ color: record.color}}>{record.color}</span>
-              )
-            }, {
-              title: 'Actions',
-              key: 'actions',
-              render: (record: Tag) => (
-                <Actions
-                  id={record.id}
-                  edit={(id: string) => this.showEditModal(id, tags.find(a => a.id === id))}
-                  remove={async (id: string) => {
-                    await deleteTag({ variables: { id } });
-                    message.success('Tag removed!');
-                  }}
-                />
-              )
-            }];
+            const COLUMNS = [
+              {
+                title: 'Name',
+                dataIndex: 'name',
+                key: 'name',
+                width: '30%',
+              },
+              {
+                title: 'Display in Navigation',
+                key: 'displayInNavigation',
+                width: '18%',
+                render: (record: Tag) => <span>{record.displayInNavigation ? 'Yes' : 'No'}</span>,
+              },
+              {
+                title: 'Color',
+                key: 'color',
+                width: '12%',
+                render: (record: Tag) => <span style={{ color: record.color }}>{record.color}</span>,
+              },
+              {
+                title: 'Actions',
+                key: 'actions',
+                render: (record: Tag) => (
+                  <Actions
+                    id={record.id}
+                    edit={(id: string) => this.showEditModal(id, tags.find(a => a.id === id))}
+                    remove={async (id: string) => {
+                      await deleteTag({ variables: { id } });
+                      message.success('Tag removed!');
+                    }}
+                  />
+                ),
+              },
+            ];
 
             return (
               <>
@@ -256,7 +251,7 @@ class Tags extends Component<Properties, State> {
                       name,
                       displayInNavigation,
                       color,
-                      plugins
+                      plugins,
                     };
 
                     if (this.state.edit) {

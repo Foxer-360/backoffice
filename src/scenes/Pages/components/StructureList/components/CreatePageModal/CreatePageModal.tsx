@@ -184,7 +184,15 @@ class CreatePageModal extends Component<Properties, State> {
 
       return;
     }
-
+    // In case of dynamic source don't urlize
+    if (url.match(/^ds\:/)) {
+      this.setState({
+        ...this.state,
+        url,
+        urlChanged: true
+      });
+      return;
+    }
     const urlSanitized = urlize(url);
     this.setState({
       ...this.state,

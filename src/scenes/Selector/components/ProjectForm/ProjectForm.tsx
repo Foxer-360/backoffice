@@ -5,6 +5,7 @@ import { CreateProjectDto } from '../../../../services/api/resources/environment
 import { Query } from 'react-apollo';
 import { queries, mutations } from '@source/services/graphql';
 import { ApolloClient } from 'apollo-client';
+import { getComponentSets } from '@source/services/modules/components';
 
 const { Component } = React;
 
@@ -23,6 +24,7 @@ interface State {
   defName: string;
   langs: Array<string>;
   defLang: string | null;
+  components: string[];
 
   nameError: boolean;
   langsError: boolean;
@@ -41,6 +43,7 @@ class ProjectForm extends Component<Properties, State> {
     defName: '',
     langs: [],
     defLang: null,
+    components: [],
 
     ...this.RESET_ERROR_VALUES,
   };
@@ -141,11 +144,14 @@ class ProjectForm extends Component<Properties, State> {
       }
     }
 
+    const components = this.state.components.join(',');
+
     const data = {
       name: this.state.name,
       defaultName: this.state.defName,
       languages,
       defaultLanguage: { id: this.state.defLang },
+      components,
     };
 
     if (this.props.onSave) {
@@ -199,7 +205,7 @@ class ProjectForm extends Component<Properties, State> {
       paddingTop: '4px',
       paddingRight: '8px',
     } as React.CSSProperties;
-    const labelSize = 6;
+    const labelSize = 7;
 
     return (
       <>
@@ -308,7 +314,7 @@ class ProjectForm extends Component<Properties, State> {
                       style={{ width: '100%' }}
                       onChange={(val) => this.handleSelectChange('defLang', val as string[])}
                       value={[this.state.defLang]}
-                      notFoundContent="Please select firstly some languages"  
+                      notFoundContent="Please select firstly some languages"
                     >
                       {data.languages && data.languages.map((lang: LooseObject) => {
                         if (indexOf(this.state.langs, lang.id) > -1) {
@@ -327,6 +333,24 @@ class ProjectForm extends Component<Properties, State> {
             <Col span={labelSize} />
             <Col span={24 - labelSize} style={{ textAlign: 'center' }}>
               <span style={{ color: 'red' }}>Please select default language!</span>
+            </Col>
+          </Row>
+          <Row style={{ paddingTop: '6px' }}>
+            <Col span={labelSize} style={labelStyle}>
+              <span>Components:</span>
+            </Col>
+            <Col span={24 - labelSize}>
+              <Select
+                mode="multiple"
+                style={{ width: '100%' }}
+                placeholder="Select which components you want to use"
+                onChange={(val) => this.handleSelectChange('components', val as string[])}
+                value={this.state.components}
+              >
+                {getComponentSets().map((val: string) => (
+                  <Select.Option key={val}>{val}</Select.Option>
+                ))}
+              </Select>
             </Col>
           </Row>
         </div>
@@ -351,12 +375,16 @@ class ProjectForm extends Component<Properties, State> {
     // Parse default language
     const defLang = data.defaultLanguage.id;
 
+    // Parse components into array
+    const components = data.components ? data.components.split(',') : [];
+
     // Update local state of values for form
     this.setState({
       name: data.name,
       defName: data.defaultName,
       langs,
       defLang,
+      components
     });
   }
 }

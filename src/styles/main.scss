@@ -1,3 +1,4 @@
+@import '../composer/scenes/Composer/components/Editor/components/Sidebar/components/FormBuilder/components/MediaLibrary/style.scss';
 body {
   overflow: hidden;
 }
@@ -270,12 +271,16 @@ body {
   top: -24px;
 }
 
-.ant-table-thead > tr > th, .ant-table-tbody > tr > td { min-width: 200px; }
-
+/* .ant-table-thead > tr > th, .ant-table-tbody > tr > td { min-width: 200px; }
+ */
 .ant-tag { margin-bottom: 4px; }
 
 .pages-filter-header {
   background: #fafafa;
   margin: 0px 0px 7px 0px;
   padding: 7px;
+}
+
+#bootstrap {
+  @import "./bootstrap/css/bootstrap.css";
 }

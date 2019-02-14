@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { Tabs } from 'antd';
 import ImageGallery from '../../Components/ImageGallery';
+import FilesGallery from '../../Components/FilesGallery';
 import AllImagesQuery from '../QueryComponents';
+import AllFilesQuery from '../QueryComponents/AllFiles';
 
 export interface GalleryTabsProps {
   // tslint:disable:no-any
@@ -41,6 +43,12 @@ export default class GalleryTabs extends React.Component<GalleryTabsProps, Galle
           <AllImagesQuery>
             <ImageGallery placeImg={this.props.placeMedia} image={this.props.media} name={this.props.name} />
           </AllImagesQuery>
+        </Tabs.TabPane>
+
+        <Tabs.TabPane tab="Files" key="1">
+          <AllFilesQuery>
+            <FilesGallery placeFile={this.props.placeMedia} file={this.props.media} name={this.props.name} />
+          </AllFilesQuery>
         </Tabs.TabPane>
       </Tabs>
     );

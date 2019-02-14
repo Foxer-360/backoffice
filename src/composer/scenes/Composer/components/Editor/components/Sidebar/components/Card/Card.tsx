@@ -13,7 +13,7 @@ export interface IProperties {
 
   dragStart: (data: ILooseObject) => void;
   dragEnd: () => void;
-}
+} 
 
 export interface IState {
   isDragging: boolean;

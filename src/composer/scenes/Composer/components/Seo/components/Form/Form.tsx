@@ -40,7 +40,12 @@ const QueriesAndMutations = adopt({
           data: { pagePlugins }
         });
       }}
-      refetchQueries={[{
+      refetchQueries={[
+      {
+        query: queries.GET_PAGES_URLS,
+        variables: { language }
+      }, 
+      {
         query: queries.PAGE_PLUGINS,
         variables: { page, language, plugin }
       }]}

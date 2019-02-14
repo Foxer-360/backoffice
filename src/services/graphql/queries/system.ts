@@ -53,6 +53,7 @@ export const GET_PROJECTS = gql`
         id
         name
       }
+      components
     }
   }
 `;
@@ -79,6 +80,7 @@ export const GET_PROJECT = gql`
         id
         name
       }
+      components
     }
   }
 `;
@@ -274,6 +276,32 @@ export const TAG_LIST = gql`
       displayInNavigation
       plugins
       color
+    }
+  }
+`;
+
+export const GET_PAGES_URLS = gql`
+  query pagesUrls($language: ID!) {
+    pagesUrls(where: { language: $language }) {
+      id
+      page
+      url
+      name
+      description
+    }
+  }
+`;
+
+export const GET_TAGS = gql`
+  query {
+    tags {
+      id
+      name
+      color
+      displayInNavigation
+      pages {
+        id
+      }
     }
   }
 `;

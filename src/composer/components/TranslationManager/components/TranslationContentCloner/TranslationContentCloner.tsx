@@ -14,6 +14,7 @@ const GET_CONTEXT = gql`
 {
   page @client
   website @client
+  websiteData @client
 }
 `;
 
@@ -73,7 +74,8 @@ class TranslationContentCloner extends Component<Properties, State> {
             error
           },
           getContext: {
-            page: pageId
+            page: pageId,
+            websiteData
           }
         }) => {
           if (loading) { return 'Loading...'; } 
@@ -96,7 +98,7 @@ class TranslationContentCloner extends Component<Properties, State> {
                 onCancel={this.handleCancel}
                 footer={null}
               >
-                {this.getPopOverContent(pages, pageId, this.cloneTranslation)}
+                {this.getPopOverContent(pages, pageId, this.cloneTranslation, websiteData)}
               </Modal>
             </span>
           );
@@ -104,7 +106,7 @@ class TranslationContentCloner extends Component<Properties, State> {
       </ComposedQuery>);
   }
 
-  getPopOverContent = (pages, pageId, updatePageTranslation) => {
+  getPopOverContent = (pages, pageId, updatePageTranslation, websiteData) => {
     const { language } = this.props;
     const currentPage = pages.find(p => p.id === pageId);
 
@@ -157,7 +159,7 @@ class TranslationContentCloner extends Component<Properties, State> {
                   title={`${p.translations[0].name}`} 
                   key={p.id}
                 >
-                  {p.translations.map(t =>
+                  {p.translations.filter(translation => websiteData.languages.some(l => translation.language.id === l.id)).map(t =>
                     <TreeNode
                       value={`${t.name}`}
                       selectable={false}

@@ -38,7 +38,7 @@ class EmbedVideoEditor extends React.Component<IEmbedVideoEditorProps, IEmbedVid
       if (ampersandPosition !== -1) {
         youtubeVideo = youtubeVideo.substring(0, ampersandPosition);
       }
-      videoSrc = 'https://www.youtube.com/embed/' + youtubeVideo;  
+      videoSrc = 'https://www.youtube.com/embed/' + youtubeVideo    ;  
     }
 
     if (vimeoVideo) {
