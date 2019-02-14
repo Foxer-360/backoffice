@@ -1,5 +1,5 @@
 import { ILooseObject } from '@source/composer/types';
-import { Context, deepCopy, deepEqual } from '@source/composer/utils';
+import { Context, deepCopy, deepEqual, addContextInformationsFromDatasourceItems } from '@source/composer/utils';
 import * as React from 'react';
 import { IComponentsServiceLikeClass, IEditorInfo, ILockInfo } from '../../../../../../Composer';
 import UserEditor from './components/UserEditor';

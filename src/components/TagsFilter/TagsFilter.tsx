@@ -5,19 +5,9 @@ import { Query, Mutation } from 'react-apollo';
 import { adopt } from 'react-adopt';
 import { Link } from 'react-router-dom';
 import { client } from '@source/services/graphql';
+import { GET_TAGS } from '@source/services/graphql/queries/system';
 
 const { Component } = React;
-
-const GET_TAGS = gql`
-  query {
-    tags {
-      id
-      name
-      color
-      displayInNavigation
-    }
-  }
-`;
 
 const SELECT_TAG_ID = gql`{
   tag @client
