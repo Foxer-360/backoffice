@@ -22,6 +22,7 @@ const INQUIRIES = gql`
       message
       url
       createdAt
+      formType
       ip
     }
   }
@@ -36,37 +37,37 @@ const DELETE_INQUIRY = gql`
 `;
 
 const columns = [
-{
-  title: 'Subject',
-  dataIndex: 'message.subject',
-  key: 'message.subject',
-}, {
-  title: 'Created at',
-  dataIndex: 'createdAt',
-  key: 'createdAt',
-}, {
-  title: 'Ip',
-  dataIndex: 'ip',
-  key: 'ip',
-}, {
-  title: 'Actions', key: 'actions', width: 200,
-  render: (unused, record) => (
-    <Mutation 
-      mutation={DELETE_INQUIRY}
-      update={(cache, { data: { deleteInquiry } }) => {
-        const { inquiries } = cache.readQuery({ query: INQUIRIES });
-        cache.writeQuery({
-          query: INQUIRIES,
-          data: { inquiries: inquiries.filter(sub => sub.id !== deleteInquiry.id )}
-        });
-      }}
-    >
-    {(deleteSubscriber) =>
-      <Popconfirm title="Are you sure, you want to remove this page ?" onConfirm={() => deleteSubscriber({ variables: { id: record.id } })}>
-        <Button size="small" ghost={true} icon="delete" style={{ marginLeft: 6 }} type="danger" />
-      </Popconfirm>}
-    </Mutation>)
-}];
+  {
+    title: 'Subject',
+    dataIndex: 'message.subject',
+    key: 'message.subject',
+  }, {
+    title: 'Created at',
+    dataIndex: 'createdAt',
+    key: 'createdAt',
+  }, {
+    title: 'Ip',
+    dataIndex: 'ip',
+    key: 'ip',
+  }, {
+    title: 'Actions', key: 'actions', width: 200,
+    render: (unused, record) => (
+      <Mutation 
+        mutation={DELETE_INQUIRY}
+        update={(cache, { data: { deleteInquiry } }) => {
+          const { inquiries } = cache.readQuery({ query: INQUIRIES });
+          cache.writeQuery({
+            query: INQUIRIES,
+            data: { inquiries: inquiries.filter(sub => sub.id !== deleteInquiry.id )}
+          });
+        }}
+      >
+      {(deleteSubscriber) =>
+        <Popconfirm title="Are you sure, you want to remove this page ?" onConfirm={() => deleteSubscriber({ variables: { id: record.id } })}>
+          <Button size="small" ghost={true} icon="delete" style={{ marginLeft: 6 }} type="danger" />
+        </Popconfirm>}
+      </Mutation>)
+  }];
 
 class Inquiries extends Component<Properties, State> {
 
@@ -82,11 +83,11 @@ class Inquiries extends Component<Properties, State> {
         <p>{row.message.phone}</p>
         <p><strong>Message:</strong></p>
         <p>{row.message.text}</p>
-        <p>
+        {row.message.attachment && <p>
           <a href={row.message.attachment} target={'_blank'}>
           <Icon type="download" /> Download attachment
           </a>
-        </p>
+        </p>}
       </div>
     );
   }
