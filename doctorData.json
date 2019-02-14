@@ -1,0 +1,312 @@
+{
+  "doctorPersonalInformation": {
+    "id": 812,
+    "created": {
+      "date": "2016-12-07 22:27:03.000000",
+      "timezone_type": 3,
+      "timezone": "Europe/Prague"
+    },
+    "updated": {
+      "date": "2019-01-21 01:37:16.000000",
+      "timezone_type": 3,
+      "timezone": "Europe/Prague"
+    },
+    "firstName": "Hana",
+    "lastName": "Amblerová",
+    "email": "hana.amblerova@mediconas.cz",
+    "phone": "261 006 462",
+    "mobilePhone": null,
+    "phoneForOrders": null,
+    "postnominal": null,
+    "prenominal": "MUDr.",
+    "polyclinic": {
+      "id": 1,
+      "name": "Budějovická",
+      "shortName": "BUD",
+      "phonePrefix": "261 006"
+    },
+    "building": {
+      "id": 5,
+      "name": "Žlutá budova\r\n",
+      "street": null,
+      "city": null,
+      "zip": null
+    },
+    "floorLabel": "2.",
+    "company": {
+      "id": 1,
+      "name": "Medicon a.s.",
+      "city": "Praha 4",
+      "street": "Antala Staška 1670/8Antala Staška 1670/80"
+    },
+    "costCenter": {
+      "id": 93,
+      "name": "3201 - PLICNÍ",
+      "number": null
+    },
+    "absence": [],
+    "workingHours": {
+      "note": "Obecná poznámka k ordinační době",
+      "weeks": [{
+        "regularity": "regular",
+        "polyclinic": {
+          "id": 1,
+          "name": "Budějovická",
+          "shortName": "BUD",
+          "phonePrefix": "261 006"
+        },
+        "note": "Poznámka k celému týdnu",
+        "days": {
+          "mo": [{
+            "from": "09:00",
+            "to": "09:00",
+            "note": "poznámka"
+          }],
+          "tu": [{
+              "from": "08:00",
+              "to": "08:00",
+              "note": null
+            },
+            {
+              "from": "13:00",
+              "to": "13:00",
+              "note": null
+            }
+          ],
+          "we": [],
+          "th": [],
+          "fr": [],
+          "st": [],
+          "su": []
+        }
+      }]
+    }
+  },
+
+  "nurses": [{
+      "id": 346,
+      "created": {
+        "date": "2016-12-07 22:26:32.000000",
+        "timezone_type": 3,
+        "timezone": "Europe/Prague"
+      },
+      "updated": {
+        "date": "2019-01-16 18:35:44.000000",
+        "timezone_type": 3,
+        "timezone": "Europe/Prague"
+      },
+      "firstName": "Petra",
+      "lastName": "Bánovská",
+      "email": "petra.banovska@clinicum.cz",
+      "phone": "266 006 172",
+      "mobilePhone": null,
+      "phoneForOrders": null,
+      "postnominal": null,
+      "prenominal": null,
+      "polyclinic": {
+        "id": 3,
+        "name": "Vysočany",
+        "shortName": "VYS",
+        "phonePrefix": "266 006"
+      },
+      "building": {
+        "id": 6,
+        "name": "Vysočany",
+        "street": null,
+        "city": null,
+        "zip": null
+      },
+      "floorLabel": "2.",
+      "company": {
+        "id": 6,
+        "name": "Clinicum a.s.",
+        "city": "Praha 9",
+        "street": "Sokolovská 304"
+      },
+      "costCenter": {
+        "id": 146,
+        "name": "12501 -  JEDNODENNÍ CHIRURGIE",
+        "number": null
+      },
+      "absence": [{
+        "id": 19305,
+        "created": {
+          "date": "2019-01-08 11:35:12.000000",
+          "timezone_type": 3,
+          "timezone": "Europe/Prague"
+        },
+        "updated": {
+          "date": "2019-01-08 11:37:25.000000",
+          "timezone_type": 3,
+          "timezone": "Europe/Prague"
+        },
+        "fromDate": {
+          "date": "2019-02-18 00:00:00.000000",
+          "timezone_type": 3,
+          "timezone": "Europe/Prague"
+        },
+        "toDate": {
+          "date": "2019-02-22 00:00:00.000000",
+          "timezone_type": 3,
+          "timezone": "Europe/Prague"
+        },
+        "halfDay": false,
+        "alternate": {
+          "id": 368,
+          "created": {
+            "date": "2016-12-07 22:26:33.000000",
+            "timezone_type": 3,
+            "timezone": "Europe/Prague"
+          },
+          "updated": {
+            "date": "2019-01-18 15:31:40.000000",
+            "timezone_type": 3,
+            "timezone": "Europe/Prague"
+          },
+          "firstName": "Lenka",
+          "lastName": "Hromádková",
+          "email": "lenka.hromadkova@clinicum.cz",
+          "phone": "266 006 103, 266 006 244",
+          "mobilePhone": null,
+          "phoneForOrders": null,
+          "postnominal": null,
+          "prenominal": null,
+          "polyclinic": {
+            "id": 3,
+            "name": "Vysočany",
+            "shortName": "VYS",
+            "phonePrefix": "266 006"
+          },
+          "building": {
+            "id": 6,
+            "name": "Vysočany",
+            "street": null,
+            "city": null,
+            "zip": null
+          },
+          "floorLabel": "2.",
+          "company": {
+            "id": 6,
+            "name": "Clinicum a.s.",
+            "city": "Praha 9",
+            "street": "Sokolovská 304"
+          },
+          "costCenter": {
+            "id": 146,
+            "name": "12501 -  JEDNODENNÍ CHIRURGIE",
+            "number": null
+          },
+          "workingHours": {
+            "note": null,
+            "weeks": []
+          }
+        },
+        "status": {
+          "id": 4,
+          "name": "Vyřešeno",
+          "const": "executed"
+        }
+      }],
+      "workingHours": {
+        "note": null,
+        "weeks": []
+      }
+    },
+    {
+      "id": 2,
+      "created": {
+        "date": "2016-12-07 22:26:26.000000",
+        "timezone_type": 3,
+        "timezone": "Europe/Prague"
+      },
+      "updated": {
+        "date": "2019-01-17 14:46:58.000000",
+        "timezone_type": 3,
+        "timezone": "Europe/Prague"
+      },
+      "firstName": "Jaroslava",
+      "lastName": "Adámková",
+      "email": "jaroslava.adamkova@mediconas.cz",
+      "phone": "261 006 214",
+      "mobilePhone": null,
+      "phoneForOrders": null,
+      "postnominal": null,
+      "prenominal": null,
+      "polyclinic": {
+        "id": 1,
+        "name": "Budějovická",
+        "shortName": "BUD",
+        "phonePrefix": "261 006"
+      },
+      "building": {
+        "id": 2,
+        "name": "Červená budova",
+        "street": null,
+        "city": null,
+        "zip": null
+      },
+      "floorLabel": "9.",
+      "company": {
+        "id": 1,
+        "name": "Medicon a.s.",
+        "city": "Praha 4",
+        "street": "Antala Staška 1670/8Antala Staška 1670/80"
+      },
+      "costCenter": {
+        "id": 7,
+        "name": "1032 – ZDRAVOTNÍ SESTRY NEZAŘAZENÉ",
+        "number": null
+      },
+      "absence": [],
+      "workingHours": {
+        "note": null,
+        "weeks": []
+      }
+    },
+    {
+      "id": 1356,
+      "created": {
+        "date": "2018-12-07 10:05:34.000000",
+        "timezone_type": 3,
+        "timezone": "Europe/Prague"
+      },
+      "updated": {
+        "date": "2018-12-07 10:05:34.000000",
+        "timezone_type": 3,
+        "timezone": "Europe/Prague"
+      },
+      "firstName": "Kateřina",
+      "lastName": "Altmanová",
+      "email": "altmanova.katerina@mediconas.cz",
+      "phone": " ",
+      "mobilePhone": null,
+      "phoneForOrders": null,
+      "postnominal": null,
+      "prenominal": null,
+      "polyclinic": {
+        "id": 2,
+        "name": "Pacovská",
+        "shortName": "PAC",
+        "phonePrefix": null
+      },
+      "building": null,
+      "floorLabel": null,
+      "company": {
+        "id": 1,
+        "name": "Medicon a.s.",
+        "city": "Praha 4",
+        "street": "Antala Staška 1670/8Antala Staška 1670/80"
+      },
+      "costCenter": {
+        "id": 25,
+        "name": "3008 – HOME CARE",
+        "number": null
+      },
+      "absence": [],
+      "workingHours": {
+        "note": null,
+        "weeks": []
+      }
+    }
+  ]
+}

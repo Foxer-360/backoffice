@@ -5,7 +5,6 @@ import {
   Collapse,
   Card,
   Select,
-  Popover,
   Button,
   Alert,
   Row,
@@ -66,6 +65,20 @@ const pageContextSchema = {
         name: {
           type: 'string',
         },
+        annotations: {
+          type: 'object',
+          properties: {
+            title: {
+              type: 'string',
+            },
+            perex: {
+              type: 'string',
+            },
+            image: {
+              type: 'string',
+            }
+          }
+        }
       },
     },
   },
@@ -106,6 +119,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     this.onDynamicSourceDataChange = this.onDynamicSourceDataChange.bind(this);
     this.onEditTab = this.onEditTab.bind(this);
     this.mediaLibraryChange = this.mediaLibraryChange.bind(this);
+    this.mediaLibraryDynamicSourceChange = this.mediaLibraryDynamicSourceChange.bind(this);
     this.getNextIdValue = this.getNextIdValue.bind(this);
     this.onChangeTab = this.onChangeTab.bind(this);
     this.state = {
@@ -334,6 +348,27 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
     });
   }
 
+  public mediaLibraryDynamicSourceChange(media: { value: object; name: string }) {
+
+    const newData = { ...this.props.data.data };
+
+    const value = {
+      recommendedSizes: this.props.data.data[media.name] && this.props.data.data[media.name].recommendedSizes,
+      ...media.value,
+    };
+    newData[media.name] = value;
+
+    this.props.onChange({
+      target: {
+        name: this.props.name,
+        value: {
+          ...this.props.data,
+          data: newData,
+        },
+      },
+    });
+  }
+
   public changeDynamicSource = e => {
     let value = e.target.value;
     this.setState({
@@ -545,7 +580,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
 
                 {this.props.data.sourceType === 'pages' && this.pagesSourceOptions(tags)}
               </Drawer>
-
+              {console.log(this.props.data.data)}
               {this.props.items &&
                 this.props.items.properties && ( this.props.data.sourceType === 'pages' || this.props.data.datasourceId ) &&
                 Object.keys(this.props.items.properties).map((elementName: string, j: number) => {
@@ -560,7 +595,7 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                       value={this.props.data && this.props.data.data && this.props.data.data[elementName]}
                       onChange={this.onDynamicSourceDataChange}
                       schemaPaths={[...this.state.schemaPaths, ...this.props.schemaPaths]}
-                      mediaLibraryChange={this.mediaLibraryChange}
+                      mediaLibraryChange={this.mediaLibraryDynamicSourceChange}
                       pageSourceAvailable={this.props.data.sourceType === 'pages'}
                     />
                   );

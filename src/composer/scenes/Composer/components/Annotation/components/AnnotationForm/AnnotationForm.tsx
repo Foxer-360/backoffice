@@ -20,7 +20,7 @@ export interface State {
   // Basic information
   title: string;
   perex: string;
-  image: string;
+  image: LooseObject;
   titleId: string;
   perexId: string;
   imageId: string;
@@ -65,7 +65,7 @@ class AnnotationForm extends Component<Properties, State> {
     this.state = {
       title: '',
       perex: '',
-      image: '',
+      image: null,
       titleId: '',
       perexId: '',
       imageId: '',
@@ -88,12 +88,12 @@ class AnnotationForm extends Component<Properties, State> {
   }
 
   handleImageChange(mediaData: LooseObject) {
-    let image = '';
-    if (mediaData && mediaData.filename) {
-      image = getImgUrl(mediaData);
+    let image;
+    if (mediaData && mediaData.value && mediaData.value.filename) {
+      image = mediaData.value;
     }
 
-    this.setState({ mediaData, image });
+    this.setState({ image });
   }
 
   handleAddNewProperty() {
@@ -237,7 +237,7 @@ class AnnotationForm extends Component<Properties, State> {
     const result = {
       title: '',
       perex: '',
-      image: '',
+      image: null,
       titleId: '',
       perexId: '',
       imageId: '',
@@ -250,8 +250,12 @@ class AnnotationForm extends Component<Properties, State> {
         case 'title':
         case 'perex':
         case 'image':
-          result[r.key] = r.value;
-          result[r.key + 'Id'] = r.id;
+          try {
+            result[r.key + 'Id'] = r.id;
+            result[r.key] = r.value && JSON.parse(r.value);
+          } catch (e) {
+            console.log(e);
+          }
           break;
         default:
           const p = {
@@ -309,9 +313,9 @@ class AnnotationForm extends Component<Properties, State> {
     }
 
     if (isImageNew) {
-      add.push({ id: '', key: 'image', value: this.state.image });
+      add.push({ id: '', key: 'image', value: JSON.stringify(this.state.image) });
     } else {
-      update.push({ id: this.state.imageId, key: 'image', value: this.state.image });
+      update.push({ id: this.state.imageId, key: 'image', value: JSON.stringify(this.state.image) });
     }
 
     this.state.properties.forEach((p: CustomProperty) => {
@@ -377,10 +381,11 @@ class AnnotationForm extends Component<Properties, State> {
             </Row>
             <Row style={{ marginBottom: '10px' }}>
               <label>Image</label>
+              {console.log(this.state)}
               <UploadImage
-                mediaData={this.state.mediaData}
+                mediaData={this.state.image}
                 onChange={this.handleImageChange}
-                mediaUrl={this.state.image}
+                mediaUrl={this.state.image && getImgUrl(this.state.image)}
               />
             </Row>
           </Col>

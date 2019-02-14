@@ -117,7 +117,12 @@ class InputRenderer extends React.Component<InputRendererProps & IFormSchemaElem
       case 'image':
       case 'file':
         return (
-          <MediaLibrary name={this.props.name} mediaData={this.props.value} onChange={this.props.mediaLibraryChange} />
+          <MediaLibrary 
+            name={this.props.name} 
+            mediaData={this.props.value} 
+            onChange={this.props.mediaLibraryChange} 
+            schemaPaths={this.props.schemaPaths}
+          />
         );
 
       case 'urlautocomplete':
