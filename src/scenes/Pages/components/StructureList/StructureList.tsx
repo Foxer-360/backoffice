@@ -76,7 +76,7 @@ const PageList = adopt({
   fullWebsite: ({ website, render }) => (
     <Query query={queries.WEBSITE_DETAIL} variables={{ id: website }}>
       {({ data }) => {
-        return render(data.website);
+        return render(data && data.website);
       }}
     </Query>
   ),

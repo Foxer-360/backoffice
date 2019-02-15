@@ -771,6 +771,18 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
                 </div>
               </Collapse>
             </Row>
+            <Row style={{ padding: '24px 0' }}>
+              <Row style={{ paddingBottom: 10 }}>
+                <Col span={24}>
+                  <label style={{ marginRight: 12 }}>Fulltext key:</label>
+                  <Input
+                    style={{ maxWidth: 250, width: '100%' }}
+                    defaultValue={this.props.data.filterBy || ''}
+                    onChange={e => this.onFulltextFilterChange(e.target.value)}
+                  />
+                </Col>
+              </Row>
+            </Row>
           </TabPane>
 
           <TabPane tab="Limit by" key="4">
@@ -931,6 +943,18 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
               </a>
             </div>
           </Collapse>
+          <Row style={{ padding: '24px 0' }}>
+            <Row style={{ paddingBottom: 10 }}>
+              <Col span={24}>
+                <label style={{ marginRight: 12 }}>Fulltext key:</label>
+                <Input
+                  style={{ maxWidth: 250, width: '100%' }}
+                  defaultValue={this.props.data.fulltextFilter || ''}
+                  onChange={e => this.onFulltextFilterChange(e.target.value)}
+                />
+              </Col>
+            </Row>
+          </Row>
         </TabPane>
 
         <TabPane tab="Limit by" key="4">
@@ -972,13 +996,24 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
         value: {
           ...this.props.data,
           filters: this.props.data.filters.map((filter, pos) => {
-            console.log('here');
             if (pos === i) {
               filter.filterBy = value;
             }
 
             return filter;
           }),
+        },
+      },
+    });
+  }
+
+  onFulltextFilterChange = (value) => {
+    this.props.onChange({
+      target: {
+        name: this.props.name,
+        value: {
+          ...this.props.data,
+          fulltextFilter: value
         },
       },
     });

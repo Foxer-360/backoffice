@@ -123,7 +123,7 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
           <iframe src={mediaData.url} style={{ width: '100%', height: '300px' }} />
         )}
 
-        {!mediaData.dynamiclySourcedImage && mediaData && mediaData.type === 'file' && (
+        {mediaData && !mediaData.dynamiclySourcedImage && mediaData.type === 'file' && (
           <div
             style={{
               display: 'flex',
@@ -138,7 +138,7 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
           </div>
         )}
 
-        {!mediaData.dynamiclySourcedImage && <Row gutter={6} style={{ display: 'flex', justifyContent: 'left', padding: '0 3px' }}>
+        {mediaData && !mediaData.dynamiclySourcedImage && <Row gutter={6} style={{ display: 'flex', justifyContent: 'left', padding: '0 3px' }}>
           <Button onClick={() => this.showDrawer('editor')} style={{ marginRight: '16px', minWidth: '105px' }}>
             <Icon type={'upload'} /> Add
           </Button>
@@ -172,7 +172,7 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
         >
           Source from dynamic source
         </Checkbox>
-        {mediaData.dynamiclySourcedImage && schemaPaths && schemaPaths.length > 0 && <Row style={{ margin: '0 0 24px' }}>
+        {mediaData && mediaData.dynamiclySourcedImage && schemaPaths && schemaPaths.length > 0 && <Row style={{ margin: '0 0 24px' }}>
             <Col span={24}>
               <label>Dynamic source:</label>
               <AutoComplete
