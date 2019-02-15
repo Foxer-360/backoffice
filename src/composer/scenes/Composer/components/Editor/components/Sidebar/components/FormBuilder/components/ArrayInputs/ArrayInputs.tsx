@@ -580,7 +580,6 @@ class ArrayInputs extends React.Component<IArrayInputsProps, IArrayInputsState> 
 
                 {this.props.data.sourceType === 'pages' && this.pagesSourceOptions(tags)}
               </Drawer>
-              {console.log(this.props.data.data)}
               {this.props.items &&
                 this.props.items.properties && ( this.props.data.sourceType === 'pages' || this.props.data.datasourceId ) &&
                 Object.keys(this.props.items.properties).map((elementName: string, j: number) => {
