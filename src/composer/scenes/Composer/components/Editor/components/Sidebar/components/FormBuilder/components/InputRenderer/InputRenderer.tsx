@@ -52,7 +52,6 @@ class InputRenderer extends React.Component<InputRendererProps & IFormSchemaElem
             schemaPaths={this.props.schemaPaths}
           />
         );
-
       case 'checkbox':
       case 'boolean':
         return (

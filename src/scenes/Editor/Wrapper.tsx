@@ -338,6 +338,9 @@ const validator = (data: InformationGathererData) => {
       },
       navigationsData: {
         data: navigationsData
+      }, 
+      projectData: {
+        data: projectData
       }
     } = data;
 
@@ -347,6 +350,7 @@ const validator = (data: InformationGathererData) => {
         languagesData,
         pageData,
         websiteData,
+        projectData,
         navigationsData
       }
     `;
@@ -357,6 +361,7 @@ const validator = (data: InformationGathererData) => {
         languagesData: websiteData.languages,
         pageData,
         websiteData,
+        projectData,
         navigationsData,
       },
     });

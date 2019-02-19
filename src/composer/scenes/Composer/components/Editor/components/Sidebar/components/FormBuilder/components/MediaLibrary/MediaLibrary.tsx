@@ -138,7 +138,9 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
           </div>
         )}
 
-        {mediaData && !mediaData.dynamiclySourcedImage && <Row gutter={6} style={{ display: 'flex', justifyContent: 'left', padding: '0 3px' }}>
+        {(
+          !mediaData ||
+          (mediaData && !mediaData.dynamiclySourcedImage)) && <Row gutter={6} style={{ display: 'flex', justifyContent: 'left', padding: '0 3px' }}>
           <Button onClick={() => this.showDrawer('editor')} style={{ marginRight: '16px', minWidth: '105px' }}>
             <Icon type={'upload'} /> Add
           </Button>
