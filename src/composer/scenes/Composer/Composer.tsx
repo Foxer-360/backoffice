@@ -8,6 +8,7 @@ import Editor from './components/Editor';
 import Spinner from './components/Spinner';
 import Users from './components/Users';
 import Seo from './components/Seo';
+import Annotation from './components/Annotation';
 
 // import './composer.css';
 
@@ -154,10 +155,10 @@ const cleanContent = ((): IContent => {
 })();
 
 const dummySpinner = {
-  disable: () => { 
+  disable: () => {
     return;
   },
-  enable: () => { 
+  enable: () => {
     return;
   }
 } as Spinner;
@@ -333,6 +334,12 @@ class Composer extends React.Component<IProperties, IState> {
           <Tabs.TabPane tab={<span><Icon type="database" />{'SEO'}</span>} key={'SEO'}>
             <Card title={'SEO'}>
               <Seo url={this.state.name} />
+            </Card>
+          </Tabs.TabPane>
+
+          <Tabs.TabPane tab={<span><Icon type="idcard" />Annotation</span>} key={'Annotation'}>
+            <Card title={'Annotation'}>
+              <Annotation />
             </Card>
           </Tabs.TabPane>
 
@@ -1133,7 +1140,7 @@ class Composer extends React.Component<IProperties, IState> {
         id: '' + id,
       });
       const comm = this.delta.pull();
-  
+
       // Activator
       if (this.spinner) {
         this.spinner.enable();
@@ -1142,7 +1149,7 @@ class Composer extends React.Component<IProperties, IState> {
       if (!activated) {
         activator = this.activateCommit(comm);
       }
-  
+
       return activator.then((can: boolean) => {
         if (!can) {
           if (this.spinner) {
@@ -1151,16 +1158,16 @@ class Composer extends React.Component<IProperties, IState> {
           this.delta.revert();
           return Promise.resolve(false);
         }
-  
+
         this.delta.push();
-  
+
         return new Promise((resolve) => {
           this.setState({
             content: builder(this.delta, this.state.content),
           }, () => {
             // Fire onComponentAdd event
             // this.eventComponentAdded(preparedData);
-  
+
             // And just resolve this promise
             if (this.spinner) {
               this.spinner.disable();

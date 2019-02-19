@@ -1,5 +1,5 @@
 import { getImgUrl } from '@source/composer/utils';
-import { Button, Col, Drawer, Icon, Input, Popconfirm, Row } from 'antd';
+import { Button, Col, Drawer, Icon, Input, Popconfirm, Row, Mention, AutoComplete, Checkbox } from 'antd';
 import * as React from 'react';
 import GalleryTabs from './Components/GalleryTabs';
 import UploadTabs from './Components/UploadTabs';
@@ -8,11 +8,14 @@ import UploadTabs from './Components/UploadTabs';
 // tslint:disable:jsx-no-multiline-js
 // tslint:disable:jsx-no-lambda
 
+const { toString } = Mention;
+
 export interface IMediaLibraryProps {
   // tslint:disable:no-any
   onChange?: any;
   mediaData: any;
   name: string;
+  schemaPaths?: Array<string>;
 }
 
 export interface IMediaLibraryState {
@@ -54,13 +57,29 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
     this.props.onChange(data);
   }
 
+  public onMentionChange = (dynamiclySourcedImage: string) => {
+    const data = { value: {  dynamiclySourcedImage  }, name: this.props.name };
+
+    this.props.onChange(data);
+  }
+
+  public onDynamicSourceOptionChecked = () => {
+    const data = { value: { ...this.props.mediaData }, name: this.props.name };
+    if (data.value.dynamiclySourcedImage) {
+      delete data.value.dynamiclySourcedImage;
+    } else {
+      data.value = { ...data.value, dynamiclySourcedImage: ' ' };
+    }
+
+    this.props.onChange(data);
+  }
+
   public dropImage() {
     this.props.onChange({ value: null, name: this.props.name });
   }
 
   public render() {
-    const { mediaData } = this.props;
-
+    const { mediaData, schemaPaths } = this.props;
     return (
       <div>
         <div className={'ant-divider ant-divider-horizontal ant-divider-with-text-left'}>
@@ -104,7 +123,7 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
           <iframe src={mediaData.url} style={{ width: '100%', height: '300px' }} />
         )}
 
-        {mediaData && mediaData.type === 'file' && (
+        {mediaData && !mediaData.dynamiclySourcedImage && mediaData.type === 'file' && (
           <div
             style={{
               display: 'flex',
@@ -119,7 +138,9 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
           </div>
         )}
 
-        <Row gutter={6} style={{ display: 'flex', justifyContent: 'left', padding: '0 3px' }}>
+        {(
+          !mediaData ||
+          (mediaData && !mediaData.dynamiclySourcedImage)) && <Row gutter={6} style={{ display: 'flex', justifyContent: 'left', padding: '0 3px' }}>
           <Button onClick={() => this.showDrawer('editor')} style={{ marginRight: '16px', minWidth: '105px' }}>
             <Icon type={'upload'} /> Add
           </Button>
@@ -132,7 +153,7 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
             Search
           </Button>
 
-          {mediaData && mediaData.filename && (
+          {mediaData && mediaData.filename &&  (
             <Popconfirm
               placement="topLeft"
               title={'Are you sure you want to delete the image?'}
@@ -146,7 +167,25 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
               </Button>
             </Popconfirm>
           )}
-        </Row>
+        </Row>}
+        <Checkbox
+          checked={(mediaData && mediaData.dynamiclySourcedImage) || false}
+          onChange={this.onDynamicSourceOptionChecked}
+        >
+          Source from dynamic source
+        </Checkbox>
+        {mediaData && mediaData.dynamiclySourcedImage && schemaPaths && schemaPaths.length > 0 && <Row style={{ margin: '0 0 24px' }}>
+            <Col span={24}>
+              <label>Dynamic source:</label>
+              <AutoComplete
+                defaultValue={(mediaData && mediaData.dynamiclySourcedImage) || ''}
+                dataSource={schemaPaths.map(path => `%${path}`)}
+                placeholder={''}
+                onSearch={this.onMentionChange}
+                onSelect={this.onMentionChange}
+              />
+            </Col>
+          </Row>}
 
         <Drawer
           title="Media Library"
