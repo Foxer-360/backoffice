@@ -6,6 +6,7 @@ interface ExternalLinkProps {
 }
 
 interface ExternalLinkState {
+  key: string;
   title: string;
   link: string;
 }
@@ -16,6 +17,7 @@ class ExternalLink extends React.Component<ExternalLinkProps, ExternalLinkState>
     super(props);
 
     this.state = {
+      key: Number(new Date()).toString(),
       title: null,
       link: null,
     };
@@ -34,10 +36,12 @@ class ExternalLink extends React.Component<ExternalLinkProps, ExternalLinkState>
   onSubmit(e: any) {
     if (this.state.title && this.state.title !== '' && this.state.link && this.state.link !== '') {
       this.props.onCreateNew({
+        key: this.state.key,
         title: this.state.title,
         link: this.state.link,
       });
       this.setState({
+        key: Number(new Date()).toString(),
         title: null,
         link: null,
       });
