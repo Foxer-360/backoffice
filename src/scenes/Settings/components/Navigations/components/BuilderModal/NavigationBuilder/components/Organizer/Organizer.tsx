@@ -75,7 +75,7 @@ class Organizer extends Component<Properties> {
   }
 
   filter(input: string, item: TransferItem): boolean {
-    let str: string = `${item.title.toLowerCase()} (${item.description.toLowerCase()})`;
+    let str: string = `${item.title.toLowerCase()}`;
     return str.indexOf(input.toLowerCase()) > -1;
   }
 

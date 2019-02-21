@@ -213,7 +213,10 @@ class ModalWindow extends Component<Properties, State> {
                 pages={this.createUrls(pages)}
                 nodes={nodes}
                 onSave={async (data: NavigationNodeWithJoin[]) => {
-                  await createNavigationStructure({ variables: { data, id: this.props.id } });
+                  await createNavigationStructure({ variables: { data: data.map(item => {
+                    delete item.key;
+                    return item;
+                  }), id: this.props.id } });
                   this.props.onSave();
                 }}
               />

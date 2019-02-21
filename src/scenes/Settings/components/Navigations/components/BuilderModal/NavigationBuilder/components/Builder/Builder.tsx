@@ -29,9 +29,9 @@ class Builder extends Component<Properties> {
       } else {
         if (!segment && node.title && node.link) {
           const externalLinkSegment = {
-            key: node.id,
+            key: node.key,
             order: node.order,
-            title: `${node.title} (${node.link})`,
+            title: node.title,
           };
           result.push(externalLinkSegment);
         }
@@ -59,19 +59,26 @@ class Builder extends Component<Properties> {
 
   parseDataTree(data: BuilderData[], parent?: string): NavigationNode[] {
     const result: NavigationNode[] = [];
+    const { nodes } = this.props;
 
     data.forEach((segment: BuilderData, index: number) => {
-      if (segment.children) {
-        this.parseDataTree(segment.children, segment.key).forEach((node: NavigationNode) => {
-          result.push(node);
+      if (segment && segment.children) {
+        this.parseDataTree(segment.children, segment.key).forEach((n: NavigationNode) => {
+          result.push(n);
         });
       }
 
-      result.push({
-        page: segment.key,
-        order: index,
-        parent: parent ? parent : null,
-      });
+      const node = nodes.find((n: NavigationNode) => n.key === segment.key);
+      if (segment) {
+        result.push({
+          key: segment.key,
+          page: segment.key,
+          order: index,
+          title: node && node.title,
+          link: node && node.link,
+          parent: parent ? parent : null,
+        });
+      }
     });
 
     return result;
@@ -85,24 +92,22 @@ class Builder extends Component<Properties> {
       const page: NavigationPage = pages.find((a: NavigationPage) => a.id === node.page);
 
       if (page) {
-        data.push({
+        return data.push({
           key: page.id,
-          title: `${page.name} (${page.url})`,
+          title: page.name,
           order: node.order || 0,
         });
       }
 
-      if (!node.page && node.title && node.link) {
-        data.push({
-          key: index.toString(),
-          title: `${node.title} (${node.link})`,
-          order: node.order || 0,
-        });
-      }
+      return data.push({
+        key: node.key || Number(new Date()).toString(),
+        title: node.title,
+        link: node.link,
+        order: node.order || 0,
+      });
     });
 
     const result: BuilderData[] = this.createDataTree(data, nodes);
-
     this.sortChildren(result);
 
     return result;
@@ -132,7 +137,6 @@ class Builder extends Component<Properties> {
 
     const data: BuilderData[] = this.getData();
     let dragObj: BuilderData;
-
     this.dropLoop(data, dragKey, (item, index, arr) => {
       arr.splice(index, 1);
       dragObj = item;
@@ -159,7 +163,6 @@ class Builder extends Component<Properties> {
     }
 
     const result = this.parseDataTree(data);
-
     this.props.structureChange(result);
   }
 
@@ -180,7 +183,7 @@ class Builder extends Component<Properties> {
             <Tree.TreeNode 
               key={item.key} 
               title={(<div>
-                  {item.title}
+                  {item.title} {item.link && `(${item.link})`}
                   <Button 
                     type="danger"
                     size="small"
@@ -206,17 +209,18 @@ class Builder extends Component<Properties> {
       page: null,
       order: null,
       parent: null,
-      title: data.title ? data.title : null,
-      link: data.link ? data.link : null,
+      key: data.key || Number(new Date()).toString(),
+      title: data.title || null,
+      link: data.link || null,
     });
+
     this.props.structureChange(newNodes);
   }
 
   onLinkDelete = (key: string, title: string) => {
-    const newNodes = [...this.props.nodes.filter(
-      n => 
-        !(n.page === key || n.id === key) ||
-        (!key && !title.includes(n.title))
+    const newNodes = [
+      ...this.props.nodes.filter(
+        n => (n.key !== key)
     )];
     this.props.structureChange(newNodes);
   }

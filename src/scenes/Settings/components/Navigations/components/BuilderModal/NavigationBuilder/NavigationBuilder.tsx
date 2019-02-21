@@ -22,13 +22,12 @@ interface State {
 }
 
 class NavigationBuilder extends Component<Properties, State> {
-
   constructor(props: Properties) {
     super(props);
 
     this.state = {
       pages: props.pages,
-      nodes: props.nodes,
+      nodes: props.nodes.map((node) => { node.key = node.page || Number(new Date()).toString(); return node; }),
     };
   }
 

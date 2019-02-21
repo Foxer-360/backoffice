@@ -45,6 +45,7 @@ export interface NavigationPage {
 }
 
 export interface NavigationNode {
+  key?: string;
   id?: string;
   page?: string;
   title?: string;
@@ -69,6 +70,7 @@ export interface NavigationStructure {
 export interface BuilderData {
   key: string;
   title: string;
+  link?: string;
   order?: number;
   children?: BuilderData[];
 }
