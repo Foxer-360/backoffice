@@ -91,6 +91,8 @@ class AnnotationForm extends Component<Properties, State> {
     let image;
     if (mediaData && mediaData.value && mediaData.value.filename) {
       image = mediaData.value;
+    } else if (mediaData.id) {
+      image = mediaData;
     }
 
     this.setState({ image });
@@ -249,6 +251,9 @@ class AnnotationForm extends Component<Properties, State> {
       switch (r.key) {
         case 'title':
         case 'perex':
+          result[r.key + 'Id'] = r.id;
+          result[r.key] = r.value;
+          break;
         case 'image':
           try {
             result[r.key + 'Id'] = r.id;
@@ -258,14 +263,13 @@ class AnnotationForm extends Component<Properties, State> {
           }
           break;
         default:
-          const p = {
+          result.properties.push({
             id: r.id,
             key: r.key,
             value: r.value,
             isNew: false,
             isDeleted: false,
-          };
-          result.properties.push(p);
+          });
           break;
       }
     });
@@ -381,7 +385,6 @@ class AnnotationForm extends Component<Properties, State> {
             </Row>
             <Row style={{ marginBottom: '10px' }}>
               <label>Image</label>
-              {console.log(this.state)}
               <UploadImage
                 mediaData={this.state.image}
                 onChange={this.handleImageChange}
@@ -391,20 +394,21 @@ class AnnotationForm extends Component<Properties, State> {
           </Col>
           <Col span={12}>
             <h2>Custom Properties</h2>
-            {this.state.properties.map((property: CustomProperty, index: number) => (
-              <Property
-                key={index}
-                name={property.key}
-                value={property.value}
+            {this.state.properties
+              .map((property: CustomProperty, index: number) => (
+                <Property
+                  key={index}
+                  name={property.key}
+                  value={property.value}
 
-                isNew={property.isNew}
-                isDeleted={property.isDeleted}
+                  isNew={property.isNew}
+                  isDeleted={property.isDeleted}
 
-                onNameChange={this.handleChangePropertyKey}
-                onValueChange={this.handleChangePropertyValue}
-                onDelete={this.handleDeleteProperty}
-              />
-            ))}
+                  onNameChange={this.handleChangePropertyKey}
+                  onValueChange={this.handleChangePropertyValue}
+                  onDelete={this.handleDeleteProperty}
+                />))
+            }
             <Button
               icon="plus-circle"
               onClick={this.handleAddNewProperty}
