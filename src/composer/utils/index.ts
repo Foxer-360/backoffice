@@ -37,6 +37,19 @@ const getImgUrl = (data: ILooseObject) => {
   return baseUrl + data.category + data.hash + '_' + data.filename;
 };
 
+const escape = function (str: string) {
+  // TODO: escape %x75 4HEXDIG ?? chars
+  return str
+    .replace(/[\"]/g, '\\"')
+    .replace(/[\\]/g, '\\\\')
+    .replace(/[\/]/g, '\\/')
+    .replace(/[\b]/g, '\\b')
+    .replace(/[\f]/g, '\\f')
+    .replace(/[\n]/g, '\\n')
+    .replace(/[\r]/g, '\\r')
+    .replace(/[\t]/g, '\\t'); 
+};
+
 const addContextInformationsFromDatasourceItems = function (datasourceItems: Array<LooseObject>, componentData: LooseObject) {
   const regex = /%cx,([^%]*)%/g;
         
@@ -51,8 +64,7 @@ const addContextInformationsFromDatasourceItems = function (datasourceItems: Arr
           const getValueFromDatasourceItems = R.path(searchKeys);
           const replacement = getValueFromDatasourceItems(datasourceItems.filter(item => item.content).map(item => item.content));
           if (replacement) {
-            
-            replacedData = replacedData.replace(result[0], replacement);
+            replacedData = replacedData.replace(result[0], escape(replacement));
           } else {
             replacedData = replacedData.replace(result[0], '');
           }

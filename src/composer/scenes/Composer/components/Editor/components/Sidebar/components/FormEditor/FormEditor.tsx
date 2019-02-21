@@ -30,6 +30,10 @@ export interface IProperties {
   context: Context;
 }
 
+export interface IState {
+  searchFilters: LooseObject;
+}
+
 const GET_CONTEXT = gql`{
   languageData @client
   pageData @client
@@ -110,7 +114,7 @@ const ComposedQuery = adopt({
       if (pageUrl) {
         let result;
         let index = 0;
-        console.log(pageUrl.url);
+
         while (result = regex.exec(pageUrl.url)) {
           if (result[1]) {
             const datasource = datasources.find(source => source.type.toLowerCase() === result[1]);
@@ -132,12 +136,15 @@ const ComposedQuery = adopt({
   }
 });
 
-class FormEditor extends React.Component<IProperties, {}> {
+class FormEditor extends React.Component<IProperties, IState> {
     onChange: (data: ILooseObject) => void;
   constructor(props: IProperties) {
 
     super(props);
     this.onChange = debounce(this.props.onChange, 500);
+    this.state = {
+      searchFilters: {}
+    };
   }
 
   public render() {
@@ -161,6 +168,9 @@ class FormEditor extends React.Component<IProperties, {}> {
                   <Row key={i}>
                     {i + 1} url slug:
                     <Select
+                      showSearch={true}
+                      onSearch={(urlSearchFilter) => this.setState({ searchFilters: { [i]: urlSearchFilter }})}
+                      onSelect={() => this.setState({ searchFilters: { [i]: null }})}
                       style={{ marginLeft: 5, width: 160 }}
                       key={datasource.id}
                       defaultValue={(datasourceItems && datasourceItems[i] && datasourceItems[i].id) || `Select ${datasource.type} url slug.`}
@@ -171,11 +181,22 @@ class FormEditor extends React.Component<IProperties, {}> {
                           datasourceItems,
                           contextSchemaDatasources.length
                         )}
+                      filterOption={false}
                     >
-                      {datasource.datasourceItems.map((item, key) => 
-                        <Option key={item.id} value={item.id}>
-                          {item.slug}
-                        </Option>)}
+                      {datasource.datasourceItems
+                        .filter(item =>
+                          !this.state.searchFilters[i] ||
+                          item.slug
+                            .toLowerCase()
+                            .includes(
+                              this.state.searchFilters[i]
+                              .toLowerCase()
+                            )
+                        )
+                        .map((item, key) => 
+                          <Option key={item.id} value={item.id}>
+                            {item.slug}
+                          </Option>)}
                     </Select>
                   </Row>);
               })}
