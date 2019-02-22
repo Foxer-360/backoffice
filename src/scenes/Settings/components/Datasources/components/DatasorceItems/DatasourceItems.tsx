@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Row, Table, Button, Popconfirm } from 'antd';
+import { Row, Table, Button, Col, Input } from 'antd';
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
 import { withRouter } from 'react-router';
@@ -9,6 +9,7 @@ import Pluralize from 'pluralize';
 import { Link } from 'react-router-dom';
 
 import Actions from '../Actions';
+const Search = Input.Search;
 
 const DATASOURCE = gql`
   query datasource($id: ID!) {
@@ -44,6 +45,7 @@ interface Properties extends RouteComponentProps<LooseObject> { }
 
 interface State {
   formData: {};
+  searchedText?: string;
 }
 
 class DatasourceItems extends Component<Properties, State> {
@@ -117,21 +119,29 @@ class DatasourceItems extends Component<Properties, State> {
               }
             ];
             return  <div>
-              <Row style={{ marginBottom: '20px' }}>
-                <h2>{Pluralize(datasource.type, 42)}:</h2>
-              </Row>
-              <Row>
-                <Button
-                  type="primary"
-                  style={{ marginBottom: 16 }}
-                >
-                  <Link to={`/datasource-item/${datasource.id}/new`}>Add new datasource item.</Link>
-                </Button>
-              </Row>
+              <div className="pages-filter-header">
+                <Row type="flex" justify="end">
+                  <Col span={6}>
+                    <Button type="primary">
+                      <Link to={`/datasource-item/${datasource.id}/new`}>Add new datasource item.</Link>
+                    </Button>
+                  </Col>
+                  <Col span={14} />
+                  <Col span={4}>
+                    <Search
+                      placeholder="search text"
+                      onChange={({ target: { value: searchedText } }) => this.setState({ searchedText })}
+                      onSearch={searchedText => this.setState({ searchedText })}
+                    />
+                  </Col>
+                </Row>
+              </div>
               <Row>
                 <Table
                   columns={datasourceItemColumns} 
-                  dataSource={datasource.datasourceItems} 
+                  dataSource={datasource.datasourceItems.filter(item => 
+                    !this.state.searchedText ||
+                    JSON.stringify(item).toLowerCase().includes(this.state.searchedText.toLowerCase()))} 
                 />
               </Row>
             </div>;

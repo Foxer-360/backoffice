@@ -191,9 +191,11 @@ class Tags extends Component<Properties, State> {
   render(): React.ReactNode {
     return (
       <>
-        <Button type="primary" style={{ marginBottom: 16 }} onClick={() => this.showCreateModal()}>
-          Add new tag
-        </Button>
+        <div className="pages-filter-header">
+          <Button type="primary" onClick={() => this.showCreateModal()}>
+            Add new tag
+          </Button>
+        </div>
         <TagQM>
           {({ tags, website, createTag, updateTag, deleteTag }: QaMForModalVars) => {
             const tableData = tags.map((a: Tag) => ({ ...a, key: a.id }));

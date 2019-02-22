@@ -264,9 +264,9 @@ class PageTypes extends Component<Properties, State> {
 
     return (
       <div>
-        <Button type="primary" onClick={this.addNew}>Add new type</Button>
-        <br /><br />
-
+        <div className="pages-filter-header">
+          <Button type="primary" onClick={this.addNew}>Add new type</Button>
+        </div>
         <QueryAndMutationForTable>
           {({ types, remove }: QaMForTableVars) => {
             if (types.loading) {
