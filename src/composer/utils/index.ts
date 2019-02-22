@@ -37,7 +37,7 @@ const getImgUrl = (data: ILooseObject) => {
   return baseUrl + data.category + data.hash + '_' + data.filename;
 };
 
-const escape = function (str: string) {
+const escape = function(str: string) {
   // TODO: escape %x75 4HEXDIG ?? chars
   return str
     .replace(/[\"]/g, '\\"')
@@ -47,14 +47,17 @@ const escape = function (str: string) {
     .replace(/[\f]/g, '\\f')
     .replace(/[\n]/g, '\\n')
     .replace(/[\r]/g, '\\r')
-    .replace(/[\t]/g, '\\t'); 
+    .replace(/[\t]/g, '\\t');
 };
 
-const addContextInformationsFromDatasourceItems = function (datasourceItems: Array<LooseObject>, componentData: LooseObject) {
+const addContextInformationsFromDatasourceItems = function(
+  datasourceItems: Array<LooseObject>,
+  componentData: LooseObject
+) {
   const regex = /%cx,([^%]*)%/g;
-        
+
   let stringifiedData = JSON.stringify(componentData);
-  let replacedData = String(stringifiedData);
+  let replacedData = `${stringifiedData}`;
   let result;
   while ((result = regex.exec(stringifiedData)) && datasourceItems && datasourceItems.length > 0) {
     if (result[1]) {
@@ -62,13 +65,22 @@ const addContextInformationsFromDatasourceItems = function (datasourceItems: Arr
         const searchKeys = result[1].split(',');
         if (Array.isArray(searchKeys) && searchKeys.length > 0) {
           const getValueFromDatasourceItems = R.path(searchKeys);
-          const replacement = getValueFromDatasourceItems(datasourceItems.filter(item => item.content).map(item => item.content));
-          if (replacement) {
+          const replacement = getValueFromDatasourceItems(
+            datasourceItems.filter(item => item.content).map(item => item.content)
+          );
+
+          if (replacement && typeof replacement === 'string') {
             replacedData = replacedData.replace(result[0], escape(replacement));
+          } else if (replacement && typeof replacement === 'object') {
+            try {
+              replacedData = replacedData.replace(`"${result[0]}"`, JSON.stringify(replacement));
+            } catch (e) {
+              console.log(e);
+            }
           } else {
             replacedData = replacedData.replace(result[0], '');
           }
-        }    
+        }
       } catch (e) {
         console.log(e);
       }
@@ -78,7 +90,7 @@ const addContextInformationsFromDatasourceItems = function (datasourceItems: Arr
   return JSON.parse(replacedData);
 };
 
-const getSchemaPaths = function (schemaWithoutRefs: LooseObject, path: string, paths: Array<string>) {
+const getSchemaPaths = function(schemaWithoutRefs: LooseObject, path: string, paths: Array<string>) {
   if (!schemaWithoutRefs.properties && schemaWithoutRefs.type === 'string') {
     paths.push(`${path}%`);
   } else if (schemaWithoutRefs.properties) {
@@ -92,16 +104,8 @@ const getSchemaPaths = function (schemaWithoutRefs: LooseObject, path: string, p
         newPath += `${prefix}${key}`;
         return getSchemaPaths(schemaWithoutRefs.properties[key], newPath, paths);
       }
-    
     });
   }
 };
 
-export {
-  Context,
-  deepCopy,
-  deepEqual,
-  getImgUrl,
-  addContextInformationsFromDatasourceItems,
-  getSchemaPaths,
-};
+export { Context, deepCopy, deepEqual, getImgUrl, addContextInformationsFromDatasourceItems, getSchemaPaths };
