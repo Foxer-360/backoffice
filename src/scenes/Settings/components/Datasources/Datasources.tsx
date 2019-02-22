@@ -133,12 +133,13 @@ class Datasources extends Component<Properties, State> {
     const { history: { push } } = this.props;
     return (
       <>
-        <Button
-          type="primary"
-          style={{ marginBottom: 16 }}
-        >
-          <Link to="/datasource/new">Add new datasource</Link>
-        </Button>
+        <div className="pages-filter-header">
+          <Button
+            type="primary"
+          >
+            <Link to="/datasource/new">Add new datasource</Link>
+          </Button>
+        </div>
         <DatasourceQM>
           {({ datasources, deleteDatasource }: QaMForModalVars) => {
             const tableData = datasources.map((a: Datasource) => ({ ...a, key: a.id }));

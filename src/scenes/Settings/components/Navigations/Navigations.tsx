@@ -182,9 +182,11 @@ class Navigations extends Component<Properties, State> {
   render(): React.ReactNode {
     return (
       <>
-        <Button type="primary" style={{ marginBottom: 16 }} onClick={() => this.showCreateModal()}>
-          Add new navigation
-        </Button>
+        <div className="pages-filter-header">
+          <Button type="primary" onClick={() => this.showCreateModal()}>
+            Add new navigation
+          </Button>
+        </div>
         <NavigationQM>
           {({
             navigations,
