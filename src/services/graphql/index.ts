@@ -24,8 +24,38 @@ const stateLink = withClientState({
   typeDefs
 });
 
+// URL for subscriptions
+let subscriptionsUrl = 'ws://localhost:5001/subscriptions';
+{
+  let port = process.env.REACT_APP_GRAPHQL_SUBSCRIPTION_PORT;
+  let url = process.env.REACT_APP_GRAPHQL_SUBSCRIPTION_SERVER;
+  let path = process.env.REACT_APP_GRAPHQL_SUBSCRIPTION_PATH;
+
+  // Define some default values
+  if (url === undefined || url.length < 1) {
+    url = 'ws://localhost';
+  }
+  if (port === undefined || port.length < 1) {
+    port = '5001';
+  }
+  if (path === undefined) {
+    path = 'subscriptions';
+  }
+
+  if (url[url.length - 1] === '/') {
+    url = url.substr(0, -1);
+  }
+  url = `${url}:${port}/${path}`;
+  const regex = /^ws:.*$/gi;
+  if (!regex.test(url)) {
+    url = `ws://${url}`;
+  }
+
+  subscriptionsUrl = url;
+}
+
 const wsLink = new WebSocketLink({
-  uri: `ws://localhost:5001/subscriptions`,
+  uri: subscriptionsUrl,
   options: {
     reconnect: true
   }
