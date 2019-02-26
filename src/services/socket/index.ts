@@ -67,17 +67,20 @@ const connect = (store?: Store<StoreState>): SocketIOClient.Socket => {
   if (!_socket) {
     let url = process.env.REACT_APP_SOCKETS_URL || 'http://localhost';
     const port = Number(process.env.REACT_APP_SOCKETS_PORT) || 8080;
-    const path = process.env.REACT_APP_SOCKETS_PATH || '';
+    let path = process.env.REACT_APP_SOCKETS_PATH || '';
 
     if (url[url.length - 1] === '/') {
       url = url.slice(0, -1);
     }
     let fullUrl = `${url}:${port}`;
-    if (path.length > 0) {
-      fullUrl = `${fullUrl}/${path}`;
+
+    if (path.length > 0 && path[0] !== '/') {
+      path = `/${path}`;
     }
 
-    _socket = io(fullUrl);
+    _socket = io(fullUrl, {
+      path
+    });
 
     if (store) {
       _bindAllEvents(store);
