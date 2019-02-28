@@ -101,7 +101,7 @@ class WebsiteForm extends Component<Properties, State> {
 
     const domainValidationRes =  domainValidationRegex.exec(this.state.domain);
 
-    if (!domainValidationRes || !domainValidationRes[0]) {
+    if ((!domainValidationRes || !domainValidationRes[0]) && this.state.domain) {
       errors.domainError = true;
       someError = true;
     }
