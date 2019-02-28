@@ -1,16 +1,20 @@
 import React from 'react';
-import { AutoComplete, Input, Checkbox } from 'antd';
+import { AutoComplete, Input, Checkbox, Drawer, Button, Icon, Card, Collapse } from 'antd';
 
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
-import { canNotDefineSchemaWithinExtensionMessage } from 'graphql/validation/rules/LoneSchemaDefinition';
+
 import { adopt } from 'react-adopt';
+import UploadTabs from '../MediaLibrary/Components/UploadTabs';
+import GalleryTabs from '../MediaLibrary/Components/GalleryTabs';
 
 const GET_CONTEXT = gql`
   {
     languageData @client
   }
 `;
+
+const Panel = Collapse.Panel;
 
 const GET_PAGES_URLS = gql`
   query pagesUrls($language: ID!) {
@@ -59,6 +63,8 @@ export interface IUrlAutocomplete {
 export interface IState {
   urlNewWindow: boolean;
   pageSourcedUrl: boolean;
+  visible: boolean;
+  drawerType: string;
 }
 
 class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
@@ -68,6 +74,8 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
     this.state = {
       urlNewWindow: false,
       pageSourcedUrl: false,
+      visible: false,
+      drawerType: 'editor',
     };
   }
 
@@ -86,6 +94,48 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
           ...(pageUrlObj ? { pageId: pageUrlObj.page } : {}),
         },
       },
+    });
+  }
+
+  onFileSelected = ({ value: data }: LooseObject) => {
+    const baseUrl = 'http://foxer360-media-library.s3.eu-central-1.amazonaws.com/';
+
+    this.closeDrawer();
+
+    if (data && data.filename) {
+      let originalUrl = baseUrl + data.category + data.hash + '_' + data.filename;
+
+      this.props.onChange({
+        target: {
+          name: this.props.name,
+          value: {
+            url: originalUrl,
+            mediaData: data,
+            urlNewWindow: this.props.value.urlNewWindow
+          },
+        },
+      });
+    } else {
+      return null;
+    }
+  }
+
+  public onClose = () => {
+    this.setState({
+      visible: false,
+    });
+  }
+
+  public closeDrawer = () => {
+    this.setState({
+      visible: false,
+    });
+  }
+
+  public showDrawer = (type: string) => {
+    this.setState({
+      drawerType: type,
+      visible: true,
     });
   }
 
@@ -116,15 +166,32 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
                 <div>
                   {(!value || (value && !value.pageSourcedUrl)) && (
                     <>
-                      <AutoComplete
-                        dataSource={pagesUrls.map(source => source.url).filter(u => u !== '')}
-                        filterOption={(inputValue, { props: { children } }: LooseObject) =>
-                          children.toUpperCase().includes(inputValue.toUpperCase())}
-                        defaultValue={pageUrlObj && pageUrlObj ? pageUrlObj.url : value && value.url}
-                        onSearch={newUrl => this.onChange({ url: newUrl }, pagesUrls)}
-                        onSelect={newUrl => this.onChange({ url: newUrl }, pagesUrls)}
-                      />
-
+                      <div className="url-autocomplete-input">
+                        <AutoComplete
+                          dataSource={pagesUrls.map(source => source.url).filter(u => u !== '')}
+                          filterOption={(inputValue, { props: { children } }: LooseObject) =>
+                            children.toUpperCase().includes(inputValue.toUpperCase())}
+                          defaultValue={pageUrlObj && pageUrlObj ? pageUrlObj.url : value && value.url}
+                          value={pageUrlObj && pageUrlObj ? pageUrlObj.url : value && value.url}
+                          onSearch={newUrl => this.onChange({ url: newUrl }, pagesUrls)}
+                          onSelect={newUrl => this.onChange({ url: newUrl }, pagesUrls)}
+                          size="default"
+                        />
+                        <div>
+                          <Button 
+                            size="default"
+                            onClick={() => this.showDrawer('gallery')}
+                          >
+                            <Icon type={'search'} />
+                          </Button>
+                          <Button 
+                            size="default"
+                            onClick={() => this.showDrawer('editor')}
+                          >
+                            <Icon type={'upload'} />
+                          </Button>
+                        </div>
+                      </div>
                       <Checkbox
                         checked={value && value.urlNewWindow}
                         onChange={() => {
@@ -135,6 +202,30 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
                       >
                         Open in New window
                       </Checkbox>
+                      <Drawer
+                        title="Media Library"
+                        placement="right"
+                        closable={true}
+                        onClose={this.onClose}
+                        visible={this.state.visible}
+                        width={500}
+                        destroyOnClose={true}
+                      >
+                        {this.state.drawerType === 'editor' ? (
+                          <UploadTabs
+                            onChange={this.onFileSelected}
+                            name={this.props.name}
+                            mediaData={pageUrlObj && pageUrlObj.mediaData}
+                            closeDrawer={this.closeDrawer}
+                          />
+                        ) : (
+                          <GalleryTabs 
+                            placeMedia={this.onFileSelected}
+                            name={this.props.name} 
+                            media={pageUrlObj && pageUrlObj.mediaData}
+                          />
+                        )}
+                      </Drawer>
                     </>
                   )}
 
