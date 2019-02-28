@@ -101,6 +101,7 @@ export const WEBSITE_DETAIL = gql`
         name
       }
       urlMask
+      domain
       project {
         id
       }

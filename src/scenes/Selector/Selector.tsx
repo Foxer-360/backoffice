@@ -299,7 +299,6 @@ class Selector extends Component<Properties, State> {
                                         return false;
                                       });
                                       // tslint:disable-next-line:no-console
-                                      console.log(data.project);
                                       this.handleSelectWebsite(id, web.defaultLanguage.id);
                                     }}
                                     type="profile"
