@@ -102,6 +102,7 @@ export const WEBSITE_DETAIL = gql`
       }
       urlMask
       domain
+      googleTrackingPixel
       project {
         id
       }

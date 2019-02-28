@@ -20,7 +20,7 @@ interface State {
   defLang: string;
   urlMask: string;
   domain: string;
-
+  googleTrackingPixel: string;
   titleError: boolean;
   langsError: boolean;
   defLangError: boolean;
@@ -43,7 +43,7 @@ class WebsiteForm extends Component<Properties, State> {
     defLang: null,
     urlMask: '',
     domain: '',
-
+    googleTrackingPixel: '',
     ...this.RESET_ERROR_VALUES,
   };
 
@@ -164,6 +164,7 @@ class WebsiteForm extends Component<Properties, State> {
       defaultLanguage: { id: this.state.defLang },
       urlMask: this.state.urlMask,
       domain: this.state.domain,
+      googleTrackingPixel: this.state.googleTrackingPixel,
     };
 
     if (this.props.onSave) {
@@ -378,6 +379,20 @@ class WebsiteForm extends Component<Properties, State> {
               <span style={{ color: 'red' }}>Domain is not filled or it is in bad format!</span>
             </Col>
           </Row>
+          <Row style={{ marginTop: '8px' }}>
+            <Col span={labelSize} style={labelStyle}>
+              <Tooltip title="Base URL mask for this website (prefix)">
+                <span>Google tracking pixel:</span>
+              </Tooltip>
+            </Col>
+            <Col span={24 - labelSize}>
+              <Input 
+                value={this.state.googleTrackingPixel} 
+                onChange={e => this.handleInputChange('googleTrackingPixel', e.target.value)} 
+              />
+            </Col>
+          </Row>
+          
         </div>
 
         <div style={{ textAlign: 'center' }}>
@@ -406,7 +421,8 @@ class WebsiteForm extends Component<Properties, State> {
       langs,
       defLang,
       urlMask: data.urlMask,
-      domain: data.domain
+      domain: data.domain,
+      googleTrackingPixel: data.googleTrackingPixel
     });
   }
 }

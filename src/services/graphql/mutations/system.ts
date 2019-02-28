@@ -91,6 +91,7 @@ export const CREATE_WEBSITE = gql`
     $defaultLanguage: LanguageWhereUniqueInput,
     $urlMask: String!
     $domain: String!,
+    $googleTrackingPixel: String
   ) {
     createWebsite(
       data: {
@@ -104,12 +105,14 @@ export const CREATE_WEBSITE = gql`
         }
         urlMask: $urlMask
         domain: $domain
+        googleTrackingPixel: $googleTrackingPixel
       }
     ) {
       id
       title
       urlMask
       domain
+      googleTrackingPixel
       defaultLanguage {
         id
         name
@@ -130,6 +133,7 @@ export const UPDATE_WEBSITE = gql`
     $defaultLanguage: LanguageWhereUniqueInput,
     $urlMask: String!,
     $domain: String!,
+    $googleTrackingPixel: String
   ) {
     updateWebsite(
       where: {
@@ -143,12 +147,14 @@ export const UPDATE_WEBSITE = gql`
         }
         urlMask: $urlMask
         domain: $domain
+        googleTrackingPixel: $googleTrackingPixel
       }
     ) {
       id
       title
       urlMask
       domain
+      googleTrackingPixel
       defaultLanguage {
         id
         name
