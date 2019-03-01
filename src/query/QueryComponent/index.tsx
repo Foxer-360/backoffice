@@ -37,7 +37,7 @@ class QueryComponent<P, S> extends Component<P, S> {
     switch (childType) {
       case 'function':
         // tslint:disable-next-line:no-any
-        const child = this.props.children as React.SFC<any>;
+        const child = this.props.children as unknown as React.SFC<any>;
         return child(buildedProperties);
       case 'object':
         // tslint:disable-next-line:no-any
