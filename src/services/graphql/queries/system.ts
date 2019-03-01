@@ -281,8 +281,8 @@ export const TAG_LIST = gql`
 `;
 
 export const GET_PAGES_URLS = gql`
-  query pagesUrls($language: ID!) {
-    pagesUrls(where: { language: $language }) {
+  query pagesUrls($language: ID!, $websiteId: ID!) {
+    pagesUrls(where: { language: $language, websiteId: $websiteId }) {
       id
       page
       url

@@ -37,12 +37,13 @@ export interface IState {
 const GET_CONTEXT = gql`{
   languageData @client
   pageData @client
+  websiteData @client
   datasourceItems @client
 }`;
 
 const GET_PAGES_URLS = gql`
-  query pagesUrls($language: ID!) {
-    pagesUrls(where: { language: $language }) {
+  query pagesUrls($language: ID!, $websiteId: ID!) {
+    pagesUrls(where: { language: $language, websiteId: $websiteId }) {
       id
       page
       url
@@ -74,10 +75,10 @@ const ComposedQuery = adopt({
       {({ data }) => render(data)}
     </Query>
   ),
-  getPagesUrls: ({ render, context: { languageData }}) => {
-    if (!languageData) { return render({ loading: true }); }
+  getPagesUrls: ({ render, context: { languageData, websiteData }}) => {
+    if (!(languageData && websiteData)) { return render({ loading: true }); }
     return (
-    <Query query={GET_PAGES_URLS} variables={{ language: languageData.id }}>
+    <Query query={GET_PAGES_URLS} variables={{ language: languageData.id, websiteId: websiteData.id }}>
       {(data) => {
         return render(data);
       }}
