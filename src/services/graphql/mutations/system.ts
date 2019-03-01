@@ -84,9 +84,15 @@ export const REMOVE_PROJECT = gql`
 `;
 
 export const CREATE_WEBSITE = gql`
-  mutation createWebsite($title: String!, $project: ID!,
-    $languages: LanguageCreateManyInput, $defaultLanguage: LanguageWhereUniqueInput,
-    $urlMask: String!) {
+  mutation createWebsite(
+    $title: String!,
+    $project: ID!,
+    $languages: LanguageCreateManyInput,
+    $defaultLanguage: LanguageWhereUniqueInput,
+    $urlMask: String!
+    $domain: String!,
+    $googleTrackingPixel: String
+  ) {
     createWebsite(
       data: {
         title: $title
@@ -98,11 +104,15 @@ export const CREATE_WEBSITE = gql`
           connect: $defaultLanguage
         }
         urlMask: $urlMask
+        domain: $domain
+        googleTrackingPixel: $googleTrackingPixel
       }
     ) {
       id
       title
       urlMask
+      domain
+      googleTrackingPixel
       defaultLanguage {
         id
         name
@@ -116,9 +126,15 @@ export const CREATE_WEBSITE = gql`
 `;
 
 export const UPDATE_WEBSITE = gql`
-  mutation updateWebsite($id: ID!, $title: String!,
-    $languages: LanguageUpdateManyInput, $defaultLanguage: LanguageWhereUniqueInput,
-    $urlMask: String!) {
+  mutation updateWebsite(
+    $id: ID!, 
+    $title: String!,
+    $languages: LanguageUpdateManyInput,
+    $defaultLanguage: LanguageWhereUniqueInput,
+    $urlMask: String!,
+    $domain: String!,
+    $googleTrackingPixel: String
+  ) {
     updateWebsite(
       where: {
         id: $id
@@ -130,11 +146,15 @@ export const UPDATE_WEBSITE = gql`
           connect: $defaultLanguage
         }
         urlMask: $urlMask
+        domain: $domain
+        googleTrackingPixel: $googleTrackingPixel
       }
     ) {
       id
       title
       urlMask
+      domain
+      googleTrackingPixel
       defaultLanguage {
         id
         name

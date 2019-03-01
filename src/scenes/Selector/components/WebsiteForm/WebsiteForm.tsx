@@ -10,7 +10,6 @@ const { Component } = React;
 interface Properties {
   projectId: string;
   data?: LooseObject;
-
   onSave?: (data: LooseObject) => void;
   onCancel?: () => void;
 }
@@ -20,11 +19,13 @@ interface State {
   langs: string[];
   defLang: string;
   urlMask: string;
-
+  domain: string;
+  googleTrackingPixel: string;
   titleError: boolean;
   langsError: boolean;
   defLangError: boolean;
   urlMaskError: boolean;
+  domainError: boolean;
 }
 
 class WebsiteForm extends Component<Properties, State> {
@@ -33,6 +34,7 @@ class WebsiteForm extends Component<Properties, State> {
     langsError: false,
     defLangError: false,
     urlMaskError: false,
+    domainError: false,
   };
 
   private RESET_STATE_VALUES: State = {
@@ -40,7 +42,8 @@ class WebsiteForm extends Component<Properties, State> {
     langs: [],
     defLang: null,
     urlMask: '',
-
+    domain: '',
+    googleTrackingPixel: '',
     ...this.RESET_ERROR_VALUES,
   };
 
@@ -73,6 +76,7 @@ class WebsiteForm extends Component<Properties, State> {
       langsError: false,
       defLangError: false,
       urlMaskError: false,
+      domainError: false,
     };
     let someError = false;
 
@@ -90,6 +94,15 @@ class WebsiteForm extends Component<Properties, State> {
     }
     if (this.state.urlMask.length < 1) {
       errors.urlMaskError = true;
+      someError = true;
+    }
+
+    const domainValidationRegex = /^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}?$/;
+
+    const domainValidationRes =  domainValidationRegex.exec(this.state.domain);
+
+    if ((!domainValidationRes || !domainValidationRes[0]) && this.state.domain) {
+      errors.domainError = true;
       someError = true;
     }
 
@@ -150,6 +163,8 @@ class WebsiteForm extends Component<Properties, State> {
       languages,
       defaultLanguage: { id: this.state.defLang },
       urlMask: this.state.urlMask,
+      domain: this.state.domain,
+      googleTrackingPixel: this.state.googleTrackingPixel,
     };
 
     if (this.props.onSave) {
@@ -331,7 +346,11 @@ class WebsiteForm extends Component<Properties, State> {
               </Tooltip>
             </Col>
             <Col span={24 - labelSize}>
-              <Input value={this.state.urlMask} onChange={e => this.handleInputChange('urlMask', e.target.value)} />
+              <Input 
+                value={this.state.urlMask}
+                disabled={!(isNew || this.props.data.urlMask === '')}
+                onChange={e => this.handleInputChange('urlMask', e.target.value)} 
+              />
             </Col>
           </Row>
           <Row style={{ paddingTop: '6px', display: this.state.urlMaskError ? '' : 'none' }}>
@@ -340,6 +359,40 @@ class WebsiteForm extends Component<Properties, State> {
               <span style={{ color: 'red' }}>Please enter url mask!</span>
             </Col>
           </Row>
+          <Row style={{ marginTop: '8px' }}>
+            <Col span={labelSize} style={labelStyle}>
+              <Tooltip title="Base URL mask for this website (prefix)">
+                <span>Domain:</span>
+              </Tooltip>
+            </Col>
+            <Col span={24 - labelSize}>
+              <Input 
+                value={this.state.domain} 
+                disabled={!(isNew || !this.props.data.domain)}
+                onChange={e => this.handleInputChange('domain', e.target.value)} 
+              />
+            </Col>
+          </Row>
+          <Row style={{ paddingTop: '6px', display: this.state.domainError ? '' : 'none' }}>
+            <Col span={labelSize} />
+            <Col span={24 - labelSize} style={{ textAlign: 'center' }}>
+              <span style={{ color: 'red' }}>Domain is not filled or it is in bad format!</span>
+            </Col>
+          </Row>
+          <Row style={{ marginTop: '8px' }}>
+            <Col span={labelSize} style={labelStyle}>
+              <Tooltip title="Base URL mask for this website (prefix)">
+                <span>Google tracking pixel:</span>
+              </Tooltip>
+            </Col>
+            <Col span={24 - labelSize}>
+              <Input 
+                value={this.state.googleTrackingPixel} 
+                onChange={e => this.handleInputChange('googleTrackingPixel', e.target.value)} 
+              />
+            </Col>
+          </Row>
+          
         </div>
 
         <div style={{ textAlign: 'center' }}>
@@ -368,6 +421,8 @@ class WebsiteForm extends Component<Properties, State> {
       langs,
       defLang,
       urlMask: data.urlMask,
+      domain: data.domain,
+      googleTrackingPixel: data.googleTrackingPixel
     });
   }
 }
