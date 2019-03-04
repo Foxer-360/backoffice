@@ -99,7 +99,7 @@ async function cloneRepository(git, path) {
 
   // Pull data also using git LFS to get images
   console.log(`Called git lfs pull for ${git}`);
-  execSync(`git lfs pull`, {
+  execSync(`git-lfs pull`, {
     cwd: path,
   });
 }
