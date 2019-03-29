@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { ILooseObject } from '@source/composer/types';
-import { Button, Col, Icon, Row, Spin, Upload, Input } from 'antd';
+import { Button, Col, Icon, Row, Upload, Popconfirm } from 'antd';
 // tslint:disable:jsx-no-multiline-js
 // tslint:disable:jsx-no-lambda
 
 export interface FileEditorProps {
   uploadFile?: (fileList: ILooseObject, mediaData?: ILooseObject) => void;
+  deleteFile?: (id: LooseObject) => void;
   onChange?: (media: object) => void;
   closeEditor?: () => void;
   loading?: boolean;
@@ -73,8 +74,8 @@ export default class FileEditor extends React.Component<FileEditorProps, FileEdi
         </Row>
 
         <hr className={'hSep'} />
-        <Row>
-          <Col span={24}>
+        <Row justify={'space-between'} type={'flex'}>
+          <Col span={12}>
             <Button
               type={'primary'}
               style={{ marginRight: '16px' }}
@@ -97,6 +98,20 @@ export default class FileEditor extends React.Component<FileEditorProps, FileEdi
             <Button type="danger" onClick={() => this.props.closeEditor()}>
               Close
             </Button>
+          </Col>
+
+          <Col span={5} offset={7} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Popconfirm
+              title="Are you sure delete this file?"
+              onConfirm={() => this.props.deleteFile(this.props.file.id)}
+              okText="Yes"
+              cancelText="No"
+              icon={<Icon type="exclamation-circle" />}
+            >
+              <Button type="danger" icon="trash">
+                Delete
+              </Button>
+            </Popconfirm>
           </Col>
         </Row>
       </div>

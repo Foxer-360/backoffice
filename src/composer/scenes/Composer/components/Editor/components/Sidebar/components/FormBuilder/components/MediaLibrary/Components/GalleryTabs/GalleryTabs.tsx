@@ -41,7 +41,11 @@ export default class GalleryTabs extends React.Component<GalleryTabsProps, Galle
       >
         <Tabs.TabPane tab="Images" key="0">
           <AllImagesQuery>
-            <ImageGallery placeImg={this.props.placeMedia} image={this.props.media} name={this.props.name} />
+            <ImageGallery 
+              placeImg={this.props.placeMedia}
+              image={this.props.media}
+              name={this.props.name}
+            />
           </AllImagesQuery>
         </Tabs.TabPane>
 

@@ -41,8 +41,9 @@ class UploadImage extends React.Component<IUploadImageProps, IUploadImageState> 
     })
       .then(response => {
         notification.success({
-          description: 'Image Deleted Successfully',
+          description: 'Image has been successfully deleted',
           message: 'Success',
+          
         });
 
         this.props.closeEditor();
