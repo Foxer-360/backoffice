@@ -136,7 +136,6 @@ class Inquiries extends Component<Properties, State> {
                 Download csv
               </CSVLink>
             </Button>
-            <CSVDownload data={csvData} target="_blank" />
           </>;
         }}</Query>
       </div>
