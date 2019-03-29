@@ -87,7 +87,7 @@ const pageContextSchema = {
 const ComposedQuery = adopt({
   website: ({ render }) => <Query query={LOCAL_SELECTED_WEBSITE}>{({ data }) => render(data.website)}</Query>,
   datasources: ({ render }) => <Query query={DATASOURCES}>{data => render(data)}</Query>,
-  tags: ({ render }) => <Query query={GET_TAGS}>{data => render(data)}</Query>,
+  tags: ({ render, website }) => (<Query query={GET_TAGS} variables={{ websiteId: website }}>{data => render(data)}</Query>),
 });
 
 // tslint:disable:jsx-no-multiline-js

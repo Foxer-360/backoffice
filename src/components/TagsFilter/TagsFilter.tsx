@@ -9,13 +9,20 @@ import { GET_TAGS } from '@source/services/graphql/queries/system';
 
 const { Component } = React;
 
+const GET_CONTEXT = gql`
+{
+  website @client
+}
+`;
+
 const SELECT_TAG_ID = gql`{
   tag @client
 }`;
 
 const ComposedQuery = adopt({
-  tags: ({ render }) => (
-    <Query query={GET_TAGS}>{
+  getContext: ({ render }) => (<Query query={GET_CONTEXT} >{({ data }) => render(data)}</Query>),
+  tags: ({ render, getContext: { website } }) => (
+    <Query query={GET_TAGS} variables={{ websiteId: website }}>{
       (data) => render(data)
     }</Query>
   ),
@@ -53,8 +60,7 @@ class Tags extends Component<Properties, State> {
     return (
       <div>
         <ComposedQuery>{
-        ({ tags: { data, loading, error }, selectedTagId }) => {
-
+        ({ getContext, tags: { data, loading, error }, selectedTagId }) => {
             if (loading) { return 'Loading...'; }
             if (error) { return 'Error...'; }
 
