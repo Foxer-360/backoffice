@@ -1,5 +1,5 @@
 import { getImgUrl } from '@source/composer/utils';
-import { Button, Col, Drawer, Icon, Input, Popconfirm, Row, Mention, AutoComplete, Checkbox } from 'antd';
+import { Button, Col, Drawer, Icon, Input, Popconfirm, Row, Mention, AutoComplete, Checkbox, Tag } from 'antd';
 import * as React from 'react';
 import GalleryTabs from './Components/GalleryTabs';
 import UploadTabs from './Components/UploadTabs';
@@ -84,7 +84,10 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
       <div>
         <div className={'ant-divider ant-divider-horizontal ant-divider-with-text-left'}>
           <span className={'ant-divider-inner-text'}>
-            {this.state.drawerType === 'editor' ? `Media Editor: ${this.props.name} ` : 'Media Library'}
+            {this.state.drawerType === 'editor' ? `${this.props.name} ` : 'Media Library'}
+            {mediaData && mediaData.recommendedSizes && (
+              <Tag color={'gold'}>size: {mediaData.recommendedSizes.width} × {mediaData.recommendedSizes.height}px</Tag>
+            )}
           </span>
         </div>
 
@@ -111,12 +114,6 @@ class MediaLibrary extends React.Component<IMediaLibraryProps, IMediaLibraryStat
               </Col>
             </Row>
           </>
-        )}
-
-        {mediaData && mediaData.recommendedSizes && (
-          <div style={{ color: '#bfbfbf', fontStyle: 'italic', textAlign: 'center', width: '100%' }}>
-            {`Recommended Sizes: ${mediaData.recommendedSizes.width}px X ${mediaData.recommendedSizes.height}px`}
-          </div>
         )}
 
         {mediaData && mediaData.type === 'embeddedVideo' && (

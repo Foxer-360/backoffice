@@ -15,6 +15,7 @@ export interface IFileGalleryProps {
   loading?: boolean;
   search?: (query: string) => void;
   searchQuery?: string;
+  refetch?: () => void;
 }
 
 export interface IFileGalleryState {
@@ -91,22 +92,18 @@ class FileGallery extends React.Component<IFileGalleryProps, IFileGalleryState> 
 
         <Row>
           <Col span={24}>
-            <div className={'mediaLibrary__gallery__row'} style={{ height: '570px', marginTop: 24 }}>
+            <div className={'mediaLibrary__gallery__row'}>
               <List
+                size={'small'}
                 className={'mediaLibrary__fileGallery__list'}
                 bordered={true}
                 loading={this.props.loading}
                 renderItem={item => (
                   <List.Item
-                    style={{ cursor: 'pointer' }}
-                    actions={[
-                      <Button onClick={() => this.showDrawer(item)} icon={'eye'} type="primary" key={item.id} />,
-                    ]}
+                    onClick={() => this.showDrawer(item)}
+                    style={{ lineHeight: '1em', cursor: 'pointer' }}
                   >
-                    <span style={{ marginRight: '15px' }}>
-                      <Icon type={this.getFileTypeIcon(item.filename)} style={{ fontSize: '24px' }} />
-                    </span>
-                    {item.filename}
+                    <Icon type={this.getFileTypeIcon(item.filename)} /> {item.filename}
                   </List.Item>
                 )}
                 dataSource={this.props.files}
@@ -126,7 +123,11 @@ class FileGallery extends React.Component<IFileGalleryProps, IFileGalleryState> 
           destroyOnClose={true}
           width={500}
         >
-          <UploadFile closeEditor={() => this.closeDrawer()} onChange={this.props.placeFile}>
+          <UploadFile
+            closeEditor={() => this.closeDrawer()}
+            onChange={this.props.placeFile}
+            refetch={this.props.refetch}
+          >
             <FileEditor
               name={this.props.name}
               file={this.state.selectedFile}

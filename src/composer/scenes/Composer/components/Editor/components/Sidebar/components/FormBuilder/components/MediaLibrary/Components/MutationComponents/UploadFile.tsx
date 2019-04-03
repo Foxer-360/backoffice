@@ -9,6 +9,7 @@ import * as React from 'react';
 export interface IUploadFileProps {
   closeEditor?: () => void;
   onChange?: (media: object) => void;
+  refetch?: () => void;
 }
 
 export interface IUploadFileState {
@@ -23,6 +24,37 @@ class UploadFile extends React.Component<IUploadFileProps, IUploadFileState> {
     this.state = {
       loading: false,
     };
+  }
+
+  public deleteFile = (id: string) => {
+    this.setState({ loading: true });
+
+    axios({
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
+      method: 'post',
+      url: `${process.env.REACT_APP_MEDIA_LIBRARY_SERVER}/delete`,
+      data: {
+        id: id,
+      },
+    })
+      .then(response => {
+        notification.success({
+          description: 'File has been successfulyl deleted',
+          message: 'Success',
+        });
+
+        this.props.closeEditor();
+        this.props.refetch();
+      })
+      .catch(err => {
+        this.setState({ loading: false });
+        notification.error({
+          description: 'Could not delete file' + ' ' + err,
+          message: 'Error',
+        });
+      });
   }
 
   public uploadFile = (fileList: ILooseObject, mediaData: ILooseObject) => {
@@ -86,6 +118,7 @@ class UploadFile extends React.Component<IUploadFileProps, IUploadFileState> {
       return React.cloneElement(child as React.ReactElement<any>, {
         loading: this.state.loading,
         uploadFile: this.uploadFile,
+        deleteFile: this.deleteFile,
       });
     });
 
