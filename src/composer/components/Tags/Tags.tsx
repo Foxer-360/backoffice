@@ -9,6 +9,12 @@ import { GET_TAGS } from '@source/services/graphql/queries/system';
 
 const { Component } = React;
 
+const GET_CONTEXT = gql`
+{
+  website @client
+}
+`;
+
 const UPDATE_TAG = gql`
   mutation($connectedPages: [PageWhereUniqueInput!], $disconnectedPages: [PageWhereUniqueInput!], $tagId: ID!) {
     updateTag(data: { pages: { connect: $connectedPages, disconnect: $disconnectedPages } }, where: { id: $tagId }) {
@@ -23,7 +29,8 @@ const UPDATE_TAG = gql`
 `;
 
 const ComposedQuery = adopt({
-  tags: ({ render }) => <Query query={GET_TAGS}>{tags => render(tags)}</Query>,
+  getContext: ({ render }) => (<Query query={GET_CONTEXT}>{({ data }) => render(data)}</Query>),
+  tags: ({ render, getContext: { website } }) => <Query query={GET_TAGS} variables={{ websiteId: website }}>{tags => render(tags)}</Query>,
   updateTag: ({ render }) => (
     <Mutation
       mutation={UPDATE_TAG}

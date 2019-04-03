@@ -295,8 +295,8 @@ export const GET_PAGES_URLS = gql`
 `;
 
 export const GET_TAGS = gql`
-  query {
-    tags {
+  query($websiteId: ID!) {
+    tags(where: { website: { id: $websiteId }}) {
       id
       name
       color

@@ -5,9 +5,15 @@ import ChatList from '@source/components/Ui/ChatList';
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
 
+const GET_CONTEXT = gql`
+{
+  website @client
+}
+`;
+
 const PAGE_TASK_LIST = gql`
-  query getPageTaskList {
-    pageTasks(orderBy: updatedAt_DESC) {
+  query getPageTaskList($websiteId: ID!) {
+    pageTasks(where: { pageTranslation: { page: { website: { id: $websiteId}}}}, orderBy: updatedAt_DESC) {
       id
       name
       description
@@ -34,8 +40,8 @@ const PAGE_TASK_LIST = gql`
 `;
 
 const PAGE_CHAT_LIST = gql`
-  query getPageChatList {
-    pageChats(orderBy: createdAt_DESC) {
+  query getPageChatList($websiteId: ID!) {
+    pageChats(where: {page: {website: {id: $websiteId}}}, orderBy: createdAt_DESC) {
       id
       text
       createdAt
@@ -82,61 +88,63 @@ const Home = () => (
         </Card>
       </Col>
     </Row>
+    <Query query={GET_CONTEXT}>
+    {({ data: { website }}) => (
+      website && <Row style={{ marginTop: '24px' }} justify={'space-between'} type={'flex'} gutter={24}>
+        <Col span={12}>
+          <Card>
+            <h3>
+              <Icon
+                type={'check'}
+                style={{
+                  color: '#1890FF',
+                  fontSize: '25px',
+                  marginRight: '12px',
+                }}
+              />
+              Recent Tasks
+            </h3>
 
-    <Row style={{ marginTop: '24px' }} justify={'space-between'} type={'flex'} gutter={24}>
-      <Col span={12}>
-        <Card>
-          <h3>
-            <Icon
-              type={'check'}
-              style={{
-                color: '#1890FF',
-                fontSize: '25px',
-                marginRight: '12px',
-              }}
-            />
-            Recent Tasks
-          </h3>
+            <div className={'dashBoard__card__cont'}>
+              <Query query={PAGE_TASK_LIST} variables={{ websiteId: website }}>
+                {({ loading, data, error, subscribeToMore, refetch }) => {
+                  return (
+                    <TaskList
+                      tasks={data && data.pageTasks && data.pageTasks.filter(task => !task.done)}
+                      loading={loading}
+                    />
+                  );
+                }}
+              </Query>
+            </div>
+          </Card>
+        </Col>
 
-          <div className={'dashBoard__card__cont'}>
-            <Query query={PAGE_TASK_LIST}>
-              {({ loading, data, error, subscribeToMore, refetch }) => {
-                return (
-                  <TaskList
-                    tasks={data && data.pageTasks && data.pageTasks.filter(task => !task.done)}
-                    loading={loading}
-                  />
-                );
-              }}
-            </Query>
-          </div>
-        </Card>
-      </Col>
+        <Col span={12}>
+          <Card>
+            <h3>
+              <Icon
+                type={'message'}
+                style={{
+                  color: '#1890FF',
+                  fontSize: '25px',
+                  marginRight: '12px',
+                }}
+              />
+              Recent Chats
+            </h3>
 
-      <Col span={12}>
-        <Card>
-          <h3>
-            <Icon
-              type={'message'}
-              style={{
-                color: '#1890FF',
-                fontSize: '25px',
-                marginRight: '12px',
-              }}
-            />
-            Recent Chats
-          </h3>
-
-          <div className={'dashBoard__card__cont'}>
-            <Query query={PAGE_CHAT_LIST}>
-              {({ loading, data, error, subscribeToMore, refetch }) => {
-                return <ChatList chats={data && data.pageChats && data.pageChats.slice(0, 15)} loading={loading} />;
-              }}
-            </Query>
-          </div>
-        </Card>
-      </Col>
-    </Row>
+            <div className={'dashBoard__card__cont'}>
+              <Query query={PAGE_CHAT_LIST} variables={{ websiteId: website }}>
+                {({ loading, data, error, subscribeToMore, refetch }) => {
+                  return <ChatList chats={data && data.pageChats && data.pageChats.slice(0, 15)} loading={loading} />;
+                }}
+              </Query>
+            </div>
+          </Card>
+        </Col>
+      </Row>)}
+    </Query>
   </div>
 );
 
