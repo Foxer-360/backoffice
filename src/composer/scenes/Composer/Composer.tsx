@@ -612,15 +612,15 @@ class Composer extends React.Component<IProperties, IState> {
    * @param id
    * @return {}
    */
-  public getComponentById(id: number, cont?: IContent) {
-    const content = cont || this.state.content;
-    if (!Array.isArray(content.content)) {
+  public getComponentById(id: number, content?: IContent) {
+    const cont = content || this.state.content;
+    if (!Array.isArray(cont.content)) {
       return {};
     }
 
     let c = {} as IContent | LooseObject; // TODO: fix!!
-    for (let i = 0; content.content.length > i; i++) {
-      c = content.content && content.content[i];
+    for (let i = 0; cont.content.length > i; i++) {
+      c = cont.content && cont.content[i];
       if (!c) {
         continue;
       }
@@ -1013,7 +1013,6 @@ class Composer extends React.Component<IProperties, IState> {
    * @return {void}
    */
   private _eventRemoveComponent(id: number): void {
-    console.log(id);
     confirm({
       content: 'Be sure you want to do this. If you remove component you cannot revert this action.',
       onOk: () => this.handleRemoveComponent(id),
