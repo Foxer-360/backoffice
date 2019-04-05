@@ -1,14 +1,76 @@
-import { Composer, Context, IEditorInfo, ILockInfo } from '@source/composer';
+import { Composer, Context, IEditorInfo, ILockInfo, IComponentObject } from '@source/composer';
 import { connect, StandardResponse } from '@source/services/socket';
 import ChatTasks from '@source/scenes/ChatTasks';
+import ComponentTemplateModal from './components/ComponentTemplateModal';
 import { ComponentsModule, PluginsModule } from '@source/services/modules';
 import history from '@source/services/history';
-import { Query } from 'react-apollo';
-import { Alert, Card, Spin } from 'antd';
+import { Alert, Card, Spin, Modal, List, Divider } from 'antd';
 import * as React from 'react';
 import gql from 'graphql-tag';
+import { Query } from 'react-apollo';
 import { client } from '@source/services/graphql';
 const socket = connect();
+
+const COMPONENT_TEMPLATE_CREATE = gql`
+mutation createComponentTemplate(
+  $websiteId: ID!, $languageId: ID!, $name: String!, $type: String!, $content: Json!
+){
+  createComponentTemplate(
+    data: {
+      name: $name,
+      type: $type,
+      content: $content,
+      language: { connect: { id: $languageId } },
+      website: { connect: { id: $websiteId } }
+    }
+  ) {
+    id,
+    name,
+    type,
+    content
+  }
+}
+`;
+
+const COMPONENT_TEMPLATE_UDPATE = gql`
+  mutation updateComponentTemplate(
+    $id: ID!,
+    $name: String!,
+    $content: Json!,
+  ) {
+    updateComponentTemplate(
+      data: {
+        name: $name,
+        content: $content,
+      },
+      where: {
+        id: $id,
+      }
+    ) {
+      id,
+      name,
+      type,
+      content
+    }
+  }
+`;
+
+const COMPONENT_TEMPLATE_QUERY = gql`
+query componentTemplates(
+  $websiteId: ID!,
+  $languageId: ID!
+){
+  componentTemplates(where: {
+    website: { id: $websiteId },
+    language: { id: $languageId }
+  }) {
+    id,
+    name,
+    type,
+    content,
+  }
+}
+`;
 
 export interface ILooseObject {
   // tslint:disable-line:interface-name
@@ -40,6 +102,12 @@ export interface IState {
   content: ILooseObject | null;
   delta: ILooseObject[] | null;
   context: Context;
+  
+  componentTemplateData: {
+    templateId?: string;
+    name: string,
+    content: LooseObject,
+  };
 
   taskAndChatHidden: boolean;
 }
@@ -60,6 +128,11 @@ class Editor extends React.Component<IProperties, IState> {
       delta: null,
       context: new Context(),
 
+      componentTemplateData: {
+        templateId: null,
+        name: '',
+        content: {},
+      },
       taskAndChatHidden: true,
     };
 
@@ -77,6 +150,8 @@ class Editor extends React.Component<IProperties, IState> {
     this.initComposerReference = this.initComposerReference.bind(this);
     this.initComposer = this.initComposer.bind(this);
     this.writeInfoIntoContext = this.writeInfoIntoContext.bind(this);
+    this.handleTemplateSave = this.handleTemplateSave.bind(this);
+    this.handleTemplateUse = this.handleTemplateUse.bind(this);
   }
 
   public componentDidUpdate(prevProps: IProperties) {
@@ -160,34 +235,41 @@ class Editor extends React.Component<IProperties, IState> {
     }
 
     const meOnSocket = socket.id;
-
+    
     return (
-      <>
-        <Composer
-          pageId={this.props.pageId}
-          onSave={this.handleSave}
-          ref={this.initComposerReference}
-          editors={this.state.editors}
-          componentService={ComponentsModule}
-          pluginService={PluginsModule}
-          me={meOnSocket}
-          locks={this.state.locks}
-          activateComponentStartEdit={this.activatorStartEditComponent}
-          activateComponentStopEdit={this.activatorStopEditComponent}
-          activateCommit={this.activatorCommit}
-          toggleChatAndTask={this.handleToggleDisplayTaskAndChat}
-          context={this.state.context}
-          language={this.props.language}
-          resetPageContent={this.resetPageContent}
-        />
+      <Query query={COMPONENT_TEMPLATE_QUERY} variables={{ websiteId: this.props.websiteId, languageId: this.props.languageId }}>
+        {({ data: { componentTemplates } }) => (<>
+            <Composer
+              pageId={this.props.pageId}
+              onSave={this.handleSave}
+              ref={this.initComposerReference}
+              editors={this.state.editors}
+              componentService={ComponentsModule}
+              pluginService={PluginsModule}
+              me={meOnSocket}
+              locks={this.state.locks}
+              activateComponentStartEdit={this.activatorStartEditComponent}
+              activateComponentStopEdit={this.activatorStopEditComponent}
 
-        <ChatTasks
-          page={this.props.pageId}
-          pageTranslation={this.props.pageTranslationId}
-          handleToggleDisplayTaskAndChat={this.handleToggleDisplayTaskAndChat}
-          taskAndChatHidden={this.state.taskAndChatHidden}
-        />
-      </>
+              onHandleTemplateSave={(id: number) => this.handleTemplateSave(id, componentTemplates)}
+              onHandleTemplateUse={(id: number) => this.handleTemplateUse(id, componentTemplates)}
+              componentTemplates={componentTemplates}
+
+              activateCommit={this.activatorCommit}
+              toggleChatAndTask={this.handleToggleDisplayTaskAndChat}
+              context={this.state.context}
+              language={this.props.language}
+              resetPageContent={this.resetPageContent}
+            />
+
+          <ChatTasks
+            page={this.props.pageId}
+            pageTranslation={this.props.pageTranslationId}
+            handleToggleDisplayTaskAndChat={this.handleToggleDisplayTaskAndChat}
+            taskAndChatHidden={this.state.taskAndChatHidden}
+          />
+        </>)}
+      </Query>
     );
   }
 
@@ -534,6 +616,99 @@ class Editor extends React.Component<IProperties, IState> {
 
           resolve(true);
         });
+    });
+  }
+
+  private handleTemplateSave(id: number, templates: LooseObject[]) {
+    const comp: IComponentObject = this.composer.getComponentById(id);
+
+    Modal.confirm({
+      title: 'Create or udpate template',
+      width: '60%',
+      onOk: () => this.onSubmit(comp),
+      content: (
+          <ComponentTemplateModal
+            component={comp}
+            website={this.props.website}
+            page={this.props.pageTranslation}
+            language={this.props.language}
+            template={this.state.componentTemplateData}
+            templates={templates.filter((t: LooseObject) => t.type === comp.name)}
+            onChange={(field: string, name: string) => {
+              this.setState({ componentTemplateData: { ...this.state.componentTemplateData, [field]: name }});
+            }}
+          />
+        ),
+    });  
+  }
+
+  private onSubmit(component: LooseObject) {
+    console.log(this.state.componentTemplateData);
+    if (!this.state.componentTemplateData.templateId) {
+      return client.mutate({
+        mutation: COMPONENT_TEMPLATE_CREATE,
+        variables: {
+          websiteId: this.props.websiteId,
+          languageId: this.props.languageId,
+          name: this.state.componentTemplateData.name || `${component.name}, ${this.props.pageTranslation.name}`,
+          type: component.name,
+          content: component.data
+        }
+      }).then(() => console.log('uloženo!!'));
+    }
+
+    return client.mutate({
+      mutation: COMPONENT_TEMPLATE_UDPATE,
+      variables: {
+        id: this.state.componentTemplateData.templateId,
+        name: this.state.componentTemplateData.name || `${component.name}, ${this.props.pageTranslation.name}`,
+        content: component.data
+      }
+    });
+  }
+  
+  // TODO: 1. Create relations instead of data copy and connect
+  // TODO: 2. Delete temporary data
+  // TODO: 3. update delta / remove
+  private handleTemplateUse(id: number, templates: LooseObject[]) {
+    const comp: IComponentObject = this.composer.getComponentById(id);
+    Modal.confirm({
+      title: 'Pick template to use',
+      width: '60%',
+      content: (
+        <List
+          dataSource={templates.filter((t: LooseObject) => t.type === comp.name)}
+          renderItem={(item: LooseObject) => (
+            <List.Item
+              key={item.id}
+            >
+              <List.Item.Meta
+                title={item.name}
+                description={
+                  <>
+                    <a
+                      onClick={() => {
+                        this.composer.updateComponent(id, { ...comp, data: item.content });
+                        Modal.destroyAll();
+                      }}
+                    >
+                      copy content
+                    </a>  
+                    <Divider type="vertical" />
+                    <a 
+                      onClick={() => {
+                        this.composer.updateComponent(id, { ...comp, data: { componentTemplateId: item.id } });
+                        Modal.destroyAll();
+                      }}
+                    >
+                      use as template
+                    </a>
+                  </>
+                }
+              />
+            </List.Item>
+          )}
+        />),
     });
   }
 }

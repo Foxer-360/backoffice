@@ -29,6 +29,10 @@ export interface IProperties {
 
   onEdit: (id: number) => Promise<boolean>;
   onRemove: (id: number) => void;
+
+  onHandleTemplateSave?: (id: number) => void;
+  onHandleTemplateUse?: (id: number) => void;
+  componentTemplates?: LooseObject[];
   dragStart: (data: ILooseObject) => void;
   dragEnd: () => void;
 
@@ -116,6 +120,9 @@ class Container extends React.Component<IProperties, {}> {
                       name={component.name}
                       onEdit={this.props.onEdit}
                       onRemove={this.props.onRemove}
+                      onHandleTemplateSave={this.props.onHandleTemplateSave}
+                      onHandleTemplateUse={this.props.onHandleTemplateUse}
+                      componentTemplates={this.props.componentTemplates}
                       dragStart={this.props.dragStart}
                       dragEnd={this.props.dragEnd}
                       componentsService={this.props.componentsService}

@@ -22,6 +22,7 @@ export interface IComponentObject {
   id: number;
   name: string;
   position: number;
+  templateId?: string;
   data: ILooseObject;
   plugins: string[];
 }
@@ -83,6 +84,11 @@ export interface IProperties {
   layouts?: boolean;
 
   context: Context;
+
+  // template management
+  onHandleTemplateSave?: (id: number) => void;
+  onHandleTemplateUse?: (id: number) => void;
+  componentTemplates?: LooseObject[];
 
   // Event handlers
   onComponentAdded?: (data: ILooseObject) => void;
@@ -321,6 +327,9 @@ class Composer extends React.Component<IProperties, IState> {
                   me={this.props.me}
                   addContainer={this.handleAddContainer}
                   removeContainer={this.handleRemoveContainer}
+                  onHandleTemplateSave={(id) => this.props.onHandleTemplateSave(id)}
+                  onHandleTemplateUse={this.props.onHandleTemplateUse}
+                  componentTemplates={this.props.componentTemplates}
                   lockContainer={this.handleLockContainer}
                   layouts={this.props.layouts}
                   language={this.props.language}
@@ -596,6 +605,39 @@ class Composer extends React.Component<IProperties, IState> {
         content: builder(this.delta, this.state.content),
       }, () => resolve());
     });
+  }
+
+  /**
+   * Returns component by id
+   * @param id
+   * @return {}
+   */
+  public getComponentById(id: number, cont?: IContent) {
+    const content = cont || this.state.content;
+    if (!Array.isArray(content.content)) {
+      return {};
+    }
+
+    let c = {} as IContent | LooseObject; // TODO: fix!!
+    for (let i = 0; content.content.length > i; i++) {
+      c = content.content && content.content[i];
+      if (!c) {
+        continue;
+      }
+
+      if (c.id === id) {
+        return c;
+      }
+
+      if (Array.isArray(c.content)) {
+        c = this.getComponentById(id, c as IContent);
+        if (c) {
+          return c;
+        }
+      }
+    }
+
+    return null;
   }
 
   //
@@ -971,6 +1013,7 @@ class Composer extends React.Component<IProperties, IState> {
    * @return {void}
    */
   private _eventRemoveComponent(id: number): void {
+    console.log(id);
     confirm({
       content: 'Be sure you want to do this. If you remove component you cannot revert this action.',
       onOk: () => this.handleRemoveComponent(id),
@@ -1270,6 +1313,7 @@ class Composer extends React.Component<IProperties, IState> {
       data: {
         ...data.data
       },
+      templateId: data.templateId,
       id: '' + id,
     });
     const comm = this.delta.pull();
