@@ -10,6 +10,7 @@ import WebsiteForm from './components/WebsiteForm';
 import { queries, mutations } from '@source/services/graphql';
 import './selector.css';
 import history from '@source/services/history';
+import { UserProfile } from '@source/contexts';
 
 const { Component } = React;
 const { Content } = Layout;
@@ -65,367 +66,379 @@ class Selector extends Component<Properties, State> {
 
   render() {
     return (
-      <Layout className="layout">
-        <Content className="content-wrap">
-          <div className="content">
-            <Carousel
-              accessibility={false}
-              dots={false}
-              ref={node => this.carousel = node}
-              initialSlide={this.PROJECT_SELECT_PAGE}
-            >
-              {/* PROJECT FORM */}
-              <div>
-                <div className="carousel-box">
-                  {this.state.projectToEdit ?
-                    <Query query={queries.GET_PROJECT} variables={{ id: this.state.projectToEdit }}>
-                      {({ loading, data, error}) => {
-                        if (loading) {
-                          return <Spin size="large" />;
-                        }
+      <UserProfile.Consumer>
+        {(userProfile) => (
+          <Layout className="layout">
+            <Content className="content-wrap">
+              <div className="content">
+                <Carousel
+                  accessibility={false}
+                  dots={false}
+                  ref={node => this.carousel = node}
+                  initialSlide={this.PROJECT_SELECT_PAGE}
+                >
+                  {/* PROJECT FORM */}
+                  <div>
+                    <div className="carousel-box">
+                      {this.state.projectToEdit ?
+                        <Query query={queries.GET_PROJECT} variables={{ id: this.state.projectToEdit }}>
+                          {({ loading, data, error}) => {
+                            if (loading) {
+                              return <Spin size="large" />;
+                            }
 
-                        if (error) {
-                          return (
-                            <>
-                              <Alert
-                                message="Network Error"
-                                description="Loading details of this project failed. Please try it again."
-                                type="error"
-                              />
-                              <div style={{ textAlign: 'center', marginTop: '16px' }}>
-                                <Button onClick={this.onProjectCancel}>Back</Button>
-                                <LogoutButton style={{ marginLeft: '12px' }} />
-                              </div>
-                            </>
-                          );
-                        }
+                            if (error) {
+                              return (
+                                <>
+                                  <Alert
+                                    message="Network Error"
+                                    description="Loading details of this project failed. Please try it again."
+                                    type="error"
+                                  />
+                                  <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                                    <Button onClick={this.onProjectCancel}>Back</Button>
+                                    <LogoutButton style={{ marginLeft: '12px' }} />
+                                  </div>
+                                </>
+                              );
+                            }
 
-                        return (
-                          <Mutation
-                            mutation={mutations.UPDATE_PROJECT}
-                            update={(cache, { data: { updateProject } }) => {
-                              let { projects } = cache.readQuery({ query: queries.GET_PROJECTS });
-                              projects = projects.map((project: LooseObject) => {
-                                if (project.id === updateProject.id) {
-                                  return updateProject;
-                                }
-
-                                return project;
-                              });
-                              cache.writeQuery({
-                                query: queries.GET_PROJECTS,
-                                data: { projects }
-                              });
-                            }}
-                          >
-                            {updateProject => (
-                              <ProjectForm
-                                data={data.project}
-                                onCancel={this.onProjectCancel}
-                                onSave={(newData: LooseObject) => {
-                                  updateProject({ variables: { id: this.state.projectToEdit, ...newData } });
-                                  this.onProjectSave();
-                                }}
-                              />
-                            )}
-                          </Mutation>
-                        );
-                      }}
-                    </Query>
-                  :
-                    <Mutation
-                      mutation={mutations.CREATE_PROJECT}
-                      update={(cache, { data: { createProject } }) => {
-                        const { projects } = cache.readQuery({ query: queries.GET_PROJECTS });
-                        cache.writeQuery({
-                          query: queries.GET_PROJECTS,
-                          data: { projects: projects.concat([createProject]) }
-                        });
-                      }}
-                    >
-                      {createProject => (
-                        <ProjectForm
-                          onCancel={this.onProjectCancel}
-                          onSave={(newData: LooseObject) => {
-                            createProject({ variables: newData });
-                            this.onProjectSave();
-                          }}
-                        />
-                      )}
-                    </Mutation>
-                  }
-                </div>
-              </div>
-
-              {/* PROJECT SELECT */}
-              <div>
-                <div className="carousel-box">
-                  <div style={{ textAlign: 'center' }}>
-                    <h1>Select Project</h1>
-                  </div>
-                  <Query query={queries.GET_PROJECTS}>
-                    {({ loading, data, error }) => {
-                      if (loading) {
-                        return (
-                          <ScrollList
-                            loading={true}
-                          />
-                        );
-                      }
-
-                      if (error) {
-                        return (
-                          <Alert
-                            message="Network Error"
-                            description="Loading projects failed. Please try it again."
-                            type="error"
-                          />
-                        );
-                      }
-
-                      return (
-                        <Mutation
-                          mutation={mutations.REMOVE_PROJECT}
-                          update={(cache, { data: { deleteProject } }) => {
-                            let { projects } = cache.readQuery({ query: queries.GET_PROJECTS });
-                            projects = projects.filter((project: LooseObject) => {
-                              if (project.id === deleteProject.id) {
-                                return false;
-                              }
-
-                              return true;
-                            });
-
-                            cache.writeQuery({
-                              query: queries.GET_PROJECTS,
-                              data: { projects }
-                            });
-                          }}
-                        >
-                          {removeProject => (
-                            <ScrollList
-                              emptyText="No projects..."
-                              data={data.projects}
-                              onSelect={this.handleSelectProject}
-                              type="book"
-                              onEdit={this.handleEditProject}
-                              onRemove={(id: string) => {
-                                removeProject({ variables: { id }});
-                              }}
-                            />
-                          )}
-                        </Mutation>
-                      );
-                    }}
-                  </Query>
-                  <Divider style={{ padding: '0px 20px' }} dashed={false}>Or</Divider>
-                  <div style={{ textAlign: 'center' }}>
-                    <Button type="primary" onClick={this.handleCreateProject}>Create new Project</Button>
-                    <LogoutButton style={{ marginLeft: '12px' }} />
-                  </div>
-                </div>
-              </div>
-
-              {/* WEBSITE SELECT */}
-              <div>
-                <div className="carousel-box">
-                  <div style={{ textAlign: 'center' }}>
-                    <h1>Select Website</h1>
-                  </div>
-                  {this.state.selectedProject ?
-                    <Query query={queries.GET_PROJECT} variables={{ id: this.state.selectedProject }}>
-                      {({ loading, data, error }) => {
-                        if (loading) {
-                          return (
-                            <ScrollList
-                              loading={true}
-                            />
-                          );
-                        }
-
-                        if (error) {
-                          return (
-                            <Alert
-                              message="Network Error"
-                              description="Loading websites failed. Please try it again."
-                              type="error"
-                            />
-                          );
-                        }
-
-                        return (
-                          <Mutation
-                            mutation={mutations.REMOVE_WEBSITE}
-                            update={(cache, { data: { deleteWebsite } }) => {
-                              const { project } = cache.readQuery({
-                                query: queries.GET_PROJECT,
-                                variables: { id: this.state.selectedProject }
-                              });
-
-                              project.websites = project.websites.filter((web: LooseObject) => {
-                                if (web.id === deleteWebsite.id) {
-                                  return false;
-                                }
-
-                                return true;
-                              });
-
-                              cache.writeQuery({
-                                query: queries.GET_PROJECT,
-                                variables: { id: this.state.selectedProject },
-                                data: { project }
-                              });
-                            }}
-                          >
-                            {removeWebsite => (
+                            return (
                               <Mutation
-                                mutation={mutations.LOCAL_SELECT_PROJECT_WEBSITE}
+                                mutation={mutations.UPDATE_PROJECT}
+                                update={(cache, { data: { updateProject } }) => {
+                                  let { projects } = cache.readQuery({ query: queries.GET_PROJECTS });
+                                  projects = projects.map((project: LooseObject) => {
+                                    if (project.id === updateProject.id) {
+                                      return updateProject;
+                                    }
+
+                                    return project;
+                                  });
+                                  cache.writeQuery({
+                                    query: queries.GET_PROJECTS,
+                                    data: { projects }
+                                  });
+                                }}
                               >
-                                {setProjectWebsite => (
-                                  <ScrollList
-                                    emptyText="No websites..."
-                                    data={data.project.websites}
-                                    onSelect={(id: string) => {
-                                      setProjectWebsite({
-                                        variables: {
-                                          project: this.state.selectedProject,
-                                          website: id
-                                        }
-                                      });
-                                      const web = data.project.websites.find((w: LooseObject) => {
-                                        if (w.id === id) {
-                                          return true;
-                                        }
-                                        return false;
-                                      });
-                                      this.handleSelectWebsite(id, web.defaultLanguage.id);
-                                    }}
-                                    type="profile"
-                                    onEdit={this.handleEditWebsite}
-                                    onRemove={(id: string) => {
-                                      removeWebsite({ variables: { id }});
+                                {updateProject => (
+                                  <ProjectForm
+                                    data={data.project}
+                                    onCancel={this.onProjectCancel}
+                                    onSave={(newData: LooseObject) => {
+                                      updateProject({ variables: { id: this.state.projectToEdit, ...newData } });
+                                      this.onProjectSave();
                                     }}
                                   />
                                 )}
                               </Mutation>
-                            )}
-                          </Mutation>
-                        );
-                      }}
-                    </Query>
-                  :
-                    <Alert
-                      message="Select Project"
-                      description="Please select project first to show websites for this project."
-                      type="info"
-                    />
-                  }
-                  <Divider style={{ padding: '0px 20px' }} dashed={false}>Or</Divider>
-                  <div style={{ textAlign: 'center' }}>
-                    <Button style={{ marginRight: '12px' }} onClick={this.goBackToProjectSelect}>Back</Button>
-                    <Button type="primary" onClick={this.handleCreateWebsite}>Create new Website</Button>
-                    <LogoutButton style={{ marginLeft: '12px' }} />
+                            );
+                          }}
+                        </Query>
+                      :
+                        <Mutation
+                          mutation={mutations.CREATE_PROJECT}
+                          update={(cache, { data: { createProject } }) => {
+                            const { projects } = cache.readQuery({ query: queries.GET_PROJECTS });
+                            cache.writeQuery({
+                              query: queries.GET_PROJECTS,
+                              data: { projects: projects.concat([createProject]) }
+                            });
+                          }}
+                        >
+                          {createProject => (
+                            <ProjectForm
+                              onCancel={this.onProjectCancel}
+                              onSave={(newData: LooseObject) => {
+                                createProject({ variables: newData });
+                                this.onProjectSave();
+                              }}
+                            />
+                          )}
+                        </Mutation>
+                      }
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              {/* WEBSITE FORM */}
-              <div>
-                <div className="carousel-box">
-                  {this.state.websiteToEdit ?
-                    <Query query={queries.WEBSITE_DETAIL} variables={{ id: this.state.websiteToEdit }}>
-                      {({ loading, data, error }) => {
-                        if (loading) {
-                          return <Spin size="large" />;
-                        }
+                  {/* PROJECT SELECT */}
+                  <div>
+                    <div className="carousel-box">
+                      <div style={{ textAlign: 'center' }}>
+                        <h1>Select Project</h1>
+                      </div>
+                      <Query query={queries.GET_PROJECTS}>
+                        {({ loading, data, error }) => {
+                          if (loading) {
+                            return (
+                              <ScrollList
+                                loading={true}
+                              />
+                            );
+                          }
 
-                        if (error) {
-                          return (
-                            <>
+                          if (error) {
+                            return (
                               <Alert
                                 message="Network Error"
-                                description="Loading details of this website failed. Please try it again."
+                                description="Loading projects failed. Please try it again."
                                 type="error"
                               />
-                              <div style={{ textAlign: 'center', marginTop: '16px' }}>
-                                <Button onClick={this.onWebsiteCancel}>Back</Button>
-                                <LogoutButton style={{ marginLeft: '12px' }} />
-                              </div>
-                            </>
-                          );
-                        }
+                            );
+                          }
 
-                        return (
-                          <Mutation
-                            mutation={mutations.UPDATE_WEBSITE}
-                            update={(cache, { data: { updateWebsite } }) => {
-                              const { project } = cache.readQuery({
-                                query: queries.GET_PROJECT, variables: { id: this.state.selectedProject } });
-                              project.websites = project.websites.map((web: LooseObject) => {
-                                if (web.id === updateWebsite.id) {
-                                  return updateWebsite;
-                                }
+                          return (
+                            <Mutation
+                              mutation={mutations.REMOVE_PROJECT}
+                              update={(cache, { data: { deleteProject } }) => {
+                                let { projects } = cache.readQuery({ query: queries.GET_PROJECTS });
+                                projects = projects.filter((project: LooseObject) => {
+                                  if (project.id === deleteProject.id) {
+                                    return false;
+                                  }
 
-                                return web;
-                              });
+                                  return true;
+                                });
 
-                              cache.writeQuery({
-                                query: queries.GET_PROJECT,
-                                variables: { id: this.state.selectedProject },
-                                data: { project }
-                              });
-                            }}
-                          >
-                            {updateWebsite => {
-                              return (
-                                <WebsiteForm
-                                  data={data.website}
-                                  projectId={this.state.selectedProject}
-                                  onCancel={this.onWebsiteCancel}
-                                  onSave={(newData: LooseObject) => {
-                                    updateWebsite({ variables: { id: this.state.websiteToEdit, ...newData } });
-                                    this.onWebsiteSave(newData);
+                                cache.writeQuery({
+                                  query: queries.GET_PROJECTS,
+                                  data: { projects }
+                                });
+                              }}
+                            >
+                              {removeProject => (
+                                <ScrollList
+                                  emptyText="No projects..."
+                                  data={data.projects}
+                                  onSelect={this.handleSelectProject}
+                                  type="book"
+                                  onEdit={this.handleEditProject}
+                                  onRemove={(id: string) => {
+                                    removeProject({ variables: { id }});
                                   }}
                                 />
-                              );
-                            }}
-                          </Mutation>
-                        );
-                      }}
-                    </Query>
-                  :
-                    <Mutation
-                      mutation={mutations.CREATE_WEBSITE}
-                      update={(cache, { data: { createWebsite }}) => {
-                        const { project } = cache.readQuery({
-                          query: queries.GET_PROJECT, variables: { id: this.state.selectedProject } });
-                        project.websites.push(createWebsite);
+                              )}
+                            </Mutation>
+                          );
+                        }}
+                      </Query>
+                      <Divider style={{ padding: '0px 20px' }} dashed={false}>Or</Divider>
+                      <div style={{ textAlign: 'center' }}>
+                        {userProfile.owner ?
+                          <Button type="primary" onClick={this.handleCreateProject}>Create new Project</Button>
+                          :
+                          null
+                        }
+                        <LogoutButton style={{ marginLeft: '12px' }} />
+                      </div>
+                    </div>
+                  </div>
 
-                        cache.writeQuery({
-                          query: queries.GET_PROJECT,
-                          variables: { id: this.state.selectedProject },
-                          data: { project }
-                        });
-                      }}
-                    >
-                      {createWebsite => (
-                        <WebsiteForm
-                          projectId={this.state.selectedProject}
-                          onCancel={this.onWebsiteCancel}
-                          onSave={(newData: LooseObject) => {
-                            createWebsite({ variables: newData });
-                            this.onWebsiteSave(newData);
+                  {/* WEBSITE SELECT */}
+                  <div>
+                    <div className="carousel-box">
+                      <div style={{ textAlign: 'center' }}>
+                        <h1>Select Website</h1>
+                      </div>
+                      {this.state.selectedProject ?
+                        <Query query={queries.GET_PROJECT} variables={{ id: this.state.selectedProject }}>
+                          {({ loading, data, error }) => {
+                            if (loading) {
+                              return (
+                                <ScrollList
+                                  loading={true}
+                                />
+                              );
+                            }
+
+                            if (error) {
+                              return (
+                                <Alert
+                                  message="Network Error"
+                                  description="Loading websites failed. Please try it again."
+                                  type="error"
+                                />
+                              );
+                            }
+
+                            return (
+                              <Mutation
+                                mutation={mutations.REMOVE_WEBSITE}
+                                update={(cache, { data: { deleteWebsite } }) => {
+                                  const { project } = cache.readQuery({
+                                    query: queries.GET_PROJECT,
+                                    variables: { id: this.state.selectedProject }
+                                  });
+
+                                  project.websites = project.websites.filter((web: LooseObject) => {
+                                    if (web.id === deleteWebsite.id) {
+                                      return false;
+                                    }
+
+                                    return true;
+                                  });
+
+                                  cache.writeQuery({
+                                    query: queries.GET_PROJECT,
+                                    variables: { id: this.state.selectedProject },
+                                    data: { project }
+                                  });
+                                }}
+                              >
+                                {removeWebsite => (
+                                  <Mutation
+                                    mutation={mutations.LOCAL_SELECT_PROJECT_WEBSITE}
+                                  >
+                                    {setProjectWebsite => (
+                                      <ScrollList
+                                        emptyText="No websites..."
+                                        data={data.project.websites}
+                                        onSelect={(id: string) => {
+                                          setProjectWebsite({
+                                            variables: {
+                                              project: this.state.selectedProject,
+                                              website: id
+                                            }
+                                          });
+                                          const web = data.project.websites.find((w: LooseObject) => {
+                                            if (w.id === id) {
+                                              return true;
+                                            }
+                                            return false;
+                                          });
+                                          this.handleSelectWebsite(id, web.defaultLanguage.id);
+                                        }}
+                                        type="profile"
+                                        onEdit={this.handleEditWebsite}
+                                        onRemove={(id: string) => {
+                                          removeWebsite({ variables: { id }});
+                                        }}
+                                      />
+                                    )}
+                                  </Mutation>
+                                )}
+                              </Mutation>
+                            );
                           }}
+                        </Query>
+                      :
+                        <Alert
+                          message="Select Project"
+                          description="Please select project first to show websites for this project."
+                          type="info"
                         />
-                      )}
-                    </Mutation>
-                  }
-                </div>
+                      }
+                      <Divider style={{ padding: '0px 20px' }} dashed={false}>Or</Divider>
+                      <div style={{ textAlign: 'center' }}>
+                        <Button style={{ marginRight: '12px' }} onClick={this.goBackToProjectSelect}>Back</Button>
+                        {userProfile.owner ?
+                          <Button type="primary" onClick={this.handleCreateWebsite}>Create new Website</Button>
+                          :
+                          null
+                        }
+                        <LogoutButton style={{ marginLeft: '12px' }} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* WEBSITE FORM */}
+                  <div>
+                    <div className="carousel-box">
+                      {this.state.websiteToEdit ?
+                        <Query query={queries.WEBSITE_DETAIL} variables={{ id: this.state.websiteToEdit }}>
+                          {({ loading, data, error }) => {
+                            if (loading) {
+                              return <Spin size="large" />;
+                            }
+
+                            if (error) {
+                              return (
+                                <>
+                                  <Alert
+                                    message="Network Error"
+                                    description="Loading details of this website failed. Please try it again."
+                                    type="error"
+                                  />
+                                  <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                                    <Button onClick={this.onWebsiteCancel}>Back</Button>
+                                    <LogoutButton style={{ marginLeft: '12px' }} />
+                                  </div>
+                                </>
+                              );
+                            }
+
+                            return (
+                              <Mutation
+                                mutation={mutations.UPDATE_WEBSITE}
+                                update={(cache, { data: { updateWebsite } }) => {
+                                  const { project } = cache.readQuery({
+                                    query: queries.GET_PROJECT, variables: { id: this.state.selectedProject } });
+                                  project.websites = project.websites.map((web: LooseObject) => {
+                                    if (web.id === updateWebsite.id) {
+                                      return updateWebsite;
+                                    }
+
+                                    return web;
+                                  });
+
+                                  cache.writeQuery({
+                                    query: queries.GET_PROJECT,
+                                    variables: { id: this.state.selectedProject },
+                                    data: { project }
+                                  });
+                                }}
+                              >
+                                {updateWebsite => {
+                                  return (
+                                    <WebsiteForm
+                                      data={data.website}
+                                      projectId={this.state.selectedProject}
+                                      onCancel={this.onWebsiteCancel}
+                                      onSave={(newData: LooseObject) => {
+                                        updateWebsite({ variables: { id: this.state.websiteToEdit, ...newData } });
+                                        this.onWebsiteSave(newData);
+                                      }}
+                                    />
+                                  );
+                                }}
+                              </Mutation>
+                            );
+                          }}
+                        </Query>
+                      :
+                        <Mutation
+                          mutation={mutations.CREATE_WEBSITE}
+                          update={(cache, { data: { createWebsite }}) => {
+                            const { project } = cache.readQuery({
+                              query: queries.GET_PROJECT, variables: { id: this.state.selectedProject } });
+                            project.websites.push(createWebsite);
+
+                            cache.writeQuery({
+                              query: queries.GET_PROJECT,
+                              variables: { id: this.state.selectedProject },
+                              data: { project }
+                            });
+                          }}
+                        >
+                          {createWebsite => (
+                            <WebsiteForm
+                              projectId={this.state.selectedProject}
+                              onCancel={this.onWebsiteCancel}
+                              onSave={(newData: LooseObject) => {
+                                createWebsite({ variables: newData });
+                                this.onWebsiteSave(newData);
+                              }}
+                            />
+                          )}
+                        </Mutation>
+                      }
+                    </div>
+                  </div>
+                </Carousel>
               </div>
-            </Carousel>
-          </div>
-        </Content>
-      </Layout>
+            </Content>
+          </Layout>
+        )}
+      </UserProfile.Consumer>
     );
   }
 

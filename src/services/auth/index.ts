@@ -37,7 +37,7 @@ export function logout(callback?: () => any) {
   clearAccessToken();
 
   // Usualy dispatch router action
-  window.location.href = 
+  window.location.href =
     `https://${process.env.REACT_APP_AUTH0_CLIENT_DOMAIN}/v2/logout?`
     + `returnTo=${encodeURIComponent(process.env.REACT_APP_AUTH0_REDIRECT_LOGOUT)}`
     + `&client_id=${process.env.REACT_APP_AUTH0_CLIENT_ID}`;
@@ -83,7 +83,7 @@ export function getError() {
 
 export function isLoggedIn() {
   /**
-   * In case that client logging out through logout endpoint say true, 
+   * In case that client logging out through logout endpoint say true,
    * to prevent application to asynchronously redirect us and let do the redirect the logout method
    */
 
@@ -185,3 +185,22 @@ function startRenewTimer(expiresIn: any) {
 function restartRenewTimer() {
   startRenewTimer( (parseInt(localStorage.getItem('expires_at') as string, 10) - new Date().getTime()) );
 }
+
+/**
+ * Simple function to decode Access token and parse auth0Id
+ */
+export const getAuth0Id = () => {
+  if (!window) { return null; }
+
+  const accessToken = getAccessToken();
+  if (!accessToken) { return null; }
+
+  const { sub } = decode<{ sub: string }>(accessToken);
+  if (!sub) { return null; }
+
+  const regex = /^.*\|([^\|]+)$/gi;
+  const res = regex.exec(sub);
+  if (!res || !res[1]) { return null; }
+
+  return res[1];
+};
