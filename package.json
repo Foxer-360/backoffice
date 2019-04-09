@@ -7,7 +7,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@foxer360/delta": "git+https://github.com/Foxer-360/delta.git#v0.1.0",
+    "@foxer360/delta": "git+https://github.com/Foxer-360/delta.git#sandbox",
     "@types/react-color": "^2.13.6",
     "@types/zen-observable": "^0.8.0",
     "ajv": "^6.7.0",
