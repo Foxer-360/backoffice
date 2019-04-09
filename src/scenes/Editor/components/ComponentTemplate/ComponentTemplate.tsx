@@ -50,6 +50,23 @@ const COMPONENT_TEMPLATE_UDPATE = gql`
   }
 `;
 
+const COMPONENT_TEMPLATE_QUERY = gql`
+  query componentTemplates(
+    $websiteId: ID!,
+    $languageId: ID!
+  ){
+    componentTemplates(where: {
+      website: { id: $websiteId },
+      language: { id: $languageId }
+    }) {
+      id,
+      name,
+      type,
+      content,
+    }
+  }
+`;
+
 export interface IProperties {
   website: LooseObject;
   language: LooseObject;
@@ -147,6 +164,9 @@ class ComponentTemplate extends React.Component<IProperties, IState> {
             optionFilterProp="children"
             onChange={(templateId: string) => {
               const template =  templates.find((t: LooseObject) => t.id === templateId);
+              if (template) {
+                template.templateId = template.id;
+              }
               this.setState({ template });
             }}
           >
@@ -198,9 +218,9 @@ class ComponentTemplate extends React.Component<IProperties, IState> {
                     }}
                   >
                     copy content
-                  </a>  
+                  </a>
                   <Divider type="vertical" />
-                  <a 
+                  <a
                     onClick={() => {
                       this.props.composer.updateComponent(componentId, { ...component, data: { componentTemplateId: item.id } });
                       Modal.destroyAll();
@@ -219,7 +239,7 @@ class ComponentTemplate extends React.Component<IProperties, IState> {
 
   private handleTemplateSave(component: LooseObject) {
     console.log(this.state.template);
-    if (!this.state.componentTemplateData.templateId) {
+    if (!this.state.template.templateId) {
       return client.mutate({
         mutation: COMPONENT_TEMPLATE_CREATE,
         variables: {
@@ -228,7 +248,28 @@ class ComponentTemplate extends React.Component<IProperties, IState> {
           name: this.state.template.name,
           type: component.name,
           content: component.data
-        }
+        },
+        update: (proxy, result) => {
+          const { componentTemplates } = proxy.readQuery({
+            query: COMPONENT_TEMPLATE_QUERY,
+            variables: {
+              websiteId: this.props.website.id,
+              languageId: this.props.language.id,
+            },
+          });
+
+          proxy.writeQuery({
+            query: COMPONENT_TEMPLATE_QUERY,
+            variables: {
+              websiteId: this.props.website.id,
+              languageId: this.props.language.id,
+            },
+            data: {
+              // tslint:disable-next-line:no-any
+              componentTemplates: [ ...componentTemplates, (result.data as any).createComponentTemplate ]
+            }
+          });
+        },
       }).then(() => {
         this.props.close();
       });
@@ -240,7 +281,34 @@ class ComponentTemplate extends React.Component<IProperties, IState> {
         id: this.state.template.templateId,
         name: this.state.template.name,
         content: component.data
-      }
+      },
+      update: (proxy, result) => {
+        const { componentTemplates } = proxy.readQuery({
+          query: COMPONENT_TEMPLATE_QUERY,
+          variables: {
+            websiteId: this.props.website.id,
+            languageId: this.props.language.id,
+          },
+        });
+
+        proxy.writeQuery({
+          query: COMPONENT_TEMPLATE_QUERY,
+          variables: {
+            websiteId: this.props.website.id,
+            languageId: this.props.language.id,
+          },
+          data: {
+            componentTemplates: componentTemplates.map((t) => {
+              // tslint:disable-next-line:no-any
+              if (t.id === (result.data as any).updateComponentTemplate.id) {
+                // tslint:disable-next-line:no-any
+                return (result.data as any).updateComponentTemplate;
+              }
+              return t;
+            }),
+          }
+        });
+      },
     }).then(() => {
       this.props.close();
     });
