@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Dropdown, Icon, List, Menu, Popconfirm } from 'antd';
 
+import { UserProfile } from '@source/contexts';
 import './item.css';
 
 const { Component } = React;
@@ -70,14 +71,19 @@ class Item extends Component<ItemProps, {}> {
             description="No description here"
           />
         </div>
-        <div style={{ float: 'right', marginRight: '20px', paddingTop: '14px' }}>
-          <Dropdown
-            overlay={moreMenu}
-            trigger={['click']}
-          >
-            <Icon style={{ fontSize: '18px', cursor: 'pointer' }} type="ellipsis" />
-          </Dropdown>
-        </div>
+        <UserProfile.Consumer>
+          {(userProfile) => userProfile.owner ? (
+
+            <div style={{ float: 'right', marginRight: '20px', paddingTop: '14px' }}>
+              <Dropdown
+                overlay={moreMenu}
+                trigger={['click']}
+              >
+                <Icon style={{ fontSize: '18px', cursor: 'pointer' }} type="ellipsis" />
+              </Dropdown>
+            </div>
+          ) : null }
+        </UserProfile.Consumer>
       </List.Item>
     );
   }
