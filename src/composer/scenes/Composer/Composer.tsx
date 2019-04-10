@@ -404,6 +404,8 @@ class Composer extends React.Component<IProperties, IState> {
     // Reset delta
     this.delta = new Delta();
 
+    console.log('%c[Composer]%c called method setContent ', 'color: green; font-weight: bold', 'color: green', content);
+
     return new Promise((resolve) => {
       this.setState({
         content: { ...content },
@@ -585,6 +587,8 @@ class Composer extends React.Component<IProperties, IState> {
 
   public importDelta(data: IOperation[]): Promise<boolean> {
     this.delta.import(data);
+
+    console.log('%c[Composer]%c called method importDelta ', 'color: green; font-weight: bold', 'color: green', builder(this.delta, this.state.content));
 
     return new Promise(resolve => {
       this.setState({

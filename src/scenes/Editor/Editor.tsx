@@ -58,7 +58,7 @@ export interface IState {
   content: ILooseObject | null;
   delta: ILooseObject[] | null;
   context: Context;
-  
+
   componentTemplate: {
     action: 'edit' | 'use' | null;
     id: number;
@@ -188,7 +188,7 @@ class Editor extends React.Component<IProperties, IState> {
     }
 
     const meOnSocket = socket.id;
-    
+
     return (
       <Query query={COMPONENT_TEMPLATE_QUERY} variables={{ websiteId: this.props.websiteId, languageId: this.props.languageId }}>
         {({ data: { componentTemplates } }) => (<>

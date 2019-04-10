@@ -41,7 +41,7 @@
 
 "@foxer360/delta@git+https://github.com/Foxer-360/delta.git#sandbox":
   version "0.1.0"
-  resolved "git+https://github.com/Foxer-360/delta.git#5b56121b9d507c7472ae065b23877b9d59e1b6d5"
+  resolved "git+https://github.com/Foxer-360/delta.git#ffdd944cf7bd51c4967f3134ff318b4223444b15"
   dependencies:
     uuid "^3.3.2"
 
