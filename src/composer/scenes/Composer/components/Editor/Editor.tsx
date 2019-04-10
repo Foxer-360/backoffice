@@ -37,6 +37,11 @@ export interface IProperties {
   moveComponent: (id: number, position: number) => void;
   addComponent: (data: ILooseObject, position: number, container: string) => Promise<boolean>;
   removeComponent: (id: number) => void;
+  
+  onHandleTemplateSave?: (id: number) => void;
+  onHandleTemplateUse?: (id: number) => void;
+  componentTemplates?: LooseObject[];
+  
   addContainer: () => void;
   removeContainer: (id: string) => void;
   lockContainer: (id: string, lock: boolean) => void;
@@ -175,6 +180,9 @@ class Editor extends React.Component<IProperties, IState> {
                 me={this.props.me}
                 dragStart={this.onDragStart}
                 dragEnd={this.onDragStop}
+                onHandleTemplateSave={this.props.onHandleTemplateSave}
+                onHandleTemplateUse={this.props.onHandleTemplateUse}
+                componentTemplates={this.props.componentTemplates}
                 isThereSource={this.state.isSomethingDragging}
                 sourceData={this.state.activeSourceData}
                 moveComponent={this.props.moveComponent}

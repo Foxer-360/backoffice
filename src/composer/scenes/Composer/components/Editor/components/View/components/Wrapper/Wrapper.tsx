@@ -37,6 +37,10 @@ export interface IProperties {
 
   onEdit: (id: number) => Promise<boolean>;
   onRemove: (id: number) => void;
+  onHandleTemplateSave?: (id: number) => void;
+  onHandleTemplateUse?: (id: number) => void;
+  componentTemplates: LooseObject[];
+
   dragStart: (data: ILooseObject) => void;
   dragEnd: () => void;
 }
@@ -134,6 +138,8 @@ class Wrapper extends React.Component<IProperties, IState> {
     // Bind this for some functions
     this.handleEdit = this.handleEdit.bind(this);
     this.handleRemove = this.handleRemove.bind(this);
+    this.handleTemplateSave = this.handleTemplateSave.bind(this);
+    this.handleTemplateUse = this.handleTemplateUse.bind(this);
     this.handleDragStart = this.handleDragStart.bind(this);
     this.handleDragEnd = this.handleDragEnd.bind(this);
   }
@@ -205,6 +211,14 @@ class Wrapper extends React.Component<IProperties, IState> {
 
   public handleRemove() {
     this.props.onRemove(this.props.id);
+  }
+
+  public handleTemplateSave() {
+    this.props.onHandleTemplateSave(this.props.id);
+  }
+
+  public handleTemplateUse() {
+    this.props.onHandleTemplateUse(this.props.id);
   }
 
   // tslint:disable-next-line:no-any
@@ -287,11 +301,16 @@ class Wrapper extends React.Component<IProperties, IState> {
       <Query query={GET_CONTEXT}>{({ error, loading, data }) => {
 
         if (error) { return 'Error...'; }
-        if (loading) { return 'Loading...'; }
+        if (loading || !this.props.componentTemplates) { return 'Loading...'; }
         
         const { datasourceItems } = data;
 
-        const parsedData = addContextInformationsFromDatasourceItems(datasourceItems, this.props.content[this.props.position].data);
+        let sourceData = this.props.content[this.props.position].data;
+        const templateData = sourceData.componentTemplateId &&
+          this.props.componentTemplates &&
+          this.props.componentTemplates.find((v: LooseObject) => v.id === sourceData.componentTemplateId);
+
+        const parsedData = addContextInformationsFromDatasourceItems(datasourceItems, (templateData && templateData.content) || sourceData);     
         
         return (
           <div
@@ -303,12 +322,20 @@ class Wrapper extends React.Component<IProperties, IState> {
             {/* There is control for component */}
             <div className="wrapper-header">
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <button className="ui-button" onClick={this.handleEdit} disabled={locked}>
-                  Edit
-                </button>
+                {!sourceData.componentTemplateId && 
+                  <button className="ui-button" onClick={this.handleEdit} disabled={locked}>
+                    Edit
+                  </button>}
                 <button className="ui-button" onClick={this.handleRemove} disabled={locked}>
                   Remove
                 </button>
+                {!sourceData.componentTemplateId && this.props.onHandleTemplateSave &&
+                  <button className="ui-button" onClick={this.handleTemplateSave} disabled={locked}>
+                    Save as template
+                  </button>}
+                {this.props.onHandleTemplateSave && <button className="ui-button" onClick={this.handleTemplateUse} disabled={locked}>
+                  Pick from template
+                </button>}
                 <div className="editMove" />
               </div>
               {locked ? (
@@ -320,9 +347,11 @@ class Wrapper extends React.Component<IProperties, IState> {
 
             {/* There is component */}
             <RenderErrorCatcher>
-              <Comp
-                data={parsedData}
-              />
+              {parsedData.componentTemplateId
+                ? <div>INVALID DATE</div>
+                : <Comp
+                  data={parsedData}
+                />}
             </RenderErrorCatcher>
           </div>
         );

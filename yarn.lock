@@ -39,9 +39,9 @@
   dependencies:
     regenerator-runtime "^0.12.0"
 
-"@foxer360/delta@git+https://github.com/Foxer-360/delta.git#v0.1.0":
+"@foxer360/delta@git+https://github.com/Foxer-360/delta.git#sandbox":
   version "0.1.0"
-  resolved "git+https://github.com/Foxer-360/delta.git#170f50e0cb5e51ff093ade81d453209b9083d606"
+  resolved "git+https://github.com/Foxer-360/delta.git#ffdd944cf7bd51c4967f3134ff318b4223444b15"
   dependencies:
     uuid "^3.3.2"
 

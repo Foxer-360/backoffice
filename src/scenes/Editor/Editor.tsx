@@ -1,14 +1,32 @@
-import { Composer, Context, IEditorInfo, ILockInfo } from '@source/composer';
+import { Composer, Context, IEditorInfo, ILockInfo, IComponentObject } from '@source/composer';
 import { connect, StandardResponse } from '@source/services/socket';
 import ChatTasks from '@source/scenes/ChatTasks';
+import ComponentTemplate from './components/ComponentTemplate';
 import { ComponentsModule, PluginsModule } from '@source/services/modules';
 import history from '@source/services/history';
-import { Query } from 'react-apollo';
 import { Alert, Card, Spin } from 'antd';
 import * as React from 'react';
 import gql from 'graphql-tag';
+import { Query } from 'react-apollo';
 import { client } from '@source/services/graphql';
 const socket = connect();
+
+const COMPONENT_TEMPLATE_QUERY = gql`
+query componentTemplates(
+  $websiteId: ID!,
+  $languageId: ID!
+){
+  componentTemplates(where: {
+    website: { id: $websiteId },
+    language: { id: $languageId }
+  }) {
+    id,
+    name,
+    type,
+    content,
+  }
+}
+`;
 
 export interface ILooseObject {
   // tslint:disable-line:interface-name
@@ -41,6 +59,11 @@ export interface IState {
   delta: ILooseObject[] | null;
   context: Context;
 
+  componentTemplate: {
+    action: 'edit' | 'use' | null;
+    id: number;
+  };
+
   taskAndChatHidden: boolean;
 }
 
@@ -59,6 +82,11 @@ class Editor extends React.Component<IProperties, IState> {
       content: null,
       delta: null,
       context: new Context(),
+
+      componentTemplate: {
+        action: null,
+        id: null,
+      },
 
       taskAndChatHidden: true,
     };
@@ -162,32 +190,51 @@ class Editor extends React.Component<IProperties, IState> {
     const meOnSocket = socket.id;
 
     return (
-      <>
-        <Composer
-          pageId={this.props.pageId}
-          onSave={this.handleSave}
-          ref={this.initComposerReference}
-          editors={this.state.editors}
-          componentService={ComponentsModule}
-          pluginService={PluginsModule}
-          me={meOnSocket}
-          locks={this.state.locks}
-          activateComponentStartEdit={this.activatorStartEditComponent}
-          activateComponentStopEdit={this.activatorStopEditComponent}
-          activateCommit={this.activatorCommit}
-          toggleChatAndTask={this.handleToggleDisplayTaskAndChat}
-          context={this.state.context}
-          language={this.props.language}
-          resetPageContent={this.resetPageContent}
-        />
+      <Query query={COMPONENT_TEMPLATE_QUERY} variables={{ websiteId: this.props.websiteId, languageId: this.props.languageId }}>
+        {({ data: { componentTemplates } }) => (<>
+            <Composer
+              pageId={this.props.pageId}
+              onSave={this.handleSave}
+              ref={this.initComposerReference}
+              editors={this.state.editors}
+              componentService={ComponentsModule}
+              pluginService={PluginsModule}
+              me={meOnSocket}
+              locks={this.state.locks}
+              activateComponentStartEdit={this.activatorStartEditComponent}
+              activateComponentStopEdit={this.activatorStopEditComponent}
 
-        <ChatTasks
-          page={this.props.pageId}
-          pageTranslation={this.props.pageTranslationId}
-          handleToggleDisplayTaskAndChat={this.handleToggleDisplayTaskAndChat}
-          taskAndChatHidden={this.state.taskAndChatHidden}
-        />
-      </>
+              onHandleTemplateSave={(id: number) => this.setState({ componentTemplate: { id, action: 'edit' }})}
+              onHandleTemplateUse={(id: number) => this.setState({ componentTemplate: { id, action: 'use' }})}
+
+              componentTemplates={componentTemplates}
+
+              activateCommit={this.activatorCommit}
+              toggleChatAndTask={this.handleToggleDisplayTaskAndChat}
+              context={this.state.context}
+              language={this.props.language}
+              resetPageContent={this.resetPageContent}
+            />
+
+          {this.composer && <ComponentTemplate
+            componentId={this.state.componentTemplate.id}
+            action={this.state.componentTemplate.action}
+            close={() => this.setState({ componentTemplate: { id: null, action: null }})}
+            composer={this.composer}
+            templates={componentTemplates}
+            page={this.props.pageTranslation}
+            language={this.props.language}
+            website={this.props.website}
+          />}
+
+          <ChatTasks
+            page={this.props.pageId}
+            pageTranslation={this.props.pageTranslationId}
+            handleToggleDisplayTaskAndChat={this.handleToggleDisplayTaskAndChat}
+            taskAndChatHidden={this.state.taskAndChatHidden}
+          />
+        </>)}
+      </Query>
     );
   }
 
