@@ -52,11 +52,17 @@ const fetchUserProfile = async (): Promise<IUserProfileProperties | null> => {
   return fetch(authServer, {
     body: JSON.stringify(jsonBody),
     headers: {
-      'content-type': 'application/json'
+      'content-type': 'application/json',
     },
     method: 'post',
   })
-  .then(res => res.json())
+  .then(res => {
+    if (!res || !res.json || typeof res.json !== 'function') {
+      return Promise.resolve(null);
+    }
+
+    return res.json();
+  })
   .then(json => {
     if (!json) {
       // tslint:disable-next-line:no-console
@@ -75,6 +81,10 @@ const fetchUserProfile = async (): Promise<IUserProfileProperties | null> => {
     }
 
     return Promise.resolve(json.data.profile);
+  }, () => {
+    // tslint:disable-next-line:no-console
+    console.log('Error while loading profile from Foxer360 Authorization Server!');
+    return Promise.resolve(null);
   });
 };
 
