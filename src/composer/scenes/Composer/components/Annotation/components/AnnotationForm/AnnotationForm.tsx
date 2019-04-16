@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Alert, Button, Col, Input, Modal, Row } from 'antd';
 
-import UploadImage from '../../../Seo/components/MediaLibrary';
+import MediaLibrary from '../../../Editor/components/Sidebar/components/FormBuilder/components/MediaLibrary';
 import { deepEqual, getImgUrl } from '@source/composer/utils';
 import Property from '../Property';
 
@@ -385,10 +385,10 @@ class AnnotationForm extends Component<Properties, State> {
             </Row>
             <Row style={{ marginBottom: '10px' }}>
               <label>Image</label>
-              <UploadImage
+              <MediaLibrary
+                name={'Image'}
                 mediaData={this.state.image}
                 onChange={this.handleImageChange}
-                mediaUrl={this.state.image && getImgUrl(this.state.image)}
               />
             </Row>
           </Col>

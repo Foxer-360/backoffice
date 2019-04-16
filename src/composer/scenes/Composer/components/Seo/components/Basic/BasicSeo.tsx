@@ -8,7 +8,8 @@ import { getImgUrl } from '@source/composer/utils';
 import { DefaultSeoContent } from '../../interfaces';
 
 import InputWrap from '../InputWrap';
-import UploadImage from '../MediaLibrary';
+// import UploadImage from '../MediaLibrary';
+import MediaLibrary from '../../../Editor/components/Sidebar/components/FormBuilder/components/MediaLibrary';
 
 import './styles.scss';
 
@@ -96,10 +97,10 @@ class BasicSeo extends Component<Properties, State> {
             />
           </InputWrap>
           <InputWrap title="Default Image">
-            <UploadImage
+            <MediaLibrary
+              name="Default Image"
               mediaData={this.state.mediaData}
               onChange={this.mediaChange}
-              mediaUrl={seoData.defaultImage}
             />
           </InputWrap>
         </Col>
@@ -116,12 +117,13 @@ class BasicSeo extends Component<Properties, State> {
   }
 
   private mediaChange = (mediaData: LooseObject) => {
-    if (mediaData && mediaData.filename) {
-      this.props.change('defaultImage', getImgUrl(mediaData));
+    if (mediaData && mediaData.value && mediaData.value.filename) {
+      this.props.change('defaultImage', getImgUrl(mediaData.value));
     } else {
       this.props.change('defaultImage', '');
     }
-    this.setState({ mediaData });
+
+    this.setState({ mediaData: mediaData.value });
   }
 
   private changeText = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => this.props.change(key, e.target.value);

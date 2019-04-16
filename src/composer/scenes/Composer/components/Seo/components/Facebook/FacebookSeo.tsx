@@ -6,7 +6,8 @@ import { Col, Icon, Input, Row } from 'antd';
 import { getImgUrl } from '@source/composer/utils';
 import { FacebookSeoContent } from '../../interfaces';
 
-import UploadImage from '../MediaLibrary';
+// import UploadImage from '../MediaLibrary';
+import MediaLibrary from '../../../Editor/components/Sidebar/components/FormBuilder/components/MediaLibrary';
 import InputWrap from '../InputWrap';
 
 import FacebookIcon from './fb.svg';
@@ -49,10 +50,10 @@ class FacebookSeo extends Component<Properties, State> {
             />
           </InputWrap>
           <InputWrap title="Image">
-            <UploadImage
+            <MediaLibrary
+              name="Image"
               mediaData={this.state.mediaData}
               onChange={this.mediaChange}
-              mediaUrl={seoData.image}
             />
           </InputWrap>
         </Col>
@@ -66,12 +67,12 @@ class FacebookSeo extends Component<Properties, State> {
   }
 
   private mediaChange = (mediaData: LooseObject) => {
-    if (mediaData && mediaData.filename) {
-      this.props.change('image', getImgUrl(mediaData));
+    if (mediaData && mediaData.value && mediaData.value.filename) {
+      this.props.change('image', getImgUrl(mediaData.value));
     } else {
       this.props.change('image', '');
     }
-    this.setState({ mediaData });
+    this.setState({ mediaData: mediaData.value });
   }
 
   private changeText = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => this.props.change(key, e.target.value);
