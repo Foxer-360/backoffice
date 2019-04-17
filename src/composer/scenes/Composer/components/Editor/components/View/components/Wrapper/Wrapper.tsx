@@ -302,7 +302,7 @@ class Wrapper extends React.Component<IProperties, IState> {
 
         if (error) { return 'Error...'; }
         if (loading || !this.props.componentTemplates) { return 'Loading...'; }
-        
+
         const { datasourceItems } = data;
 
         let sourceData = this.props.content[this.props.position].data;
@@ -310,8 +310,8 @@ class Wrapper extends React.Component<IProperties, IState> {
           this.props.componentTemplates &&
           this.props.componentTemplates.find((v: LooseObject) => v.id === sourceData.componentTemplateId);
 
-        const parsedData = addContextInformationsFromDatasourceItems(datasourceItems, (templateData && templateData.content) || sourceData);     
-        
+        const parsedData = addContextInformationsFromDatasourceItems(datasourceItems, (templateData && templateData.content) || sourceData);
+
         return (
           <div
             style={wrapperStyle}
@@ -322,7 +322,7 @@ class Wrapper extends React.Component<IProperties, IState> {
             {/* There is control for component */}
             <div className="wrapper-header">
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                {!sourceData.componentTemplateId && 
+                {!sourceData.componentTemplateId &&
                   <button className="ui-button" onClick={this.handleEdit} disabled={locked}>
                     Edit
                   </button>}
@@ -338,11 +338,18 @@ class Wrapper extends React.Component<IProperties, IState> {
                 </button>}
                 <div className="editMove" />
               </div>
-              {locked ? (
-                <div style={{ float: 'right', marginRight: '16px' }}>
-                  <UserEditor editors={this.props.editors} id={editor} />
+              <div style={{ fontSize: '22px', color: '#e0e0e0', float: 'right', marginRight: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <span>
+                    Position: <strong>{this.props.content[this.props.position].position}</strong>
+                  </span>
+                  {locked ? (
+                    <div style={{ marginLeft: '20px' }}>
+                      <UserEditor editors={this.props.editors} id={editor} />
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
+              </div>
             </div>
 
             {/* There is component */}
