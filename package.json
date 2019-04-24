@@ -1,6 +1,6 @@
 {
   "name": "@foxer360/backoffice",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Core application called BackOffice used to create website projects and manage content using Composer.",
   "repository": "git@github.com:Foxer-360/backoffice.git",
   "author": "Filip Suchý <nevim42@gmail.com>",
