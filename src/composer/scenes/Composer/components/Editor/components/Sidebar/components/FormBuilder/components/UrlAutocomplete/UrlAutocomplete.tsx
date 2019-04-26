@@ -98,28 +98,28 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
     });
   }
 
-  onFileSelected = ({ value: data }: LooseObject) => {
-    const baseUrl = 'http://foxer360-media-library.s3.eu-central-1.amazonaws.com/';
+    onFileSelected = ({ value: data }: LooseObject) => {
+      const baseUrl = 'http://foxer360-media-library.s3.eu-central-1.amazonaws.com/';
 
-    this.closeDrawer();
+      this.closeDrawer();
 
-    if (data && data.filename) {
-      let originalUrl = baseUrl + data.category + data.hash + '_' + data.filename;
+      if (data && data.filename) {
+        let originalUrl = baseUrl + data.category + data.hash + '_' + data.filename;
 
-      this.props.onChange({
-        target: {
-          name: this.props.name,
-          value: {
-            url: originalUrl,
-            mediaData: data,
-            urlNewWindow: this.props.value.urlNewWindow
+        this.props.onChange({
+          target: {
+            name: this.props.name,
+            value: {
+              url: originalUrl,
+              mediaData: data,
+              urlNewWindow: this.props.value && this.props.value.urlNewWindow
+            },
           },
-        },
-      });
-    } else {
-      return null;
+        });
+      } else {
+        return null;
+      }
     }
-  }
 
   public onClose = () => {
     this.setState({
@@ -128,9 +128,8 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
   }
 
   public closeDrawer = () => {
-    this.setState({
-      visible: false,
-    });
+    setTimeout(() => this.setState({ visible: false }), 1000);
+    
   }
 
   public showDrawer = (type: string) => {
@@ -165,15 +164,15 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
               {this.props.notitle && this.props.notitle === true ? null : <label>{this.props.label}</label>}
               {pagesUrls && pagesUrls.length > 0 && (
                 <div>
-                  {(!value || (value && !value.pageSourcedUrl)) && (
+                  {(!value || (value && !value.pageSourcedUrl)) && !this.state.visible && (
                     <>
                       <div className="url-autocomplete-input">
+                        {/** do not display autocomplete when there is visible drawer */}
                         <AutoComplete
                           dataSource={pagesUrls.map(source => source.url).filter(u => u !== '')}
                           filterOption={(inputValue, { props: { children } }: LooseObject) =>
                             children.toUpperCase().includes(inputValue.toUpperCase())}
                           defaultValue={pageUrlObj && pageUrlObj ? pageUrlObj.url : value && value.url}
-                          value={pageUrlObj && pageUrlObj ? pageUrlObj.url : value && value.url}
                           onSearch={newUrl => this.onChange({ url: newUrl }, pagesUrls)}
                           onSelect={newUrl => this.onChange({ url: newUrl }, pagesUrls)}
                           size="default"
@@ -203,32 +202,40 @@ class UrlAutocomplete extends React.Component<IUrlAutocomplete, IState> {
                       >
                         Open in New window
                       </Checkbox>
-                      <Drawer
-                        title="Media Library"
-                        placement="right"
-                        closable={true}
-                        onClose={this.onClose}
-                        visible={this.state.visible}
-                        width={500}
-                        destroyOnClose={true}
-                      >
-                        {this.state.drawerType === 'editor' ? (
-                          <UploadTabs
-                            onChange={this.onFileSelected}
-                            name={this.props.name}
-                            mediaData={pageUrlObj && pageUrlObj.mediaData}
-                            closeDrawer={this.closeDrawer}
-                          />
-                        ) : (
-                          <GalleryTabs 
-                            placeMedia={this.onFileSelected}
-                            name={this.props.name} 
-                            media={pageUrlObj && pageUrlObj.mediaData}
-                          />
-                        )}
-                      </Drawer>
                     </>
                   )}
+                  {this.state.visible &&
+                    <AutoComplete
+                      dataSource={pagesUrls.map(source => source.url).filter(u => u !== '')}
+                      filterOption={(inputValue, { props: { children } }: LooseObject) =>
+                        children.toUpperCase().includes(inputValue.toUpperCase())}
+                      size="default"
+                    />
+                  }
+                  {this.state.visible && <Drawer
+                    title="Media Library"
+                    placement="right"
+                    closable={true}
+                    onClose={this.onClose}
+                    visible={this.state.visible}
+                    width={500}
+                    destroyOnClose={true}
+                  >
+                    {this.state.drawerType === 'editor' ? (
+                      <UploadTabs
+                        onChange={this.onFileSelected}
+                        name={this.props.name}
+                        mediaData={pageUrlObj && pageUrlObj.mediaData}
+                        closeDrawer={this.closeDrawer}
+                      />
+                    ) : (
+                      <GalleryTabs 
+                        placeMedia={this.onFileSelected}
+                        name={this.props.name} 
+                        media={pageUrlObj && pageUrlObj.mediaData}
+                      />
+                    )}
+                  </Drawer>}
 
                   {pageSourceAvailable && (
                     <Checkbox
