@@ -67,7 +67,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
       console.log(
         `[GraphQL error]: Message: ${errorMessage}, Location: ${locations}, Path: ${path}`
       );
-      message.warning(errorMessage, 10);
+      // message.warning(errorMessage, 10);
 
     });
   }
