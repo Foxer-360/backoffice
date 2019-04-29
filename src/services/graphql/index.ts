@@ -46,7 +46,7 @@ let subscriptionsUrl = 'ws://localhost:5001/subscriptions';
     url = url.substr(0, -1);
   }
   url = `${url}:${port}/${path}`;
-  const regex = /^ws:.*$/gi;
+  const regex = /^wss?:.*$/gi;
   if (!regex.test(url)) {
     url = `ws://${url}`;
   }
