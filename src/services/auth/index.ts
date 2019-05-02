@@ -118,9 +118,12 @@ export async function setSession(
   silent: boolean = false
 ) {
   const idToken = (authResult && authResult.idToken) || getParameterByName(ID_TOKEN_KEY);
-  const expiresAt: Date = getTokenExpirationDate(idToken);
+  const accessToken = (authResult && authResult.accessToken) || getParameterByName(ACCESS_TOKEN_KEY);
+
+  const expiresAt: Date = getTokenExpirationDate(accessToken);
+
   localStorage.setItem(ID_TOKEN_KEY, idToken);
-  localStorage.setItem(ACCESS_TOKEN_KEY, (authResult && authResult.accessToken) || getParameterByName(ACCESS_TOKEN_KEY));
+  localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
 
   // tslint:disable-next-line:no-any
   const expiresIn: any = (authResult && authResult.expiresIn) || (expiresAt.getTime() - new Date().getTime());
