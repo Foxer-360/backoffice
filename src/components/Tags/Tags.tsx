@@ -141,7 +141,6 @@ class Tags extends Component<Properties, State> {
                 {data.tags &&
                   data.tags
                     .filter(({ pages }) => this.isTagSelected(pages, pageId))
-                    .slice(0, this.state.itemsToShow)
                     .map(({ color, name, pages, id: tagId }, key) => {
                       return (
                         <Tag

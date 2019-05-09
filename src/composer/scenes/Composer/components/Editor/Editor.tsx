@@ -154,7 +154,7 @@ class Editor extends React.Component<IProperties, IState> {
                     </span>
                   )}
                   {pageId && (
-                    <div style={{ marginTop: 12 }}>
+                    <div style={{ marginTop: 12, whiteSpace: 'pre-wrap' }}>
                       <Tags pageId={pageId} />
                     </div>
                   )}
