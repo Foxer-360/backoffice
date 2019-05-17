@@ -154,7 +154,7 @@ class StructureList extends Component<Properties, State> {
     searchedText: null,
   };
   private readonly COLUMNS = [
-    { title: 'Name', dataIndex: 'name', key: 'name', width: 400,
+    { title: 'Name', dataIndex: 'name', key: 'name', width: 550,
       render: (name, row) => {
         return (
           <div style={{ display: 'inline-block' }}>
