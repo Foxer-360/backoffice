@@ -94,6 +94,11 @@ const ListRenderItem = (
 );
 
 class Tasks extends Component<Properties, State> {
+  private RESET_FORM = {
+    name: '',
+    description: '',
+  };
+
   private RESET_STATE = {
     showFinished: false,
     unfinishedFirst: false,
@@ -103,11 +108,6 @@ class Tasks extends Component<Properties, State> {
       ...this.RESET_FORM,
     },
   } as State;
-
-  private RESET_FORM = {
-    name: '',
-    description: '',
-  };
 
   constructor(props: Properties) {
     super(props);
