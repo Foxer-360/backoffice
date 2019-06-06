@@ -63,13 +63,14 @@ const GET_PAGE = gql`
 
 const ComposedQuery = adopt({
   pageData: ({ render, variables: { pageId, languageCode } }) => <Query query={GET_PAGE} variables={{ pageId, languageCode }}>{page => render(page)}</Query>,
-  updatePageTranslation: ({ render, variables: { pageId } }) => (
+  updatePageTranslation: ({ render, variables: { pageId, languageCode } }) => (
     <Mutation
       mutation={UPDATE_PAGE_TRANSLATION}
-      update={(cache, { data: { updatePageTranslationName } }) => {
+      update={(cache, { data: { updatePageTranslation } }) => {
         const { page } = cache.readQuery({ 
           query: GET_PAGE,
           variables: {
+            languageCode,
             pageId
           } 
         });
@@ -77,26 +78,27 @@ const ComposedQuery = adopt({
         const updatedPage = { 
           ...page, 
           translations: page.translations.map((translation) => {
-            if (translation.id === updatePageTranslationName.id ) {
-              return updatePageTranslationName;
+            if (translation.id === updatePageTranslation.id ) {
+              return updatePageTranslation;
             } else {
               return translation;
             }
           })
         };
-
+        
         cache.writeQuery({
           query: GET_PAGE,
           data: {
             page: updatedPage
           },
           variables: {
-            pageId
+            pageId,
+            languageCode
           }
         });
       }}
     >
-      {updatePageTranslationName => render(updatePageTranslationName)}
+      {updatePageTranslation => render(updatePageTranslation)}
     </Mutation>
   )
 });
@@ -123,8 +125,9 @@ class TranslationTextManager extends Component<Properties, State> {
     };
   }
 
-  showModal = () => {
+  showModal = (translation: LooseObject) => {
     this.setState({
+      translation,
       editingMode: true,
     });
   }
@@ -143,7 +146,6 @@ class TranslationTextManager extends Component<Properties, State> {
 
   render(): JSX.Element {
     const { pageId, language } = this.props;
-    const { editingMode } = this.state;
 
     return (
       <ComposedQuery variables={{ pageId, languageCode: language.code }}>
@@ -165,7 +167,7 @@ class TranslationTextManager extends Component<Properties, State> {
               type={'default'}
               icon={'edit'}
               size={'small'}
-              onClick={this.showModal}
+              onClick={() => this.showModal(translation)}
             />
             <Modal
               title="Update Page Info"
@@ -219,11 +221,12 @@ class TranslationTextManager extends Component<Properties, State> {
           size={'default'}
           defaultValue={translation.name}
           prefix={<Icon type="bold" style={{ color: 'rgba(0,0,0,.25)' }} />}
-          onChange={({ target: { value: newName }}) => {
+          onChange={({ target: { value: name }}) => {
             this.setState({
+              ...this.state,
               translation: {
-                ...translation,
-                name: newName
+                ...this.state.translation,
+                name
               }
             });
           }}
@@ -238,11 +241,12 @@ class TranslationTextManager extends Component<Properties, State> {
           size={'default'}
           defaultValue={translation.url}
           prefix={<Icon type="link" style={{ color: 'rgba(0,0,0,.25)' }} />}
-          onChange={({ target: { value: newUrl }}) => {
+          onChange={({ target: { value: url }}) => {
             this.setState({
+              ...this.state,
               translation: {
-                ...translation,
-                url: newUrl
+                ...this.state.translation,
+                url
               }
             });
           }}
@@ -252,11 +256,12 @@ class TranslationTextManager extends Component<Properties, State> {
         <TextArea
           placeholder="Description"
           defaultValue={translation.description}
-          onChange={({ target: { value: newDescription }}) => {
+          onChange={({ target: { value: description }}) => {
             this.setState({
+              ...this.state,
               translation: {
-                ...translation,
-                description: newDescription
+                ...this.state.translation,
+                description
               }
             });
           }}
