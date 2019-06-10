@@ -134,6 +134,7 @@ class ModalWindow extends Component<Properties, State> {
             componentService={ComponentsModule}
             pluginService={PluginsModule}
             onSave={this.handleCloseEditor}
+            componentTemplates={[]}
             layouts={true}
             ref={node => {
               this.composer = node;
