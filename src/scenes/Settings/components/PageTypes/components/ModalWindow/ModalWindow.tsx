@@ -6,8 +6,54 @@ import { Context, IComponentObject } from '@source/composer';
 import { ComponentsModule, PluginsModule } from '@source/services/modules';
 import pluginsService from '@source/services/plugins';
 import { IContent } from '@foxer360/delta';
+import gql from 'graphql-tag';
+import { Query } from 'react-apollo';
+import { adopt } from 'react-adopt';
+import { queries } from '@source/services/graphql';
+import ComponentTemplate from '@source/scenes/Editor/components/ComponentTemplate';
 
 const { Component } = React;
+
+const COMPONENT_TEMPLATE_QUERY = gql`
+query componentTemplates(
+  $websiteId: ID!,
+  $languageId: ID!
+){
+  componentTemplates(where: {
+    website: { id: $websiteId },
+    language: { id: $languageId }
+  }) {
+    id,
+    name,
+    type,
+    content,
+  }
+}
+`;
+
+const TemplatesQuery = adopt({
+  website: ({ render }) => (
+    <Query query={queries.LOCAL_SELECTED_WEBSITE}>
+      {({ data: { website } }) => {
+        return render(website);
+      }}
+    </Query>
+  ),
+  language: ({ render }) => (
+    <Query query={queries.LOCAL_SELECTED_LANGUAGE}>
+      {({ data: { language } }) => {
+        return render(language);
+      }}
+    </Query>
+  ),
+  templates: ({ render, website, language }) => (
+    <Query query={COMPONENT_TEMPLATE_QUERY} variables={{ websiteId: website, languageId: language }}>
+      {({ data: { componentTemplates } }) => {
+        return render(componentTemplates);
+      }}
+    </Query>
+  ),
+});
 
 export interface Properties {
   data?: LooseObject;
@@ -23,6 +69,11 @@ export interface State {
   content: IContent;
 
   editorVisible: boolean;
+
+  componentTemplate: {
+    action: 'edit' | 'use' | null;
+    id: number;
+  };
 }
 
 class ModalWindow extends Component<Properties, State> {
@@ -32,6 +83,10 @@ class ModalWindow extends Component<Properties, State> {
     plugins: [],
     content: null,
     editorVisible: false,
+    componentTemplate: {
+      action: null,
+      id: null,
+    }
   } as State;
 
   private composer: Composer;
@@ -120,33 +175,50 @@ class ModalWindow extends Component<Properties, State> {
           </Row>
         </Modal>
 
-        <Modal
-          visible={this.state.editorVisible}
-          onCancel={this.handleCloseEditor}
-          onOk={this.handleCloseEditor}
-          width={1280}
-          closable={false}
-          footer={null}
-          style={{ top: '20px' }}
-          maskClosable={false}
-        >
-          <Composer
-            componentService={ComponentsModule}
-            pluginService={PluginsModule}
-            onSave={this.handleCloseEditor}
-            componentTemplates={[]}
-            layouts={true}
-            ref={node => {
-              this.composer = node;
-              if (this.composer) {
-                if (this.state.content) {
-                  this.composer.setContent(this.state.content);
-                }
-              }
-            }}
-            context={new Context()}
-          />
-        </Modal>
+        <TemplatesQuery>
+          {(data) => (<>
+            <Modal
+              visible={this.state.editorVisible}
+              onCancel={this.handleCloseEditor}
+              onOk={this.handleCloseEditor}
+              width={1280}
+              closable={false}
+              footer={null}
+              style={{ top: '20px' }}
+              maskClosable={false}
+            >
+              <Composer
+                componentService={ComponentsModule}
+                pluginService={PluginsModule}
+                onSave={this.handleCloseEditor}
+                componentTemplates={data.templates}
+                onHandleTemplateSave={(id: number) => this.setState({ componentTemplate: { id, action: 'edit' }})}
+                onHandleTemplateUse={(id: number) => this.setState({ componentTemplate: { id, action: 'use' }})}
+                layouts={true}
+                ref={node => {
+                  this.composer = node;
+                  if (this.composer) {
+                    if (this.state.content) {
+                      this.composer.setContent(this.state.content);
+                    }
+                  }
+                }}
+                context={new Context()}
+              />
+            </Modal>
+
+            {this.composer && <ComponentTemplate
+              componentId={this.state.componentTemplate.id}
+              action={this.state.componentTemplate.action}
+              close={() => this.setState({ componentTemplate: { id: null, action: null }})}
+              composer={this.composer}
+              templates={data.templates}
+              page={null}
+              language={data.language}
+              website={data.website}
+            />}
+          </>)}
+        </TemplatesQuery>
       </>
     );
   }
